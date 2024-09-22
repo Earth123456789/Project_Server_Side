@@ -71,7 +71,7 @@ class Ticket(models.Model):
 
 
     def __str__(self):
-        return f"Ticket for {self.event_participant.user.username} - {self.event_participant.event.event_name}"
+        return f"Ticket for {self.event_participant.user.username} - {self.event_participant.event }"
 
 
 

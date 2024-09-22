@@ -1,0 +1,6 @@
+{% load static %}
+<div class="slider">
+    {% for event in slider_events %}
+        <img src="{{ event.image.url }}" alt="Event Image" >
+    {% endfor %}
+</div>

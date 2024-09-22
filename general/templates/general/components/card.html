@@ -1,0 +1,25 @@
+{% load custom_filters %}
+
+<a href="#">
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-24 ">
+        {% for event in events %}
+        <div class="max-w-sm bg-white rounded-lg flex flex-col items-center">
+            <img class="rounded-lg object-cover" style="width: 375px; height: 375px;" src="{{ event.image.url }}"
+                alt="{{ event.name }}" />
+            <div class="pt-5 w-full text-left">
+                <!-- เรียก function ผ่าน custom_filters (template ที่สร้างขึ้นมา) -->
+                <p class="font-semibold" style="color: red;">{{ event.start_date|custom_date:event.end_date }}</p>
+                <h5 class="mb-4 mt-2 text-2xl font-bold tracking-tight text-gray-900 dark:text-white">{{ event.name|truncatewords:10 }}</h5>
+                <div class="flex">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="grey"
+                        class="bi bi-geo-alt-fill" viewBox="0 0 16 16">
+                        <path d="M8 16s6-5.686 6-10A6 6 0 0 0 2 6c0 4.314 6 10 6 10m0-7a3 3 0 1 1 0-6 3 3 0 0 1 0 6" />
+                    </svg>
+                    <!-- truncatewords:5  ใช้เพื่อจำกัดคำให้ออกมาแค่ 5 คำที่เป็น .. -->
+                    <p class="text-gray-500 ml-4">{{ event.location.name|truncatewords:5 }}</p>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</a>
