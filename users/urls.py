@@ -1,11 +1,11 @@
 from django.urls import path
-from general.views import HomepageView
+from users.views import RegisterView
 from django.conf import settings
 from django.conf.urls.static import static
 
 
 urlpatterns = [
-    path("", HomepageView.as_view(), name="homepage"),
+    path("register/", RegisterView.as_view(), name="register"),
 ] 
 
 # ตั้งค่าเพื่อให้ใช้ รูปที่มาจาก media (imagefiled) ได้

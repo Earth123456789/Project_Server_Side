@@ -1,0 +1,28 @@
+body {
+    position: relative; /* ให้ body มีตำแหน่ง relative */
+    /* overflow: hidden; */ /* เอาออกเพื่อให้เลื่อนได้ */
+    margin: 0; /* เอา margin ออก */
+    padding: 0; /* เอา padding ออก */
+}
+
+body::before {
+    content: "";
+    background-image: url('../pic/concert.jpg'); /* ระบุที่อยู่ของรูป */
+    background-size: cover; /* ปรับให้เต็มพื้นที่ */
+    background-position: center; /* จัดกึ่งกลาง */ 
+    position: fixed; /* ทำให้พื้นหลังอยู่คงที่ */
+    width: 100%;
+    height: 100%;
+    z-index: -1; /* วางเบื้องหลัง */
+    opacity: 0.8;
+}
+
+.container {
+    position: relative; /* ทำให้เนื้อหาอยู่บนพื้นหลัง */
+    padding: 20px;
+    background-color: rgba(255, 255, 255, 0.8); /* สีพื้นหลังเนื้อหา */
+    border-radius: 10px; /* ทำให้มุมโค้ง */
+    z-index: 1; /* ให้อยู่ข้างหน้า */
+    max-height: 100vh; /* จำกัดความสูงของ container */
+    overflow-y: auto; /* ให้สามารถเลื่อนในแนวตั้ง */
+}

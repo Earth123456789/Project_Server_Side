@@ -1,0 +1,75 @@
+{% extends "general/components/layout.html" %}
+{% load static %}
+{% block title %}{% endblock %}
+{% block content %}
+<link rel="stylesheet" href="{% static 'users/css/style.css' %}">
+
+<div class="flex items-center justify-end mr-48">
+    <div class="bg-white rounded-lg shadow-lg p-6 max-w-sm w-full">
+        <form method="POST" enctype="multipart/form-data">
+            {% csrf_token %}
+            {{ form.non_field_errors }}
+            <!-- User Information -->
+            <h2 class="text-3xl font-bold mb-4">สมัครสมาชิก</h2>
+            <div class="mb-4">
+                <label for="{{ form.username.id_for_label }}">ชื่อผู้ใช้:</label>
+                {{ form.username }}
+                {{ form.username.errors }}
+            </div>
+            <div class="mb-4">
+                <label for="{{ form.email.id_for_label }}">อีเมล:</label>
+                {{ form.email }}
+                {{ form.email.errors }}
+            </div>
+            <div class="mb-4">
+                <label for="{{ form.password.id_for_label }}">รหัสผ่าน:</label>
+                {{ form.password }}
+                {{ form.password.errors }}
+            </div>
+            <div class="mb-4">
+                <label for="{{ form.confirm_password.id_for_label }}">ยืนยันรหัสผ่าน:</label>
+                {{ form.confirm_password }}
+                {{ form.confirm_password.errors }}
+            </div>
+            <div class="mb-4">
+                <label for="{{ form.first_name.id_for_label }}">ชื่อจริง:</label>
+                {{ form.first_name }}
+                {{ form.first_name.errors }}
+            </div>
+            <div class="mb-4">
+                <label for="{{ form.last_name.id_for_label }}">นามสกุล:</label>
+                {{ form.last_name }}
+                {{ form.last_name.errors }}
+            </div>
+            <!-- User Information -->
+            <div class="mb-3">
+                <label for="{{ form.gender.id_for_label }}">เพศ:</label>
+                {{ form.gender }}
+                {{ form.gender.errors }}
+            </div>
+            <div class="mb-4">
+                <label for="{{ form.telephone.id_for_label }}">หมายเลขโทรศัพท์:</label>
+                {{ form.telephone }}
+                {{ form.telephone.errors }}
+            </div>
+            <div class="mb-4">
+                <label for="{{ form.date_of_birth.id_for_label }}">วันเกิด:</label>
+                {{ form.date_of_birth }}
+                {{ form.date_of_birth.errors }}
+            </div>
+            <div class="mb-4">
+                {{ form.agree_terms }}
+                <label for="{{ form.agree_terms.id_for_label }}" class="ml-2">ฉันยอมรับข้อตกลงของเว็บไซต์ Ticket
+                    Bever</label>
+                {{ form.agree_terms.errors }}
+            </div>
+
+            <!-- Submit Button -->
+            <button type="submit"
+                class="w-full bg-green-500 hover:bg-green-700 text-white font-bold py-2 rounded">สมัครสมาชิก</button>
+        </form>
+        <!-- Login เสร็จมาใส่ -->
+        <h1>เป็นสมาชิกแล้ว? เข้าสู่ระบบ</h1>
+    </div>
+</div>
+{% endblock %}

@@ -13,16 +13,22 @@ class HomepageView(View):
 
         # เกี่ยว session
         if category_name:
+            # card.html + homepage.html
             events = Event.objects.filter(category__name=category_name)
         else:
+            # card.html
             events = Event.objects.all()
 
         # ไม่เกี่ยวกับ session ดึง DB ธรรมดา
-        # ดึง Event ที่มีผู้ติดตามมากที่สุด โดยดึงผ่าน related_name='followers' 
+
+        # ดึง Event ที่มีผู้ติดตามมากที่สุด โดยดึงผ่าน related_name='followers'  
+        # cardfollowers.html
         most_followed_event = Event.objects.annotate(num_followers = Count('followers')).order_by('-num_followers')[:3]
 
+        # silder.html
         slider_events = Event.objects.all()[:5]
 
+        # homepage.html
         categories = Category.objects.all()
 
         context = {
