@@ -36,7 +36,7 @@ class HomepageView(View):
         return render(request, 'general/homepage.html', context)
     
     def post(self, request):
-
+        
         # เก็บหมวดหมู่ใน session แล้ว redirect กลับไปที่หน้าเดิม
         category_name = request.POST.get('category')
         request.session['category'] = category_name
