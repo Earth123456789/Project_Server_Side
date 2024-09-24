@@ -146,6 +146,11 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 AUTH_USER_MODEL = "users.User"
 
+AUTHENTICATION_BACKENDS = [
+    'django.contrib.auth.backends.ModelBackend',  # Backend พื้นฐานที่ใช้ username และ password
+    'users.backends.UsernameOrEmailBackend',        # Custom backend ที่ใช้ username หรือ email
+]
+
 
 
 

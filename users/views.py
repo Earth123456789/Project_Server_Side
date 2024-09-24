@@ -1,9 +1,10 @@
+# users/views.py 
 from django.shortcuts import render, redirect
 from django.views import View
-from users.forms import UserRegistrationForm
+from users.forms import UserRegistrationForm, UserLoginForm
 from django.db import transaction
 from users.models import UserProfile
-
+from django.contrib.auth import logout, login
 
 # Create your views here.
 class RegisterView(View):
@@ -35,4 +36,19 @@ class RegisterView(View):
         return render(request, 'registration/register.html', {'form': form})
     
 
-
+class LoginView(View):
+    
+    def get(self, request):
+        form = UserLoginForm()
+        return render(request, 'registration/login.html', {"form": form})
+    
+    def post(self, request):
+        form = UserLoginForm(data=request.POST)
+        if form.is_valid():
+            # backends.py (มีการแก้เพิ่ม)
+            user = form.get_user() 
+            # login + สร้าง session
+            login(request,user)
+            return redirect('homepage')  
+        print(form.errors)
+        return render(request,'registration/login.html', {"form":form})

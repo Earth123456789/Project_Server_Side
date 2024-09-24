@@ -1,3 +1,4 @@
+# users/forms.py
 from django import forms
 from users.models import User
 from django.forms import ModelForm
@@ -5,6 +6,7 @@ from django.core.exceptions import ValidationError
 from django.utils import timezone
 from datetime import timedelta
 from django.core.validators import RegexValidator
+from django.contrib.auth.forms import AuthenticationForm
 
 class UserRegistrationForm(ModelForm):
 
@@ -15,7 +17,7 @@ class UserRegistrationForm(ModelForm):
     )
 
     password = forms.CharField(
-        widget=forms.PasswordInput(attrs={'class': 'bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500', 
+        widget=forms.PasswordInput(attrs={'class': 'bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 kanit-small', 
                                           'placeholder': 'กรอกรหัสผ่าน'})
     )
 
@@ -23,12 +25,12 @@ class UserRegistrationForm(ModelForm):
         required=True,
         label="ฉันยอมรับข้อตกลงของเว็บไซต์ Ticket Bever",
         error_messages={'required': 'กรุณายอมรับข้อตกลง'},
-        widget=forms.CheckboxInput(attrs={'class': 'w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600'})
+        widget=forms.CheckboxInput(attrs={'class': 'w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600 kanit-small'})
     )
 
     confirm_password = forms.CharField(
         widget=forms.PasswordInput(attrs={
-            'class': 'bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500', 
+            'class': 'bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 kanit-small', 
             'placeholder': 'กรอกรหัสผ่านยีนยัน'
         })
     )
@@ -41,7 +43,7 @@ class UserRegistrationForm(ModelForm):
             ('O', 'อื่นๆ')
         ],
         widget=forms.Select(attrs={
-            'class': 'bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5'
+            'class': 'bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 kanit-small'
         })  
     )
 
@@ -49,13 +51,13 @@ class UserRegistrationForm(ModelForm):
         max_length=15,
         validators=[phone_validator],  
         widget=forms.TextInput(attrs={
-            'class': 'bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500', 
+            'class': 'bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 kanit-small', 
             'placeholder': '0812345678'  
         })
     )
 
     date_of_birth = forms.DateField(
-        widget=forms.DateInput(attrs={'type': 'date', 'class': 'border border-gray-300 rounded-md p-2 w-full', 'placeholder': 'วันเกิด'})
+        widget=forms.DateInput(attrs={'type': 'date', 'class': 'border border-gray-300 rounded-md p-2 w-full kanit-small', 'placeholder': 'วันเกิด'})
     )
 
     class Meta:
@@ -110,7 +112,23 @@ class UserRegistrationForm(ModelForm):
         return confirm_password
 
 
-    
+
+
+class UserLoginForm(AuthenticationForm):
+    username = forms.CharField(
+        label='ชื่อผู้ใช้หรืออีเมล',
+        widget=forms.TextInput(attrs={
+            'class': 'bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500',  # เพิ่ม class สำหรับตกแต่ง
+            'placeholder': 'กรุณากรอกชื่อผู้ใช้หรืออีเมล'
+        })
+    )
+    password = forms.CharField(
+        label='รหัสผ่าน',
+        widget=forms.PasswordInput(attrs={
+            'class': 'bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500',  # เพิ่ม class สำหรับตกแต่ง
+            'placeholder': 'กรุณากรอกรหัสผ่าน'
+        })
+    )    
         
     
 

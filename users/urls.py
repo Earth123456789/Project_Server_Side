@@ -1,10 +1,12 @@
+# users/url.py
 from django.urls import path
-from users.views import RegisterView
+from users.views import RegisterView, LoginView
 from django.conf import settings
 from django.conf.urls.static import static
 
 
 urlpatterns = [
+    path('', LoginView.as_view(), name="login"),
     path("register/", RegisterView.as_view(), name="register"),
 ] 
 

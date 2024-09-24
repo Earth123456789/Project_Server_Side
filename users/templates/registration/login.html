@@ -1,0 +1,34 @@
+{% extends "general/components/layout.html" %}
+{% load static %}
+{% load custom_filters %}
+{% block title %}เข้าสู่ระบบ - {% endblock %}
+{% block content %}
+<link rel="stylesheet" href="{% static 'users/css/style.css' %}">
+
+<div class="flex items-center justify-end mr-48">
+    <div class="bg-white rounded-lg shadow-lg p-6 max-w-sm w-full mt-8">
+        <form method="POST">
+            {% csrf_token %}
+            <!-- ระดับ form -->
+            <div class="text-red-700 kanit-small mb-4">
+                {{ form.non_field_errors.as_text }}
+            </div>
+            <h2 class="text-3xl font-bold mb-4 kanit-black">เข้าสู่ระบบ</h2>
+            <div class="mb-4">
+                <label for="{{ form.username.id_for_label }}" class="kanit-small">ชื่อผู้ใช้หรืออีเมล:</label>
+                {{ form.username }}
+            </div>
+            <div class="mb-4">
+                <label for="{{ form.password.id_for_label }}" class="kanit-small">รหัสผ่าน:</label>
+                {{ form.password }}
+            </div>
+            <button type="submit"
+                class="w-full bg-green-500 hover:bg-green-700 text-white font-bold py-2 rounded kanit-small">เข้าสู่ระบบ</button>
+        </form>
+        <div class="flex justify-center text-center mt-4">
+            <h1 class="kanit-small">ยังไม่ได้เป็นสมาชิก? <a href="{% url 'register' %}"
+                    class="text-blue-500 underline">สมัครสมาชิก</a></h1>
+        </div>
+    </div>
+</div>
+{% endblock %}
