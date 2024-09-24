@@ -26,3 +26,11 @@ body::before {
     max-height: 100vh; /* จำกัดความสูงของ container */
     overflow-y: auto; /* ให้สามารถเลื่อนในแนวตั้ง */
 }
+
+.errorlist {
+    color: red; /* เปลี่ยนสีข้อความของข้อผิดพลาดทั้งหมด */
+}
+
+.field-error {
+    color: red; /* เปลี่ยนสีข้อความข้อผิดพลาดของฟิลด์ */
+}

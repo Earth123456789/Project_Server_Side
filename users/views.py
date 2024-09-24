@@ -4,6 +4,7 @@ from users.forms import UserRegistrationForm
 from django.db import transaction
 from users.models import UserProfile
 
+
 # Create your views here.
 class RegisterView(View):
     def get(self, request):
@@ -29,7 +30,9 @@ class RegisterView(View):
             )
             user_profile.save()
 
-            # login เสร็จเปลี่ยนด้วย
-            return redirect('homepage')
+            return redirect('login')
 
         return render(request, 'registration/register.html', {'form': form})
+    
+
+

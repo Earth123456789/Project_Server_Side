@@ -1,6 +1,6 @@
 {% extends "general/components/layout.html" %}
 {% load static %}
-{% block title %}{% endblock %}
+{% block title %}ลงทะเบียนผู้ใช้งาน - {% endblock %} 
 {% block content %}
 <link rel="stylesheet" href="{% static 'users/css/style.css' %}">
 
@@ -8,61 +8,80 @@
     <div class="bg-white rounded-lg shadow-lg p-6 max-w-sm w-full">
         <form method="POST" enctype="multipart/form-data">
             {% csrf_token %}
-            {{ form.non_field_errors }}
             <!-- User Information -->
             <h2 class="text-3xl font-bold mb-4">สมัครสมาชิก</h2>
             <div class="mb-4">
                 <label for="{{ form.username.id_for_label }}">ชื่อผู้ใช้:</label>
                 {{ form.username }}
-                {{ form.username.errors }}
+                {% if form.username.errors %}
+                    <div class="text-red-700">{{ form.username.errors.as_text }}</div>
+                {% endif %}
             </div>
             <div class="mb-4">
                 <label for="{{ form.email.id_for_label }}">อีเมล:</label>
                 {{ form.email }}
-                {{ form.email.errors }}
+                {% if form.email.errors %}
+                    <div class="text-red-700">{{ form.email.errors.as_text }}</div>
+                {% endif %}
             </div>
             <div class="mb-4">
                 <label for="{{ form.password.id_for_label }}">รหัสผ่าน:</label>
                 {{ form.password }}
-                {{ form.password.errors }}
+                {% if form.password.errors %}
+                    <div class="text-red-700">{{ form.password.errors.as_text }}</div>
+                {% endif %}
             </div>
             <div class="mb-4">
                 <label for="{{ form.confirm_password.id_for_label }}">ยืนยันรหัสผ่าน:</label>
                 {{ form.confirm_password }}
-                {{ form.confirm_password.errors }}
+                {% if form.confirm_password.errors %}
+                    <div class="text-red-700">{{ form.confirm_password.errors.as_text }}</div>
+                {% endif %}
             </div>
             <div class="mb-4">
                 <label for="{{ form.first_name.id_for_label }}">ชื่อจริง:</label>
                 {{ form.first_name }}
-                {{ form.first_name.errors }}
+                {% if form.first_name.errors %}
+                    <div class="text-red-700">{{ form.first_name.errors.as_text }}</div>
+                {% endif %}
             </div>
             <div class="mb-4">
                 <label for="{{ form.last_name.id_for_label }}">นามสกุล:</label>
                 {{ form.last_name }}
-                {{ form.last_name.errors }}
+                {% if form.last_name.errors %}
+                    <div class="text-red-700">{{ form.last_name.errors.as_text }}</div>
+                {% endif %}
             </div>
-            <!-- User Information -->
+            <!-- UserProfile Information -->
             <div class="mb-3">
                 <label for="{{ form.gender.id_for_label }}">เพศ:</label>
                 {{ form.gender }}
-                {{ form.gender.errors }}
+                {% if form.gender.errors %}
+                    <div class="text-red-700">{{ form.gender.errors.as_text }}</div>
+                {% endif %}
             </div>
             <div class="mb-4">
                 <label for="{{ form.telephone.id_for_label }}">หมายเลขโทรศัพท์:</label>
                 {{ form.telephone }}
-                {{ form.telephone.errors }}
+                {% if form.telephone.errors %}
+                    <div class="text-red-700">{{ form.telephone.errors.as_text }}</div>
+                {% endif %}
             </div>
             <div class="mb-4">
                 <label for="{{ form.date_of_birth.id_for_label }}">วันเกิด:</label>
                 {{ form.date_of_birth }}
-                {{ form.date_of_birth.errors }}
+                {% if form.date_of_birth.errors %}
+                    <div class="text-red-700">{{ form.date_of_birth.errors.as_text }}</div>
+                {% endif %}
             </div>
             <div class="mb-4">
                 {{ form.agree_terms }}
-                <label for="{{ form.agree_terms.id_for_label }}" class="ml-2">ฉันยอมรับข้อตกลงของเว็บไซต์ Ticket
-                    Bever</label>
-                {{ form.agree_terms.errors }}
+                <label for="{{ form.agree_terms.id_for_label }}" class="ml-2">ฉันยอมรับข้อตกลงของเว็บไซต์ Ticket Bever</label>
+                {% if form.agree_terms.errors %}
+                    <div class="text-red-700">{{ form.agree_terms.errors.as_text }}</div>
+                {% endif %}
             </div>
+
 
             <!-- Submit Button -->
             <button type="submit"

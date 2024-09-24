@@ -55,8 +55,7 @@
         <div class="mt-24">
             <div class="ml-36">
                 <h1 class="text-3xl font-extrabold mb-8">อีเว้นต์ทั้งหมด</h1>
-                <form method="post">
-                    {% csrf_token %}
+                <form method="get">
                     <button
                         type="submit"
                         name="category"
@@ -65,7 +64,7 @@
                         <span class="relative px-5 py-2.5 transition-all ease-in duration-75 bg-white dark:bg-gray-900 rounded-md group-hover:bg-opacity-0">
                             ทั้งหมด
                         </span>
-                    </button><!-- ปุ่มสำหรับแสดงอีเว้นต์ทั้งหมด -->    
+                    </button><!-- Button for showing all events -->    
                     {% for category in categories %}
                     <button
                         type="submit"

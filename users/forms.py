@@ -4,8 +4,15 @@ from django.forms import ModelForm
 from django.core.exceptions import ValidationError
 from django.utils import timezone
 from datetime import timedelta
+from django.core.validators import RegexValidator
 
 class UserRegistrationForm(ModelForm):
+
+    # สร้างรูปแบบการค้นหา
+    phone_validator = RegexValidator(
+        regex=r'^(0[0-9]{1})[0-9]{8}$',  # รูปแบบสำหรับหมายเลขมือถือไทย  ^: เริ่มต้น  0: ตัวแรกต้องเป็น 0 [0-9]{1}: หลังจาก 0 ต้องมี 0-9 เพียงหนึ่งหลัก [0-9]{8}: หมายถึงจะต้องมีตัวเลขอีก 8 หลักตามหลัง รวมกันแล้วจะต้องเป็นหมายเลขโทรศัพท์ทั้งหมด 10 หลัก $:จุดสิ้นสุด
+        message="หมายเลขโทรศัพท์ต้องเป็นหมายเลขโทรศัพท์มือถือที่ถูกต้อง เช่น 0812345678."
+    )
 
     password = forms.CharField(
         widget=forms.PasswordInput(attrs={'class': 'bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500', 
@@ -28,7 +35,7 @@ class UserRegistrationForm(ModelForm):
     
     gender = forms.ChoiceField(
         choices=[
-            (None, 'กรุราเลือกเพศ'),
+            (None, 'กรุณาเลือกเพศ'),
             ('M', 'ชาย'),
             ('F', 'หญิง'),
             ('O', 'อื่นๆ')
@@ -38,11 +45,14 @@ class UserRegistrationForm(ModelForm):
         })  
     )
 
-    telephone = forms.CharField(max_length=15, 
-                                widget=forms.TextInput(attrs={
-                                    'class': 'bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500', 
-                                    'placeholder': '081 234 5678'
-                                }))
+    telephone = forms.CharField(
+        max_length=15,
+        validators=[phone_validator],  
+        widget=forms.TextInput(attrs={
+            'class': 'bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500', 
+            'placeholder': '0812345678'  
+        })
+    )
 
     date_of_birth = forms.DateField(
         widget=forms.DateInput(attrs={'type': 'date', 'class': 'border border-gray-300 rounded-md p-2 w-full', 'placeholder': 'วันเกิด'})
@@ -81,23 +91,25 @@ class UserRegistrationForm(ModelForm):
                 raise ValidationError("คุณต้องมีอายุมากกว่า 10 ปีในการลงทะเบียนเข้าใช้ระบบนี้")
         return date_of_birth
     
-    # ตรวจระดับ form
-    def clean(self):
-        cleaned_data = super().clean()
-        password = cleaned_data.get("password")
-        confirm_password = cleaned_data.get("confirm_password")
-
+    # ตรวจระดับ field
+    def clean_password(self):
+        password = self.cleaned_data.get("password")
         # ตรวจสอบความยาวของรหัสผ่าน
-        if password:
-            if len(password) <= 9:
-                raise ValidationError("รหัสผ่านต้องมีความยาวมากกว่า 9 ตัวอักษร")
-            
+        if password and len(password) <= 9:
+            raise ValidationError("รหัสผ่านต้องมีความยาวมากกว่า 9 ตัวอักษร")
+        return password
+
+    def clean_confirm_password(self):
+        confirm_password = self.cleaned_data.get("confirm_password")
+        password = self.cleaned_data.get("password")
+
         # ตรวจสอบว่าตรงกับรหัสยืนยันไหม
         if password and confirm_password and password != confirm_password:
             raise ValidationError("รหัสผ่านและยืนยันรหัสผ่านต้องตรงกัน")
-
-        return cleaned_data
         
+        return confirm_password
+
+
     
         
     

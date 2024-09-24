@@ -6,6 +6,7 @@ class User(AbstractUser):
     email = models.EmailField(unique=True)
     followed_events = models.ManyToManyField('organizers.Event', related_name='followers', blank=True)
 
+
     # ทำให้เห็นใน หน้า admin
     def __str__(self):
         return self.username
