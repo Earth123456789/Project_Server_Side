@@ -173,7 +173,8 @@ SOCIALACCOUNT_PROVIDERS = {
         'SCOPE': [
             'profile',
             'email',
-        ]
+        ],
+        
     }
 }
 

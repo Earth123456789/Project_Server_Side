@@ -30,7 +30,13 @@
             <h1 class="kanit-small">ยังไม่ได้เป็นสมาชิก? <a href="{% url 'register' %}"
                     class="text-blue-500 underline">สมัครสมาชิก</a></h1>
         </div>
-    
+
+        <div class="flex justify-center text-center mt-4">
+            <hr class="my-4">
+            <p class="kanit-small">หรือ</p>
+            <hr class="my-4">
+        </div>
+        
         <div class="flex justify-center text-center mt-4">
             <a href="{% provider_login_url 'google' %}">
                 <button

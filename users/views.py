@@ -49,6 +49,13 @@ class LoginView(View):
             user = form.get_user() 
             # login + สร้าง session
             login(request,user)
+            
             return redirect('homepage')  
         print(form.errors)
         return render(request,'registration/login.html', {"form":form})
+
+class LogoutView(View):
+    
+    def get(self, request):
+        logout(request)
+        return redirect('homepage')
