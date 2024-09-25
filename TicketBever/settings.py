@@ -41,7 +41,12 @@ INSTALLED_APPS = [
     'users',
     'general',
     'organizers',
+    'allauth',
+    'allauth.account',
+    'allauth.socialaccount',
+    'allauth.socialaccount.providers.google',
 ]
+
 
 
 MIDDLEWARE = [
@@ -52,6 +57,8 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    # Add the account middleware:
+    "allauth.account.middleware.AccountMiddleware",
 ]
 
 ROOT_URLCONF = 'TicketBever.urls'
@@ -147,10 +154,44 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 AUTH_USER_MODEL = "users.User"
 
 AUTHENTICATION_BACKENDS = [
+    'allauth.account.auth_backends.AuthenticationBackend',
     'django.contrib.auth.backends.ModelBackend',  # Backend พื้นฐานที่ใช้ username และ password
     'users.backends.UsernameOrEmailBackend',        # Custom backend ที่ใช้ username หรือ email
 ]
 
 
+SOCIALACCOUNT_PROVIDERS = {
+    'google': {
+        # For each OAuth based provider, either add a ``SocialApp``
+        # (``socialaccount`` app) containing the required client
+        # credentials, or list them here:
+        'APP': {
+            'client_id': '176318734223-pcrt87njc864n58kr9g0ql17cuj8nahl.apps.googleusercontent.com',
+            'secret': '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',
+            'key': ''
+        },
+        'SCOPE': [
+            'profile',
+            'email',
+        ]
+    }
+}
 
+SOCIALACCOUNT_LOGIN_ON_GET = True
+
+SOCIALACCOUNT_AUTO_SIGNUP = True
+
+SITE_ID = 1
+
+# Login + Logout
+
+LOGIN_URL = 'login'
+LOGOUT_URL = 'logout'
+LOGIN_REDIRECT_URL = 'homepage'  # ที่จะถูก redirect ไปเมื่อเข้าสู่ระบบสำเร็จ
+ACCOUNT_LOGOUT_REDIRECT_URL = 'homepage'  # ที่จะถูก redirect ไปเมื่อออกจากระบบ
+ACCOUNT_SIGNUP_REDIRECT_URL = 'homepage'  # ที่จะถูก redirect ไปหลังจากลงทะเบียน
+
+# Additional settings for AllAuth
+ACCOUNT_EMAIL_REQUIRED = True  # ให้ระบุอีเมลในการลงทะเบียน
+ACCOUNT_AUTHENTICATED_LOGIN_REDIRECTS = True  # สำหรับการ redirect หลังจากเข้าสู่ระบบ
 

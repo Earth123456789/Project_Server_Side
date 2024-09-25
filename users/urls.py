@@ -8,6 +8,7 @@ from django.conf.urls.static import static
 urlpatterns = [
     path('', LoginView.as_view(), name="login"),
     path("register/", RegisterView.as_view(), name="register"),
+    
 ] 
 
 # ตั้งค่าเพื่อให้ใช้ รูปที่มาจาก media (imagefiled) ได้
