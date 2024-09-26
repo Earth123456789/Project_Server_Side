@@ -26,10 +26,10 @@ class UserProfile(models.Model):
         Other = "Other"
 
     user = models.OneToOneField("users.User", on_delete=models.CASCADE)
-    gender = models.CharField(max_length=10, choices=Gender.choices)
-    telephone = models.CharField(max_length=15)
-    date_of_birth = models.DateField()  
-    image = models.ImageField(upload_to='profile_pics/', blank=True, null=True) 
+    gender = models.CharField(max_length=10, choices=Gender.choices, blank=True, null=True)
+    telephone = models.CharField(max_length=15, blank=True, null=True)
+    date_of_birth = models.DateField(blank=True, null=True)  
+    profile_picture = models.URLField(blank=True, null=True)
 
     def __str__(self):
         return self.user.username

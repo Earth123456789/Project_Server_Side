@@ -173,7 +173,11 @@ SOCIALACCOUNT_PROVIDERS = {
         'SCOPE': [
             'profile',
             'email',
+            'openid'
         ],
+        'AUTH_PARAMS': {
+            'access_type': 'online',
+        }
         
     }
 }
@@ -182,7 +186,7 @@ SOCIALACCOUNT_LOGIN_ON_GET = True
 
 SOCIALACCOUNT_AUTO_SIGNUP = True
 
-SITE_ID = 1
+
 
 # Login + Logout
 

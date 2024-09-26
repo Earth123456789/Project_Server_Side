@@ -3,6 +3,7 @@ from django.http import HttpResponse, JsonResponse
 from django.views import View
 from organizers.models import Event, Category
 from django.db.models import Count
+from users.models import UserProfile 
 # Create your views here.
 
 class HomepageView(View):
@@ -27,6 +28,7 @@ class HomepageView(View):
 
         # homepage.html
         categories = Category.objects.all()
+        
 
         context = {
             "events" : events,

@@ -4,6 +4,7 @@ from django.views import View
 from users.forms import UserRegistrationForm, UserLoginForm
 from django.db import transaction
 from users.models import UserProfile
+from allauth.socialaccount.models import SocialAccount
 from django.contrib.auth import logout, login
 
 # Create your views here.
@@ -47,10 +48,12 @@ class LoginView(View):
         if form.is_valid():
             # backends.py (มีการแก้เพิ่ม)
             user = form.get_user() 
+            print(user) # test  
             # login + สร้าง session
             login(request,user)
             
             return redirect('homepage')  
+        
         print(form.errors)
         return render(request,'registration/login.html', {"form":form})
 
@@ -59,3 +62,4 @@ class LogoutView(View):
     def get(self, request):
         logout(request)
         return redirect('homepage')
+

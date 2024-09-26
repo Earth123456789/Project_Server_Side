@@ -10,8 +10,9 @@
                     class="text-gray-900 inline-flex items-center px-2 pt-1 text-lg kanit-regular">ผู้จัดงานอีเวนต์</a>
                 {% if user.is_authenticated %}
                 <div class="relative flex items-center ml-4">
-                    {% if user.userprofile.image %}
-                    <img class="h-10 w-10 rounded-full cursor-pointer" src="{{ user.userprofile.image.url }}"
+                    {% if user.userprofile.profile_picture %}
+                    <!-- ไม่ต้องเขียนใน views เพราะมีการใช้ AbstactUser เพื่อเชื่อมต่อกับข้อมูลอยู่แล้ว -->
+                    <img class="h-10 w-10 rounded-full cursor-pointer" src="{{ user.userprofile.profile_picture }}"
                         alt="Profile Picture" onclick="toggleDropdown()">
                     {% else %}
                     <img class="h-10 w-10 rounded-full cursor-pointer"
