@@ -8,7 +8,11 @@ from django.contrib.auth import logout, login
 from django.contrib import messages
 from django.core.mail import EmailMessage
 from django.conf import settings
-from django.http import JsonResponse
+from django.contrib.auth.tokens import default_token_generator
+from django.utils.http import urlsafe_base64_encode
+from django.utils.encoding import force_str
+from django.utils.encoding import force_bytes
+from django.template.loader import render_to_string
 
 
 # Create your views here.
@@ -81,18 +85,35 @@ class ChangePasswordView(View):
             user = User.objects.get(email=email)
             
             # ส่งอีเมลยืนยันการเปลี่ยนรหัสผ่าน
-            self.send_email(user)
+            self.send_email(user, request)
             messages.success(request, 'เช็คอีเมลของคุณเพื่อทำการเปลี่ยนรหัสผ่าน')
             return redirect('login')
         
         print(form.errors)
         return render(request, 'registration/change_password_form.html', {'form': form})
 
-    def send_email(self, user):
-        subject = 'การเปลี่ยนรหัสผ่าน'
-        message = f'สวัสดี {user.username},\n\nคุณได้เปลี่ยนรหัสผ่านของคุณเรียบร้อยแล้ว หากคุณไม่ได้ทำการเปลี่ยนแปลงนี้ กรุณาติดต่อเราที่ support@example.com'
+    def send_email(self, user, request):
+        
+        subject = 'เปลี่ยนรหัสผ่าน'
+
+        # ดึง domain จาก request
+        domain = request.get_host()
+        # สร้าง token ที่ไม่ซ้ำกันสำหรับผู้ใช้ (เป็นของ django)
+        token = default_token_generator.make_token(user)
+        # เข้ารหัส Primary Key ของผู้ใช้ให้ปลอดภัย
+        uid = urlsafe_base64_encode(force_bytes(user.pk))
+        link = f'http://{domain}/password_reset_confirm/{uid}/{token}/'
+        reset_link = f"{link}"
+
+        # render template เป็น string โดยไม่ต้องส่ง response
+        message = render_to_string('users/password_reset_email.html', {
+            'user': user,
+            'reset_link': reset_link,
+        })
+
         from_email = settings.DEFAULT_FROM_EMAIL
         recipient_list = [user.email]
+
 
         email = EmailMessage(subject, message, from_email, recipient_list)
         email.send()

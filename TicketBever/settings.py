@@ -12,6 +12,9 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 
 import os
 from pathlib import Path
+from dotenv import load_dotenv
+
+load_dotenv()
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -21,10 +24,10 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-y*=x8_xr1n6)w@o6=)79$(f)qokpp!nr*!ny5hdnuh=wcopv)_'
+SECRET_KEY = os.getenv("SECRET_KEY")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = os.getenv("DEBUG") == "True"
 
 ALLOWED_HOSTS = []
 
@@ -88,11 +91,11 @@ WSGI_APPLICATION = 'TicketBever.wsgi.application'
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.postgresql",
-        "NAME": "event_db",
-        "USER": "postgres",
-        "PASSWORD": "Vipat",
-        "HOST": "localhost",
-        "PORT": "5432",
+        "NAME": os.getenv("DATABASE_NAME", ""),
+        "USER": os.getenv("DATABASE_USERNAME", ""),
+        "PASSWORD": os.getenv("DATABASE_PASSWORD", ""),
+        "HOST": os.getenv("DATABASE_HOST", ""),
+        "PORT": os.getenv("DATABASE_PORT", ""),
     }
 }
 
@@ -166,8 +169,8 @@ SOCIALACCOUNT_PROVIDERS = {
         # (``socialaccount`` app) containing the required client
         # credentials, or list them here:
         'APP': {
-            'client_id': '176318734223-pcrt87njc864n58kr9g0ql17cuj8nahl.apps.googleusercontent.com',
-            'secret': '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',
+            'client_id': os.getenv("GOOGLE_CLIENT_ID", ""),
+            'secret': os.getenv("GOOGLE_SECRET_ID", ""),
             'key': ''
         },
         'SCOPE': [
@@ -200,8 +203,19 @@ ACCOUNT_SIGNUP_REDIRECT_URL = 'homepage'  # ที่จะถูก redirect �
 ACCOUNT_EMAIL_REQUIRED = True  # ให้ระบุอีเมลในการลงทะเบียน
 ACCOUNT_AUTHENTICATED_LOGIN_REDIRECTS = True  # สำหรับการ redirect หลังจากเข้าสู่ระบบ
 
-# Test Send Email in Local
+# Email
 
-EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+if DEBUG:
+    EMAIL_BACKEND = "django.core.mail.backends.filebased.EmailBackend"
+    EMAIL_FILE_PATH = BASE_DIR / "test_inbox"
+    PASSWORD_RESET_TIMEOUT = 60
+else:
+    EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
+    EMAIL_HOST = os.getenv("EMAIL_HOST")
+    EMAIL_PORT = os.getenv("EMAIL_PORT")
+    EMAIL_USE_TLS = os.getenv("EMAIL_USE_TLS") == "True"
+    EMAIL_HOST_USER = os.getenv("EMAIL_HOST_USER")
+    EMAIL_HOST_PASSWORD = os.getenv("EMAIL_HOST_PASSWORD")
+    PASSWORD_RESET_TIMEOUT = 600
 
 
