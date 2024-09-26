@@ -3,97 +3,101 @@
 {% block title %}ลงทะเบียนผู้ใช้งาน - {% endblock %}
 {% block content %}
 <link rel="stylesheet" href="{% static 'users/css/style.css' %}">
+<section>
+    <div class="flex items-center justify-end mr-48">
+        <div class="bg-white rounded-lg shadow-lg p-6 max-w-sm w-full mt-8">
+            <article>
+                <form method="POST" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <!-- User Information -->
+                    <h2 class="text-3xl font-bold mb-4 kanit-black">สมัครสมาชิก</h2>
+                    <div class="mb-4">
+                        <label for="{{ form.username.id_for_label }}" class="kanit-small">ชื่อผู้ใช้:</label>
+                        {{ form.username }}
+                        <!-- ใช้การ check ระดับ filed -->
+                        {% if form.username.errors %}
+                        <div class="text-red-700 kanit-small">{{ form.username.errors.as_text }}</div>
+                        {% endif %}
+                    </div>
+                    <div class="mb-4">
+                        <label for="{{ form.email.id_for_label }}" class="kanit-small">อีเมล:</label>
+                        {{ form.email }}
+                        {% if form.email.errors %}
+                        <div class="text-red-700 kanit-small">{{ form.email.errors.as_text }}</div>
+                        {% endif %}
+                    </div>
+                    <div class="mb-4">
+                        <label for="{{ form.password.id_for_label }}" class="kanit-small">รหัสผ่าน:</label>
+                        {{ form.password }}
+                        {% if form.password.errors %}
+                        <div class="text-red-700 kanit-small">{{ form.password.errors.as_text }}</div>
+                        {% endif %}
+                    </div>
+                    <div class="mb-4">
+                        <label for="{{ form.confirm_password.id_for_label }}"
+                            class="kanit-small">ยืนยันรหัสผ่าน:</label>
+                        {{ form.confirm_password }}
+                        {% if form.confirm_password.errors %}
+                        <div class="text-red-700 kanit-small">{{ form.confirm_password.errors.as_text }}</div>
+                        {% endif %}
+                    </div>
+                    <div class="mb-4">
+                        <label for="{{ form.first_name.id_for_label }}" class="kanit-small">ชื่อจริง:</label>
+                        {{ form.first_name }}
+                        {% if form.first_name.errors %}
+                        <div class="text-red-700 kanit-small">{{ form.first_name.errors.as_text }}</div>
+                        {% endif %}
+                    </div>
+                    <div class="mb-4">
+                        <label for="{{ form.last_name.id_for_label }}" class="kanit-small">นามสกุล:</label>
+                        {{ form.last_name }}
+                        {% if form.last_name.errors %}
+                        <div class="text-red-700 kanit-small">{{ form.last_name.errors.as_text }}</div>
+                        {% endif %}
+                    </div>
+                    <!-- UserProfile Information -->
+                    <div class="mb-3">
+                        <label for="{{ form.gender.id_for_label }}" class="kanit-small">เพศ:</label>
+                        {{ form.gender }}
+                        {% if form.gender.errors %}
+                        <div class="text-red-700 kanit-small">{{ form.gender.errors.as_text }}</div>
+                        {% endif %}
+                    </div>
+                    <div class="mb-4">
+                        <label for="{{ form.telephone.id_for_label }}" class="kanit-small">หมายเลขโทรศัพท์:</label>
+                        {{ form.telephone }}
+                        {% if form.telephone.errors %}
+                        <div class="text-red-700 kanit-small">{{ form.telephone.errors.as_text }}</div>
+                        {% endif %}
+                    </div>
+                    <div class="mb-4">
+                        <label for="{{ form.date_of_birth.id_for_label }}" class="kanit-small">วันเกิด:</label>
+                        {{ form.date_of_birth }}
+                        {% if form.date_of_birth.errors %}
+                        <div class="text-red-700 kanit-small">{{ form.date_of_birth.errors.as_text }}</div>
+                        {% endif %}
+                    </div>
+                    <div class="mb-4">
+                        {{ form.agree_terms }}
+                        <label for="{{ form.agree_terms.id_for_label }}"
+                            class="ml-2 kanit-small">ฉันยอมรับข้อตกลงของเว็บไซต์
+                            Ticket Bever</label>
+                        {% if form.agree_terms.errors %}
+                        <div class="text-red-700 kanit-small">{{ form.agree_terms.errors.as_text }}</div>
+                        {% endif %}
+                    </div>
 
-<div class="flex items-center justify-end mr-48">
-    <div class="bg-white rounded-lg shadow-lg p-6 max-w-sm w-full mt-8">
-        <form method="POST" enctype="multipart/form-data">
-            {% csrf_token %}
-            <!-- User Information -->
-            <h2 class="text-3xl font-bold mb-4 kanit-black">สมัครสมาชิก</h2>
-            <div class="mb-4">
-                <label for="{{ form.username.id_for_label }}" class="kanit-small">ชื่อผู้ใช้:</label>
-                {{ form.username }}
-                <!-- ใช้การ check ระดับ filed -->
-                {% if form.username.errors %}
-                <div class="text-red-700 kanit-small">{{ form.username.errors.as_text }}</div>
-                {% endif %}
-            </div>
-            <div class="mb-4">
-                <label for="{{ form.email.id_for_label }}" class="kanit-small">อีเมล:</label>
-                {{ form.email }}
-                {% if form.email.errors %}
-                <div class="text-red-700 kanit-small">{{ form.email.errors.as_text }}</div>
-                {% endif %}
-            </div>
-            <div class="mb-4">
-                <label for="{{ form.password.id_for_label }}" class="kanit-small">รหัสผ่าน:</label>
-                {{ form.password }}
-                {% if form.password.errors %}
-                <div class="text-red-700 kanit-small">{{ form.password.errors.as_text }}</div>
-                {% endif %}
-            </div>
-            <div class="mb-4">
-                <label for="{{ form.confirm_password.id_for_label }}" class="kanit-small">ยืนยันรหัสผ่าน:</label>
-                {{ form.confirm_password }}
-                {% if form.confirm_password.errors %}
-                <div class="text-red-700 kanit-small">{{ form.confirm_password.errors.as_text }}</div>
-                {% endif %}
-            </div>
-            <div class="mb-4">
-                <label for="{{ form.first_name.id_for_label }}" class="kanit-small">ชื่อจริง:</label>
-                {{ form.first_name }}
-                {% if form.first_name.errors %}
-                <div class="text-red-700 kanit-small">{{ form.first_name.errors.as_text }}</div>
-                {% endif %}
-            </div>
-            <div class="mb-4">
-                <label for="{{ form.last_name.id_for_label }}" class="kanit-small">นามสกุล:</label>
-                {{ form.last_name }}
-                {% if form.last_name.errors %}
-                <div class="text-red-700 kanit-small">{{ form.last_name.errors.as_text }}</div>
-                {% endif %}
-            </div>
-            <!-- UserProfile Information -->
-            <div class="mb-3">
-                <label for="{{ form.gender.id_for_label }}" class="kanit-small">เพศ:</label>
-                {{ form.gender }}
-                {% if form.gender.errors %}
-                <div class="text-red-700 kanit-small">{{ form.gender.errors.as_text }}</div>
-                {% endif %}
-            </div>
-            <div class="mb-4">
-                <label for="{{ form.telephone.id_for_label }}" class="kanit-small">หมายเลขโทรศัพท์:</label>
-                {{ form.telephone }}
-                {% if form.telephone.errors %}
-                <div class="text-red-700 kanit-small">{{ form.telephone.errors.as_text }}</div>
-                {% endif %}
-            </div>
-            <div class="mb-4">
-                <label for="{{ form.date_of_birth.id_for_label }}" class="kanit-small">วันเกิด:</label>
-                {{ form.date_of_birth }}
-                {% if form.date_of_birth.errors %}
-                <div class="text-red-700 kanit-small">{{ form.date_of_birth.errors.as_text }}</div>
-                {% endif %}
-            </div>
-            <div class="mb-4">
-                {{ form.agree_terms }}
-                <label for="{{ form.agree_terms.id_for_label }}" class="ml-2 kanit-small">ฉันยอมรับข้อตกลงของเว็บไซต์
-                    Ticket Bever</label>
-                {% if form.agree_terms.errors %}
-                <div class="text-red-700 kanit-small">{{ form.agree_terms.errors.as_text }}</div>
-                {% endif %}
-            </div>
 
-
-            <!-- Submit Button -->
-            <button type="submit"
-                class="w-full bg-green-500 hover:bg-green-700 text-white font-bold py-2 rounded kanit-small">สมัครสมาชิก</button>
-        </form>
-        <!-- Login เสร็จมาใส่ -->
-        <div class="flex justify-center text-center mt-4">
-            <h1 class="kanit-small mt-4">เป็นสมาชิกแล้ว? <a href="{% url 'login' %}"
-                    class="text-blue-500 underline">เข้าสู่ระบบ </a></h1>
+                    <button type="submit"
+                        class="w-full bg-green-500 hover:bg-green-700 text-white font-bold py-2 rounded kanit-small">สมัครสมาชิก</button>
+                </form>
+            </article>
+            <div class="flex justify-center text-center mt-4">
+                <h1 class="kanit-small mt-4">เป็นสมาชิกแล้ว? <a href="{% url 'login' %}"
+                        class="text-blue-500 underline">เข้าสู่ระบบ
+                    </a></h1>
+            </div>
         </div>
     </div>
-</div>
+</section>
 {% endblock %}

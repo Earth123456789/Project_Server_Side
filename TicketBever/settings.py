@@ -200,3 +200,8 @@ ACCOUNT_SIGNUP_REDIRECT_URL = 'homepage'  # ที่จะถูก redirect �
 ACCOUNT_EMAIL_REQUIRED = True  # ให้ระบุอีเมลในการลงทะเบียน
 ACCOUNT_AUTHENTICATED_LOGIN_REDIRECTS = True  # สำหรับการ redirect หลังจากเข้าสู่ระบบ
 
+# Test Send Email in Local
+
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+
+

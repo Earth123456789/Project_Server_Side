@@ -129,6 +129,25 @@ class UserLoginForm(AuthenticationForm):
             'placeholder': 'กรุณากรอกรหัสผ่าน'
         })
     )    
+
+
+# Form vs ModelForm
+# ModelForm เหมาะกับตรวจและบันทึกข้อมูล
+# Form เหมาะกับข้อมูลไม่ตรงกับโมเดล
+
+class ChangePasswordForm(forms.Form):
+
+    email = forms.EmailField(label='อีเมล', widget=forms.TextInput(attrs={'class': 'bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500', 
+                                             'placeholder': 'กรอกอีเมล'}))
+
+    def clean_email(self):
+        # ดึงค่า email และ ตรวจสอบ + ทำความสะอาดข้อมูล
+        email = self.cleaned_data.get('email')
+        # ตรวจสอบว่ามีข้อมูลในตาราง User ไหม ใช้ .exists() ตรวจ
+        if not User.objects.filter(email=email).exists():
+            raise forms.ValidationError("อีเมลนี้ไม่มีในระบบ")
+        return email
+    
         
     
 

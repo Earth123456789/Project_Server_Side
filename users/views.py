@@ -1,11 +1,15 @@
 # users/views.py 
 from django.shortcuts import render, redirect
 from django.views import View
-from users.forms import UserRegistrationForm, UserLoginForm
+from users.forms import UserRegistrationForm, UserLoginForm, ChangePasswordForm
 from django.db import transaction
-from users.models import UserProfile
-from allauth.socialaccount.models import SocialAccount
+from users.models import UserProfile, User
 from django.contrib.auth import logout, login
+from django.contrib import messages
+from django.core.mail import EmailMessage
+from django.conf import settings
+from django.http import JsonResponse
+
 
 # Create your views here.
 class RegisterView(View):
@@ -62,4 +66,36 @@ class LogoutView(View):
     def get(self, request):
         logout(request)
         return redirect('homepage')
+    
+class ChangePasswordView(View):
+
+    def get(self, request):
+        form = ChangePasswordForm()
+        return render(request, 'registration/change_password_form.html', {'form': form})
+    
+    def post(self, request):
+        form = ChangePasswordForm(data=request.POST)
+        
+        if form.is_valid():
+            email = form.cleaned_data['email']
+            user = User.objects.get(email=email)
+            
+            # ส่งอีเมลยืนยันการเปลี่ยนรหัสผ่าน
+            self.send_email(user)
+            messages.success(request, 'เช็คอีเมลของคุณเพื่อทำการเปลี่ยนรหัสผ่าน')
+            return redirect('login')
+        
+        print(form.errors)
+        return render(request, 'registration/change_password_form.html', {'form': form})
+
+    def send_email(self, user):
+        subject = 'การเปลี่ยนรหัสผ่าน'
+        message = f'สวัสดี {user.username},\n\nคุณได้เปลี่ยนรหัสผ่านของคุณเรียบร้อยแล้ว หากคุณไม่ได้ทำการเปลี่ยนแปลงนี้ กรุณาติดต่อเราที่ support@example.com'
+        from_email = settings.DEFAULT_FROM_EMAIL
+        recipient_list = [user.email]
+
+        email = EmailMessage(subject, message, from_email, recipient_list)
+        email.send()
+
+
 
