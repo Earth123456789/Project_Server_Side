@@ -3,7 +3,8 @@ from django.http import HttpResponse, JsonResponse
 from django.views import View
 from organizers.models import Event, Category
 from django.db.models import Count
-from users.models import UserProfile 
+from users.models import UserProfile, User
+from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
 # Create your views here.
 
 class HomepageView(View):
@@ -39,5 +40,31 @@ class HomepageView(View):
         }
 
         return render(request, 'general/homepage.html', context)
+    
+class EventView(View):
+     
+
+    def get(self, request, event_id):
+         
+        event = Event.objects.get(pk=event_id)
+        context = {
+            'event' : event
+        }
+
+        return render(request, "general/event_detail.html", context)
+
+class EditFollwer(View):
+    
+    def put(self, request, event_id, user_id):
+        event = Event.objects.get(pk = event_id)
+        user = User.objects.get(pk = user_id)
+        user.followed_events.add(event)
+        return JsonResponse({'status':'add_susecss'}, status=200)
+    
+    def delete(self, request,  event_id, user_id):
+        event = Event.objects.get(pk = event_id)
+        user = User.objects.get(pk = user_id)
+        user.followed_events.remove(event)
+        return JsonResponse({'status':'remove_susecss'}, status=200)
     
     

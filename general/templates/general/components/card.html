@@ -1,15 +1,19 @@
 {% load custom_filters %}
 
-<a href="#">
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-24 ">
-        {% for event in events %}
+
+
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-24 ">
+    {% for event in events %}
+    <a href="{% url 'event' event.id %}">
         <div class="max-w-sm bg-white rounded-lg flex flex-col items-center">
             <img class="rounded-lg object-cover" style="width: 375px; height: 375px;" src="{{ event.image.url }}"
                 alt="{{ event.name }}" />
             <div class="pt-5 w-full text-left">
                 <!-- เรียก function ผ่าน custom_filters (template ที่สร้างขึ้นมา) -->
                 <p class="font-semibold kanit-regular" style="color: red;">{{ event.start_date|custom_date:event.end_date }}</p>
-                <h5 class="mb-4 mt-2 text-2xl font-bold tracking-tight text-gray-900 dark:text-white kanit-black-italic">{{ event.name|truncatewords:10 }}</h5>
+                <h5
+                    class="mb-4 mt-2 text-2xl font-bold tracking-tight text-gray-900 dark:text-white kanit-black-italic">
+                    {{ event.name|truncatewords:10 }}</h5>
                 <div class="flex">
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="grey"
                         class="bi bi-geo-alt-fill" viewBox="0 0 16 16">
@@ -20,6 +24,7 @@
                 </div>
             </div>
         </div>
-        {% endfor %}
-    </div>
+    </a>
+    {% endfor %}
+</div>
 </a>

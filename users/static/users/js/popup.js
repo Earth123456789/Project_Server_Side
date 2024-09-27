@@ -7,7 +7,10 @@ document.addEventListener('DOMContentLoaded', function () {
 
         Swal.fire({
             title: 'กรุณาตรวจสอบอีเมลของคุณเพื่อรีเซ็ตรหัสผ่าน',
-            timer: 1500
+            icon: 'info',
+            timer: 1000, 
+            showConfirmButton: false, 
+            showCancelButton: false, 
         }).then(() => {
             form.submit(); // ส่งฟอร์ม
         });
