@@ -1,7 +1,7 @@
 # users/views.py 
 from django.shortcuts import render, redirect
 from django.views import View
-from users.forms import UserRegistrationForm, UserLoginForm, ChangePasswordForm
+from users.forms import UserRegistrationForm, UserLoginForm, ChangePasswordForm, UserPasswordChangeForm
 from django.db import transaction
 from users.models import UserProfile, User
 from django.contrib.auth import logout, login
@@ -9,7 +9,7 @@ from django.contrib import messages
 from django.core.mail import EmailMessage
 from django.conf import settings
 from django.contrib.auth.tokens import default_token_generator
-from django.utils.http import urlsafe_base64_encode
+from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.utils.encoding import force_str
 from django.utils.encoding import force_bytes
 from django.template.loader import render_to_string
@@ -102,7 +102,7 @@ class ChangePasswordView(View):
         token = default_token_generator.make_token(user)
         # เข้ารหัส Primary Key ของผู้ใช้ให้ปลอดภัย
         uid = urlsafe_base64_encode(force_bytes(user.pk))
-        link = f'http://{domain}/password_reset_confirm/{uid}/{token}/'
+        link = f'http://{domain}/user/password_reset_confirm/{uid}/{token}/'
         reset_link = f"{link}"
 
         # render template เป็น string โดยไม่ต้องส่ง response
@@ -120,3 +120,30 @@ class ChangePasswordView(View):
 
 
 
+class PasswordResetConfirmView(View):
+
+    def get(self, request, uidb64, token):
+        # ถอดรหัสข้อมูล 
+        uid = force_str(urlsafe_base64_decode(uidb64))
+        user = User.objects.get(pk=uid)
+
+        # ตรวจ token กับ User
+        if user is not None and default_token_generator.check_token(user, token):
+            form = UserPasswordChangeForm(user)
+            print(user)
+            return render(request, 'users/password_reset_form.html', {'form': form  ,'valid_token': True})
+    
+    def post(self, request, uidb64, token):
+        uid = force_str(urlsafe_base64_decode(uidb64))
+        user = User.objects.get(pk=uid)
+
+        # ตรวจ token กับ User
+        if user is not None and default_token_generator.check_token(user, token):
+            form = UserPasswordChangeForm(user, request.POST)
+            if form.is_valid():
+                form.save()  
+                return redirect('login')
+            else:
+                return render(request, 'users/password_reset_form.html', {'form': form, 'valid_token': True})
+        else:
+            return redirect('login')

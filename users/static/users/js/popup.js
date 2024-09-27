@@ -6,11 +6,8 @@ document.addEventListener('DOMContentLoaded', function () {
         event.preventDefault(); // ป้องกันการส่งฟอร์มตามปกติ
 
         Swal.fire({
-            icon: 'success',
-            title: 'สำเร็จ!',
-            text: 'กรุณาตรวจสอบอีเมลของคุณเพื่อรีเซ็ตรหัสผ่าน',
-            timer: 1500,
-            showConfirmButton: false 
+            title: 'กรุณาตรวจสอบอีเมลของคุณเพื่อรีเซ็ตรหัสผ่าน',
+            timer: 1500
         }).then(() => {
             form.submit(); // ส่งฟอร์ม
         });
