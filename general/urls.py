@@ -1,5 +1,5 @@
 from django.urls import path
-from general.views import HomepageView, EventView, EditFollwer
+from general.views import HomepageView, EventView
 from django.conf import settings
 from django.conf.urls.static import static
 
@@ -7,7 +7,7 @@ from django.conf.urls.static import static
 urlpatterns = [
     path("", HomepageView.as_view(), name="homepage"),
     path("event/<int:event_id>/", EventView.as_view(), name="event"),
-    path("event/<int:event_id>/followers/<int:user_id>/", EditFollwer.as_view(), name="follower")
+    path("event/<int:event_id>/followers/<int:user_id>/", EventView.as_view(), name="follower"),
 ] 
 
 # ตั้งค่าเพื่อให้ใช้ รูปที่มาจาก media (imagefiled) ได้

@@ -13,20 +13,29 @@ class HomepageView(View):
         # รับค่าหมวดหมู่จาก query parameters แทน session
         category_name = request.GET.get('category', None)
 
+        search = request.GET.get('search', None)
+
         # ดึง Event ตามหมวดหมู่ที่ระบุ
         if category_name:
             events = Event.objects.filter(category__name=category_name)
         else:
             events = Event.objects.all()
+        
+        if search:
+            # คืนค่าทุกเหตุการณ์ไม่ว่าจะเป็นตัวพิมพ์ใหญ่หรือตัวพิมพ์เล็ก
+            events = Event.objects.filter(name__icontains=search)
+            
 
 
         # ดึง Event ที่มีผู้ติดตามมากที่สุด โดยดึงผ่าน related_name='followers'  
         # cardfollowers.html
-        most_followed_event = Event.objects.annotate(num_followers = Count('followers')).order_by('-num_followers')[:3]
-
         # silder.html
-        slider_events = Event.objects.all()[:5]
-
+        most_followed_event = None
+        slider_events = None
+        if not search:
+            most_followed_event = Event.objects.annotate(num_followers=Count('followers')).order_by('-num_followers')[:3]
+            slider_events = Event.objects.all()[:5]
+    
         # homepage.html
         categories = Category.objects.all()
         
@@ -52,8 +61,6 @@ class EventView(View):
         }
 
         return render(request, "general/event_detail.html", context)
-
-class EditFollwer(View):
     
     def put(self, request, event_id, user_id):
         event = Event.objects.get(pk = event_id)
@@ -66,5 +73,4 @@ class EditFollwer(View):
         user = User.objects.get(pk = user_id)
         user.followed_events.remove(event)
         return JsonResponse({'status':'remove_susecss'}, status=200)
-    
-    
+

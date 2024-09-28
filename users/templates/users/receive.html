@@ -1,0 +1,78 @@
+{% extends "general/components/layout.html" %}
+{% load static %}
+{% load custom_filters %}
+{% block title %}{% endblock %}
+{% block nav %}
+{% include "general/components/navbar.html" %}
+{% endblock %}
+{% block content %}
+<section>
+    <article class="flex ml-36 space-x-8 mt-36">
+        <img class="rounded-lg object-cover" style="width: 400px; height: 500px;" src="{{ event.image.url }}"
+            alt="{{ event.name }}" />
+        <div>
+            {% for category in event.category.all %}
+            <p class="text-gray-500 kanit-regular">{{ category.name }}</p>
+            {% endfor %}
+            <h5 class="mb-4 mt-2 text-2xl font-bold tracking-tight text-gray-900 dark:text-white kanit-black mt-4">{{ event.name }}
+            </h5>
+            <div class="flex mt-4">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                    class="bi bi-calendar" viewBox="0 0 16 16">
+                    <path
+                        d="M3.5 0a.5.5 0 0 1 .5.5V1h8V.5a.5.5 0 0 1 1 0V1h1a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V3a2 2 0 0 1 2-2h1V.5a.5.5 0 0 1 .5-.5M1 4v10a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V4z" />
+                </svg>
+                <p class="font-semibold kanit-regular ml-4">{{ event.start_date|custom_date:event.end_date }}</p>
+            </div>
+            <div class="flex mt-4">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                    class="bi bi-geo-alt-fill" viewBox="0 0 16 16">
+                    <path d="M8 16s6-5.686 6-10A6 6 0 0 0 2 6c0 4.314 6 10 6 10m0-7a3 3 0 1 1 0-6 3 3 0 0 1 0 6" />
+                </svg>
+                <p class="ml-4 kanit-regular">{{ event.location.name }}</p>
+            </div>
+            <div class="w-3/5">
+                <p class="text-gray-500 ml-8 kanit-regular">{{ event.location.description }}</p>
+            </div>
+            <div class="flex mt-4">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                    class="bi bi-people-fill" viewBox="0 0 16 16">
+                    <path
+                        d="M7 14s-1 0-1-1 1-4 5-4 5 3 5 4-1 1-1 1zm4-6a3 3 0 1 0 0-6 3 3 0 0 0 0 6m-5.784 6A2.24 2.24 0 0 1 5 13c0-1.355.68-2.75 1.936-3.72A6.3 6.3 0 0 0 5 9c-4 0-5 3-5 4s1 1 1 1zM4.5 8a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5" />
+                </svg>
+                <!-- ไม่ต้อง loop เพราะ .count return เป็น int ไม่ได้เป็น queryset -->
+                <p class="ml-4 kanit-regular">{{ event.followers.count }} ผู้ติดตาม</p>
+            </div>
+        </div>
+    </article>
+    <article class="ml-36">
+        <h5 class="mb-4 mt-12 text-2xl font-bold tracking-tight text-gray-900 dark:text-white kanit-black">บัตร
+        </h5>
+
+        <div
+            class="flex justify-between items-center max-w-7xl p-6 bg-white border border-gray-200 rounded-lg shadow">
+
+            <h5 class="mb-2 text-2xl font-bold tracking-tight text-gray-900 dark:text-white flex-grow">จำนวน</h5>
+            <form class="max-w-sm">
+                <select id="countries"
+                    class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
+                    <option selected>0</option>
+                    <option value="1">1</option>
+                    <option value="2">2</option>
+                    <option value="3">3</option>
+                    <option value="4">4</option>
+                    <option value="5">5</option>
+                </select>
+            </form>
+        </div>
+    </article>
+</section>
+{% endblock %}
+
+{% block script %}
+<script src="{% static 'general/js/navbar.js' %}"></script>
+{% endblock %}
+
+{% block footer %}
+{% include "general/components/footer.html" %}
+{% endblock %}

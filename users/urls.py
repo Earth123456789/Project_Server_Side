@@ -1,16 +1,19 @@
 # users/url.py
 from django.urls import path
-from users.views import RegisterView, LoginView, LogoutView, ChangePasswordView, PasswordResetConfirmView
+from users.views import RegisterView, LoginView, LogoutView, ChangePasswordView, PasswordResetConfirmView, ReceiveTicketView
 from django.conf import settings
 from django.conf.urls.static import static
 
 
 urlpatterns = [
+    # Auth Path
     path("", LoginView.as_view(), name="login"),
     path("register/", RegisterView.as_view(), name="register"),
     path("logout/", LogoutView.as_view(), name="logout"),
     path('password_reset/', ChangePasswordView.as_view(), name='password_reset'),
     path('password_reset_confirm/<str:uidb64>/<str:token>/', PasswordResetConfirmView.as_view(), name='password_reset_confirm'),
+    # User Ticket Path
+    path("receive/<int:event_id>/", ReceiveTicketView.as_view(), name="receive_ticket" )
 ] 
 
 # ตั้งค่าเพื่อให้ใช้ รูปที่มาจาก media (imagefiled) ได้

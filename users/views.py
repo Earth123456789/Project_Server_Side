@@ -4,6 +4,7 @@ from django.views import View
 from users.forms import UserRegistrationForm, UserLoginForm, ChangePasswordForm, UserPasswordChangeForm
 from django.db import transaction
 from users.models import UserProfile, User
+from organizers.models import Event
 from django.contrib.auth import logout, login
 from django.contrib import messages
 from django.core.mail import EmailMessage
@@ -147,3 +148,15 @@ class PasswordResetConfirmView(View):
                 return render(request, 'users/password_reset_form.html', {'form': form, 'valid_token': True})
         else:
             return redirect('login')
+
+
+class ReceiveTicketView(View):
+
+    def get(self, request, event_id):
+        
+        event = Event.objects.get(pk=event_id)
+        context = {
+            'event' : event
+        }
+
+        return render(request, "users/receive.html", context)
