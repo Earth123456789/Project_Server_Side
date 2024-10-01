@@ -1,0 +1,68 @@
+{% extends "general/components/layout.html" %}
+{% load static %}
+{% block title %}คำร้องเปลี่ยนรหัสผ่าน - {% endblock %}
+{% block nav %}
+{% include "general/components/navbar.html" %}
+{% endblock %}
+{% block content %}
+
+<div class="min-h-screen flex flex-col justify-center items-center">
+    {% include "users/components/listinfo.html" %}
+    <div class="container mt-8 flex flex-col items-center justify-center">
+        {% if valid_token %}
+        <form method="post" class="w-full max-w-lg bg-white border border-gray-200 rounded-lg shadow p-8">
+            {% csrf_token %}
+            <div class="mb-4">
+                <label for="{{ form.email.id_for_label }}" class="kanit-small">อีเมล:</label>
+                {{ form.email }}
+                {% if form.email.errors %}
+                <div class="text-red-700 kanit-small">{{ form.email.errors.as_text }}</div>
+                {% endif %}
+            </div>
+            <div class="mb-4">
+                <label for="{{ form.first_name.id_for_label }}" class="kanit-small">ชื่อจริง:</label>
+                {{ form.first_name }}
+                {% if form.first_name.errors %}
+                <div class="text-red-700 kanit-small">{{ form.first_name.errors.as_text }}</div>
+                {% endif %}
+            </div>
+            <div class="mb-4">
+                <label for="{{ form.last_name.id_for_label }}" class="kanit-small">นามสกุล:</label>
+                {{ form.last_name }}
+                {% if form.last_name.errors %}
+                <div class="text-red-700 kanit-small">{{ form.last_name.errors.as_text }}</div>
+                {% endif %}
+            </div>
+            <div class="mb-4">
+                <label for="{{ form.telephone.id_for_label }}" class="kanit-small">หมายเลขโทรศัพท์:</label>
+                {{ form.telephone }}
+                {% if form.telephone.errors %}
+                <div class="text-red-700 kanit-small">{{ form.telephone.errors.as_text }}</div>
+                {% endif %}
+            </div>
+            <div class="mb-4">
+                <label for="{{ form.date_of_birth.id_for_label }}" class="kanit-small">วันเกิด:</label>
+                {{ form.date_of_birth }}
+                {% if form.date_of_birth.errors %}
+                <div class="text-red-700 kanit-small">{{ form.date_of_birth.errors.as_text }}</div>
+                {% endif %}
+            </div>
+            <div class="flex justify-center mt-2">
+                <button type="submit" class="text-white bg-gradient-to-r from-green-400 via-green-500 to-green-600 hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-green-300 dark:focus:ring-green-800 shadow-lg shadow-green-500/50 dark:shadow-lg dark:shadow-green-800/80 font-medium rounded-lg text-sm px-5 py-2.5 text-center me-2 mb-2 kanit-small">ยืนยัน</button>
+            </div>
+        </form>
+        {% else %}
+        <p class="text-center">Invalid or expired token. Please try again.</p>
+        {% endif %}
+    </div>
+</div>
+
+{% block script %}
+<script src="{% static 'general/js/navbar.js' %}"></script>
+{% endblock %}
+
+{% endblock %}
+{% block footer %}
+{% include "general/components/footer.html" %}
+{% endblock %}
+

@@ -27,7 +27,7 @@ class UserProfile(models.Model):
 
     user = models.OneToOneField("users.User", on_delete=models.CASCADE)
     gender = models.CharField(max_length=10, choices=Gender.choices, blank=True, null=True)
-    telephone = models.CharField(max_length=15, blank=True, null=True)
+    telephone = models.CharField(max_length=20, blank=True, null=True)
     date_of_birth = models.DateField(blank=True, null=True)  
     profile_picture = models.URLField(blank=True, null=True)
 
@@ -43,9 +43,9 @@ class EventParticipant(models.Model):
 
     event = models.ForeignKey("organizers.Event", on_delete=models.CASCADE)
     user = models.ForeignKey("users.User", on_delete=models.CASCADE)
-    participation_date = models.DateField()
+    participation_date = models.DateField(auto_now_add=True)
     status = models.CharField(
-        max_length=15,
+        max_length=30,
         choices=RegisterStatus.choices,  
         default=RegisterStatus.No_Show
     )

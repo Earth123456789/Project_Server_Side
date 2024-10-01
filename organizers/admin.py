@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Category, Company, Location, Event
+from .models import Category, Company, Location, Event, Payment
 from django.utils.html import format_html
 
 @admin.register(Category)
@@ -24,6 +24,10 @@ class EventAdmin(admin.ModelAdmin):
         return ", ".join([category.name for category in obj.category.all()])
     # ทำให้ ชื่อตรง list_display ขึ้นเป็น Categories
     get_categories.short_description = 'Categories' 
+
+@admin.register(Payment)
+class EventAdmin(admin.ModelAdmin):
+    list_display = ('event', 'user', 'amount', 'payment_date', 'payment_method', 'is_successful')  
 
    
 
