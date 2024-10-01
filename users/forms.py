@@ -1,6 +1,6 @@
 # users/forms.py
 from django import forms
-from users.models import User
+from users.models import User, UserProfile
 from django.forms import ModelForm
 from django.core.exceptions import ValidationError
 from django.utils import timezone
@@ -215,7 +215,7 @@ class AttendeeForm(ModelForm):
             'last_name': forms.TextInput(attrs={'class': 'bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 kanit-small', 
                                                 'placeholder': 'กรอกนามสกุลของคุณ'}),
         }
-
+        
     def clean_date_of_birth(self):
         date_of_birth = self.cleaned_data.get('date_of_birth')
         if date_of_birth:
@@ -225,9 +225,6 @@ class AttendeeForm(ModelForm):
                 raise ValidationError("คุณต้องมีอายุมากกว่า 13 ปีในการลงทะเบียนเข้าใช้ระบบนี้")
         return date_of_birth
     
-
-  
-
 
 
 

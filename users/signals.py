@@ -1,4 +1,4 @@
-# save data to Userprofile model
+# เก็บรูปลง Userprofile
 
 from allauth.account.signals import user_logged_in
 from allauth.socialaccount.models import SocialAccount

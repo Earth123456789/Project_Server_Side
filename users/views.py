@@ -179,9 +179,23 @@ class AttendeeView(LoginRequiredMixin, View):
         # ถอดรหัสข้อมูล 
         uid = force_str(urlsafe_base64_decode(uidb64))
         user = User.objects.get(pk=uid)
-
+        
+        try:
+            user_profile = UserProfile.objects.get(user=user)
+        except UserProfile.DoesNotExist:
+            user_profile = None
+            
         if user is not None and default_token_generator.check_token(user, token):
             form = AttendeeForm(instance=user)
+            # ตั้งค่าค่าเริ่มต้น field ให้ใส่ userprofile ได้
+            if user_profile.telephone and user_profile.date_of_birth:
+                form.fields['telephone'].initial = user_profile.telephone
+                form.fields['date_of_birth'].initial = user_profile.date_of_birth.strftime('%Y-%m-%d')
+            else:
+                form.fields['telephone'].initial = ''
+                form.fields['date_of_birth'].initial = ''
+
+            print(user_profile.date_of_birth)
             context = {
             'user': user,
             'valid_token': True,
@@ -241,10 +255,8 @@ class PaymentView(LoginRequiredMixin, View):
         is_registered = EventParticipant.objects.filter(user=user, event_id=event_id).exists()
 
         if not is_registered:
-            # Redirect to the attendee page if not registered
             return redirect('attendent', event_id=event_id, uidb64=urlsafe_base64_encode(force_bytes(user.pk)), token=default_token_generator.make_token(user))
         
-        # Render the payment page if registered
         return render(request, 'users/payment.html', {'event_id': event_id})
 
     
