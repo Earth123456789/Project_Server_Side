@@ -12,9 +12,10 @@ from django.utils.encoding import force_str
 from django.utils.encoding import force_bytes
 from django.template.loader import render_to_string
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
+import requests
 
 from users.forms import UserRegistrationForm, UserLoginForm, ChangePasswordForm, UserPasswordChangeForm, AttendeeForm
-from users.models import UserProfile, User, EventParticipant
+from users.models import UserProfile, User, EventParticipant, Ticket
 
 from organizers.models import Event
 
@@ -246,19 +247,20 @@ class AttendeeView(LoginRequiredMixin, View):
 
         return render(request, 'users/attendee.html', context)
 
-class PaymentView(LoginRequiredMixin, View):
-    login_url = 'login'
+# ถ้าทำอันอื่นเสร็จเดี๋ยวกลับมาทำ
+# class PaymentView(LoginRequiredMixin, View):
+#     login_url = 'login'
 
-    def get(self, request, event_id):
+#     def get(self, request, event_id):
 
-        user = request.user
+#         user = request.user
          
-        is_registered = EventParticipant.objects.filter(user=user, event_id=event_id).exists()
+#         is_registered = EventParticipant.objects.filter(user=user, event_id=event_id).exists()
 
-        if not is_registered:
-            return redirect('attendent', event_id=event_id, uidb64=urlsafe_base64_encode(force_bytes(user.pk)), token=default_token_generator.make_token(user))
+#         if not is_registered:
+#             return redirect('attendent', event_id=event_id, uidb64=urlsafe_base64_encode(force_bytes(user.pk)), token=default_token_generator.make_token(user))
         
-        return render(request, 'users/payment.html', {'event_id': event_id})
+#         return render(request, 'users/payment.html', {'event_id': event_id})
 
 
 class SuccessView(View):
@@ -281,8 +283,17 @@ class SuccessView(View):
         for event_participant in event_participants:
             event_participant.status = "Register"
             event_participant.save() 
-        
-        
+
+
+        ticket = Ticket(
+            event_participant=event_participant,
+        )
+        qr_data = ticket.entry_code  
+        qr_code_url = f"https://api.qrserver.com/v1/create-qr-code/?data={qr_data}&size=300x300"
+        ticket.qr_code = qr_data
+        ticket.qr_code_image = qr_code_url
+        ticket.save()
+
         return redirect('homepage')
 
 

@@ -1,6 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
-
+from uuid import uuid4
 
 class User(AbstractUser): 
     email = models.EmailField(unique=True)
@@ -24,11 +24,11 @@ class User(AbstractUser):
 
 class UserProfile(models.Model):
     class Gender(models.Choices):
-        M = "M"
-        F = "F"
-        Other = "Other"
+        M = 'M'
+        F = 'F'
+        Other = 'Other'
 
-    user = models.OneToOneField("users.User", on_delete=models.CASCADE)
+    user = models.OneToOneField('users.User', on_delete=models.CASCADE)
     gender = models.CharField(max_length=10, choices=Gender.choices, blank=True, null=True)
     telephone = models.CharField(max_length=20, blank=True, null=True)
     date_of_birth = models.DateField(blank=True, null=True)  
@@ -39,13 +39,13 @@ class UserProfile(models.Model):
 
 class EventParticipant(models.Model):
     class RegisterStatus(models.Choices):
-        Register = "Register"
-        Attended = "Attended"
-        Cancelled = "Cancelled"
-        No_Show = "No Show"
+        Register = 'Register'
+        Attended = 'Attended'
+        Cancelled = 'Cancelled'
+        No_Show = 'No Show'
 
-    event = models.ForeignKey("organizers.Event", on_delete=models.CASCADE)
-    user = models.ForeignKey("users.User", on_delete=models.CASCADE)
+    event = models.ForeignKey('organizers.Event', on_delete=models.CASCADE)
+    user = models.ForeignKey('users.User', on_delete=models.CASCADE)
     participation_date = models.DateField(auto_now_add=True)
     status = models.CharField(
         max_length=30,
@@ -63,15 +63,17 @@ class Ticket(models.Model):
         Used = 'Used'
         Expired = 'Expired'
 
-    event_participant = models.OneToOneField("users.EventParticipant", on_delete=models.CASCADE)
+    event_participant = models.OneToOneField('users.EventParticipant', on_delete=models.CASCADE)
     qr_code = models.CharField(max_length=255)
-    qr_code_image = models.ImageField(upload_to='qr_codes/', null=True, blank=True)
+    qr_code_image = models.URLField(null=True, blank=True)
     status = models.CharField(
         max_length=15,
         choices=StatusChoices.choices,  
         default=StatusChoices.Valid  
     )
     issue_date = models.DateField(auto_now_add=True)
+    # แก้ข้อมูลไม่ได้
+    entry_code = models.UUIDField(default=uuid4, editable=False, unique=True)
 
 
     def __str__(self):
