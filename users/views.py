@@ -127,30 +127,24 @@ class ChangePasswordView(View):
 class PasswordResetConfirmView(View):
 
     def get(self, request, uidb64, token):
-        # ถอดรหัสข้อมูล 
+        # ถอดรหัสข้อมูล เพื่อดึงข้อมูล User มาใช้งาน ถอดรหัสจะเป็น (user.pk) ที่ส่ง request เข้ามา
         uid = force_str(urlsafe_base64_decode(uidb64))
         user = User.objects.get(pk=uid)
 
-        # ตรวจ token กับ User
-        if user is not None and default_token_generator.check_token(user, token):
-            form = UserPasswordChangeForm(user)
-            print(user)
-            return render(request, 'users/password_reset_form.html', {'form': form  ,'valid_token': True})
+        form = UserPasswordChangeForm(user)
+        print(user)
+        return render(request, 'users/password_reset_form.html', {'form': form  ,'valid_token': True})
     
     def post(self, request, uidb64, token):
         uid = force_str(urlsafe_base64_decode(uidb64))
         user = User.objects.get(pk=uid)
 
-        # ตรวจ token กับ User
-        if user is not None and default_token_generator.check_token(user, token):
-            form = UserPasswordChangeForm(user, request.POST)
-            if form.is_valid():
-                form.save()  
-                return redirect('login')
-            else:
-                return render(request, 'users/password_reset_form.html', {'form': form, 'valid_token': True})
-        else:
+        form = UserPasswordChangeForm(user, request.POST)
+        if form.is_valid():
+            form.save()  
             return redirect('login')
+        else:
+            return render(request, 'users/password_reset_form.html', {'form': form, 'valid_token': True})
 
 # receive.html, models.py
 class ReceiveTicketView(LoginRequiredMixin, View):
@@ -185,24 +179,24 @@ class AttendeeView(LoginRequiredMixin, View):
         except UserProfile.DoesNotExist:
             user_profile = None
             
-        if user is not None and default_token_generator.check_token(user, token):
-            form = AttendeeForm(instance=user)
-            # ตั้งค่าค่าเริ่มต้น field ให้ใส่ userprofile ได้
-            if user_profile.telephone and user_profile.date_of_birth:
-                form.fields['telephone'].initial = user_profile.telephone
-                form.fields['date_of_birth'].initial = user_profile.date_of_birth.strftime('%Y-%m-%d')
-            else:
-                form.fields['telephone'].initial = ''
-                form.fields['date_of_birth'].initial = ''
+   
+        form = AttendeeForm(instance=user)
+        # ตั้งค่าค่าเริ่มต้น field ให้ใส่ userprofile ได้
+        if user_profile.telephone and user_profile.date_of_birth:
+            form.fields['telephone'].initial = user_profile.telephone
+            form.fields['date_of_birth'].initial = user_profile.date_of_birth.strftime('%Y-%m-%d')
+        else:
+            form.fields['telephone'].initial = ''
+            form.fields['date_of_birth'].initial = ''
 
-            print(user_profile.date_of_birth)
-            context = {
-            'user': user,
-            'valid_token': True,
-            'form': form
-            }
-            print(user)
-            return render(request, 'users/attendee.html', context)
+        print(user_profile.date_of_birth)
+        context = {
+        'user': user,
+        'valid_token': True,
+        'form': form
+        }
+        print(user)
+        return render(request, 'users/attendee.html', context)
         
     # จัดการข้อผิดพลาด ทำให้ไม่ต้องทำความสะอาดฐานข้อมูลด้วยตัวเอง บันทึกข้อมูลในครั้งเดียวแทนที่จะบันทึกทีละรายการ
     @transaction.atomic
@@ -211,38 +205,45 @@ class AttendeeView(LoginRequiredMixin, View):
         uid = force_str(urlsafe_base64_decode(uidb64))
         user = User.objects.get(pk=uid)
         event = Event.objects.get(pk=event_id)
-        if user is not None and default_token_generator.check_token(user, token):
-            form = AttendeeForm(request.POST, instance=user)
-            if form.is_valid():
-                form.save()
+        form = AttendeeForm(request.POST, instance=user)
+        if form.is_valid():
+            form.save()
             
-                user_profile = UserProfile.objects.get(user=user)
+            user_profile = UserProfile.objects.get(user=user)
 
-                user_profile.telephone = form.cleaned_data.get('telephone')  
-                user_profile.date_of_birth = form.cleaned_data.get('date_of_birth')
-                user_profile.gender = form.cleaned_data.get('gender')
-                user_profile.save()
-                participation = EventParticipant(
-                    user=user,
-                    event=event,
-                    status="Attended" 
-                )
-                participation.save()
+            user_profile.telephone = form.cleaned_data.get('telephone')  
+            user_profile.date_of_birth = form.cleaned_data.get('date_of_birth')
+            user_profile.gender = form.cleaned_data.get('gender')
+            user_profile.save()
+            participation = EventParticipant(
+                user=user,
+                event=event,
+                status="Attended" 
+            )
+            participation.save()
 
-                context = {
-                    'user': user,
-                    'valid_token': True,
-                    'form': form
-                }
-            print(user)
-            print(form.errors)
-            return redirect('payment', event_id=event_id)
-        
-        context = {
+            context = {
                 'user': user,
                 'valid_token': True,
                 'form': form
             }
+            print(user)
+            print(form.errors)
+
+            if event.ticket_price == 0.00:
+                request_user = request.user
+                token = default_token_generator.make_token(request_user)
+                uid = urlsafe_base64_encode(force_bytes(request_user.pk))
+                return redirect('success', event_id=event_id, uidb64=uid, token=token)
+            else:
+                return redirect('payment', event_id=event_id)
+        
+        context = {
+            'user': user,
+            'valid_token': True,
+            'form': form
+        }
+
         return render(request, 'users/attendee.html', context)
 
 class PaymentView(LoginRequiredMixin, View):
@@ -259,7 +260,31 @@ class PaymentView(LoginRequiredMixin, View):
         
         return render(request, 'users/payment.html', {'event_id': event_id})
 
+
+class SuccessView(View):
+
+    def get(self, request, event_id, uidb64, token):
+        # ถอดรหัสข้อมูล 
+        uid = force_str(urlsafe_base64_decode(uidb64))
+        user = User.objects.get(pk=uid)
+        context = {
+            'user': user
+        }
+        return render(request, 'users/success.html', context)
     
+    def post(self, request, event_id, uidb64, token):
+        # ถอดรหัสข้อมูล 
+        uid = force_str(urlsafe_base64_decode(uidb64))
+        user = User.objects.get(pk=uid)
+        event_participants = EventParticipant.objects.filter(event_id=event_id, user=user)
+
+        for event_participant in event_participants:
+            event_participant.status = "Register"
+            event_participant.save() 
+        
+        
+        return redirect('homepage')
+
 
     
 

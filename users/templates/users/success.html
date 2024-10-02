@@ -1,0 +1,51 @@
+{% extends "general/components/layout.html" %}
+{% load static %}
+{% load custom_filters %}
+{% block title %}{% endblock %}
+{% block nav %}
+{% include "general/components/navbar.html" %}
+{% endblock %}
+{% block content %}
+
+<section>
+    <div class="min-h-screen flex flex-col justify-center items-center">
+        {% include "users/components/success_step.html" %}
+        <article>
+
+            <div class="container mt-8 flex flex-col items-center justify-center">
+                <form method="post" class="w-full max-w-lg bg-white border border-gray-200 rounded-lg shadow p-12 flex flex-col items-center justify-center">
+                    {% csrf_token %}
+                    <div class="mt-4 flex justify-between w-full">
+                        <p class="kanit-small text-xl">ชื่อนามสกุล: </p>
+                        <h1 class="kanit-black text-xl ml-4">{{ user.full_name }}</h1>
+                    </div>
+                    <div class="mt-4 flex justify-between w-full">
+                        <p class="kanit-small text-xl">อีเมล: </p>
+                        <h1 class="kanit-black text-xl">{{ user.email }}</h1>
+                    </div>
+                    <div class="mt-4 flex justify-between w-full">
+                        <p class="kanit-small text-xl">เบอร์โทร: </p>
+                        <h1 class="kanit-black text-xl">{{ user.userprofile.telephone }}</h1>
+                    </div>
+                    <div class="mt-4 flex justify-between w-full">
+                        <p class="kanit-small text-xl">วัน/เดือน/ปี เกิด: </p>
+                        <h1 class="kanit-black text-xl">{{ user.userprofile.date_of_birth }}</h1>
+                    </div>
+                    <button type="submit"
+                        class="mt-4 focus:outline-none text-white bg-green-700 hover:bg-green-800 focus:ring-4 focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-green-600 dark:hover:bg-green-700 dark:focus:ring-green-800">ยืนยัน</button>
+                </form>
+            </div>
+
+        </article>
+    </div>
+</section>
+
+
+{% endblock %}
+{% block script %}
+<script src="{% static 'general/js/navbar.js' %}"></script>
+{% endblock %}
+
+{% block footer %}
+{% include "general/components/footer.html" %}
+{% endblock %}

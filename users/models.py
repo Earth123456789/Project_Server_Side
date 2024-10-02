@@ -11,6 +11,9 @@ class User(AbstractUser):
     def __str__(self):
         return self.username
     
+    def full_name(self):
+        return f"{self.first_name} {self.last_name}"
+    
     # Organizer: is_staff = True
     def is_organizer(self):
         return self.is_staff
