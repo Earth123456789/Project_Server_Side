@@ -12,9 +12,9 @@ from django.utils.encoding import force_str
 from django.utils.encoding import force_bytes
 from django.template.loader import render_to_string
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
-import requests
+from django.http import JsonResponse
 
-from users.forms import UserRegistrationForm, UserLoginForm, ChangePasswordForm, UserPasswordChangeForm, AttendeeForm
+from users.forms import UserRegistrationForm, UserLoginForm, ChangePasswordForm, UserPasswordChangeForm, AttendeeForm, UserProfileForm
 from users.models import UserProfile, User, EventParticipant, Ticket
 
 from organizers.models import Event
@@ -24,7 +24,12 @@ from organizers.models import Event
 class RegisterView(View):
     def get(self, request):
         form = UserRegistrationForm()
-        return render(request, 'registration/register.html', {'form': form})
+
+        context = {
+            'form': form
+        }
+
+        return render(request, 'registration/register.html', context)
     
     # จัดการข้อผิดพลาด ทำให้ไม่ต้องทำความสะอาดฐานข้อมูลด้วยตัวเอง บันทึกข้อมูลในครั้งเดียวแทนที่จะบันทึกทีละรายการ
     @transaction.atomic
@@ -46,15 +51,24 @@ class RegisterView(View):
             user_profile.save()
 
             return redirect('login')
+        
+        context = {
+            'form': form
+        }
 
-        return render(request, 'registration/register.html', {'form': form})
+        return render(request, 'registration/register.html', context)
     
 # register.html, login.html, forms.py, backends.py, signals.py, models.py
 class LoginView(View):
     
     def get(self, request):
         form = UserLoginForm()
-        return render(request, 'registration/login.html', {"form": form})
+
+        context = {
+            "form": form
+        }
+
+        return render(request, 'registration/login.html', context)
     
     def post(self, request):
         form = UserLoginForm(data=request.POST)
@@ -68,7 +82,12 @@ class LoginView(View):
             return redirect('homepage')  
         
         print(form.errors)
-        return render(request,'registration/login.html', {"form":form})
+
+        context = {
+            'form': form
+        }
+
+        return render(request,'registration/login.html', context)
 
 class LogoutView(View):
     
@@ -81,7 +100,12 @@ class ChangePasswordView(View):
 
     def get(self, request):
         form = ChangePasswordForm()
-        return render(request, 'registration/change_password_form.html', {'form': form})
+
+        context = {
+            'form': form
+        }
+
+        return render(request, 'registration/change_password_form.html', context)
     
     def post(self, request):
         form = ChangePasswordForm(data=request.POST)
@@ -95,7 +119,12 @@ class ChangePasswordView(View):
             return redirect('login')
         
         print(form.errors)
-        return render(request, 'registration/change_password_form.html', {'form': form})
+
+        context = {
+            'form': form
+        }
+
+        return render(request, 'registration/change_password_form.html', context)
 
     def send_email(self, user, request):
         
@@ -134,7 +163,13 @@ class PasswordResetConfirmView(View):
 
         form = UserPasswordChangeForm(user)
         print(user)
-        return render(request, 'users/password_reset_form.html', {'form': form  ,'valid_token': True})
+
+        context = {
+            'form': form,
+            'valid_token': True
+        }
+
+        return render(request, 'users/password_reset_form.html', context)
     
     def post(self, request, uidb64, token):
         uid = force_str(urlsafe_base64_decode(uidb64))
@@ -145,7 +180,13 @@ class PasswordResetConfirmView(View):
             form.save()  
             return redirect('login')
         else:
-            return render(request, 'users/password_reset_form.html', {'form': form, 'valid_token': True})
+
+            context = {
+                'form': form,
+                'valid_token': True
+            }
+
+            return render(request, 'users/password_reset_form.html', context)
 
 # receive.html, models.py
 class ReceiveTicketView(LoginRequiredMixin, View):
@@ -183,7 +224,7 @@ class AttendeeView(LoginRequiredMixin, View):
    
         form = AttendeeForm(instance=user)
         # ตั้งค่าค่าเริ่มต้น field ให้ใส่ userprofile ได้
-        if user_profile.telephone and user_profile.date_of_birth:
+        if user_profile:
             form.fields['telephone'].initial = user_profile.telephone
             form.fields['date_of_birth'].initial = user_profile.date_of_birth.strftime('%Y-%m-%d')
         else:
@@ -274,6 +315,8 @@ class SuccessView(View):
         }
         return render(request, 'users/success.html', context)
     
+    # จัดการข้อผิดพลาด ทำให้ไม่ต้องทำความสะอาดฐานข้อมูลด้วยตัวเอง บันทึกข้อมูลในครั้งเดียวแทนที่จะบันทึกทีละรายการ
+    @transaction.atomic
     def post(self, request, event_id, uidb64, token):
         # ถอดรหัสข้อมูล 
         uid = force_str(urlsafe_base64_decode(uidb64))
@@ -281,7 +324,7 @@ class SuccessView(View):
         event_participants = EventParticipant.objects.filter(event_id=event_id, user=user)
 
         for event_participant in event_participants:
-            event_participant.status = "Register"
+            event_participant.status = 'Register'
             event_participant.save() 
 
 
@@ -295,9 +338,76 @@ class SuccessView(View):
         ticket.save()
 
         return redirect('homepage')
-
-
     
+class UserProfileView(LoginRequiredMixin, View):
+    login_url = 'login'
+
+    def get(self, request, user_id):
+
+        user = User.objects.get(pk=user_id)
+        try:
+            user_profile = UserProfile.objects.get(user=user)
+        except UserProfile.DoesNotExist:
+            user_profile = None
+
+        form = UserProfileForm(instance=user) 
+        
+        if user_profile:
+            form.fields['gender'].initial = user_profile.gender
+            form.fields['telephone'].initial = user_profile.telephone
+            form.fields['date_of_birth'].initial = user_profile.date_of_birth.strftime('%Y-%m-%d')
+        else:
+            form.fields['telephone'].initial = ''
+            form.fields['date_of_birth'].initial = ''
+        
+        context = {
+            'user': user,
+            'form': form
+        }
+
+        return render(request, 'users/userprofile.html', context)
+    
+    def post(self, request, user_id):
+
+        user = User.objects.get(pk=user_id)
+        try:
+            user_profile = UserProfile.objects.get(user=user)
+        except UserProfile.DoesNotExist:
+            user_profile = None
+
+        # ต้องใช้ enctype="multipart/form-data" (กำหนดชนิดการเข้ารหัส เพื่อให้ sever file ที่เข้ามา)  file จะถูกผ่าน request.FILES
+        form = UserProfileForm(request.POST, request.FILES, instance=user)
+
+        if form.is_valid():
+            form.save()
+
+            user_profile.profile_picture = request.FILES['profile_picture']
+            user_profile.gender = form.cleaned_data.get('gender')
+            user_profile.telephone = form.cleaned_data.get('telephone')
+            user_profile.date_of_birth = form.cleaned_data.get('date_of_birth')
+            user_profile.save()
+
+            return redirect('userprofile', user.id)
+        else:
+            
+            context = {
+                'user': user,
+                'form': form
+            }
+            
+            return render(request, 'users/userprofile.html', context)
+    
+class UserChangePassword(LoginRequiredMixin, View):
+    login_url = 'login'
+
+    def get(self, request, user_id):
+        form = ChangePasswordForm()
+
+        context = {
+            'form': form
+        }
 
 
+        return render(request, 'users/userprofilepassword.html', context)
+    
 

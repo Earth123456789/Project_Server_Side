@@ -224,6 +224,86 @@ class AttendeeForm(ModelForm):
             if age < 13:
                 raise ValidationError("คุณต้องมีอายุมากกว่า 13 ปีในการลงทะเบียนเข้าใช้ระบบนี้")
         return date_of_birth
+
+
+class UserProfileForm(ModelForm):
+
+    profile_picture = forms.ImageField(
+        required=False,  
+        widget=forms.ClearableFileInput(attrs={
+            'class': 'block w-full text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-gray-50 dark:text-gray-400 focus:outline-none dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400',
+            'type': 'file',
+            'id': 'file_input',
+            'placeholder': 'เลือกรูปโปรไฟล์'
+        })
+    )
+    
+    # สร้างรูปแบบการค้นหา
+    phone_validator = RegexValidator(
+        regex=r'^(0[0-9]{1})[0-9]{8}$',  # รูปแบบสำหรับหมายเลขมือถือไทย  ^: เริ่มต้น  0: ตัวแรกต้องเป็น 0 [0-9]{1}: หลังจาก 0 ต้องมี 0-9 เพียงหนึ่งหลัก [0-9]{8}: หมายถึงจะต้องมีตัวเลขอีก 8 หลักตามหลัง รวมกันแล้วจะต้องเป็นหมายเลขโทรศัพท์ทั้งหมด 10 หลัก $:จุดสิ้นสุด
+        message="หมายเลขโทรศัพท์ต้องเป็นหมายเลขโทรศัพท์มือถือที่ถูกต้อง เช่น 0812345678."
+    )
+    
+    gender = forms.ChoiceField(
+        choices=[
+            (None, 'กรุณาเลือกเพศ'),
+            ('M', 'ชาย'),
+            ('F', 'หญิง'),
+            ('O', 'อื่นๆ')
+        ],
+        widget=forms.Select(attrs={
+            'class': 'bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 kanit-small'
+        })  
+    )
+
+    telephone = forms.CharField(
+        max_length=15,
+        validators=[phone_validator],  
+        widget=forms.TextInput(attrs={
+            'class': 'bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 kanit-small', 
+            'placeholder': '0812345678'  
+        })
+    )
+
+    date_of_birth = forms.DateField(
+        widget=forms.DateInput(attrs={'type': 'date', 'class': 'border border-gray-300 rounded-md p-2 w-full kanit-small', 'placeholder': 'วันเกิด'})
+    )
+
+    class Meta:
+        model = User
+        fields = [
+            'username', 
+            'email', 
+            'first_name',
+            'last_name',
+            'gender', 
+            'telephone', 
+            'date_of_birth',
+            'profile_picture',
+        ] 
+
+        widgets = {
+            'username': forms.TextInput(attrs={'class': 'bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 kanit-small', 
+                                               'placeholder': 'กรอกชื่อผู้ใช้งาน'}),
+            'email': forms.EmailInput(attrs={'class': 'bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 kanit-small', 
+                                             'placeholder': 'กรอกอีเมล'}),
+            'first_name': forms.TextInput(attrs={'class': 'bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 kanit-small', 
+                                                 'placeholder': 'กรอกชื่อจริงของคุณ'}),
+            'last_name': forms.TextInput(attrs={'class': 'bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 kanit-small', 
+                                                'placeholder': 'กรอกนามสกุลของคุณ'}),
+        }
+    
+
+    def clean_date_of_birth(self):
+        date_of_birth = self.cleaned_data.get('date_of_birth')
+        if date_of_birth:
+            # ดึงวันที่ ณ ปัจจุบัน มา ลบ ข้อมูลที่ได้จาก form date_of_birth แล้วมาทำเป็นปี โดยทำเป็นวันก่อนแล้วหาร 365
+            age = (timezone.now().date() - date_of_birth).days // 365     # คำนวณอายุ
+            if age < 13:
+                raise ValidationError("คุณต้องมีอายุมากกว่า 13 ปีในการลงทะเบียนเข้าใช้ระบบนี้")
+        return date_of_birth
+
+
     
 
 

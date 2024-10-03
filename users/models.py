@@ -32,7 +32,7 @@ class UserProfile(models.Model):
     gender = models.CharField(max_length=10, choices=Gender.choices, blank=True, null=True)
     telephone = models.CharField(max_length=20, blank=True, null=True)
     date_of_birth = models.DateField(blank=True, null=True)  
-    profile_picture = models.URLField(blank=True, null=True)
+    profile_picture = models.ImageField(upload_to='profile_pics/', blank=True, null=True) 
 
     def __str__(self):
         return self.user.username

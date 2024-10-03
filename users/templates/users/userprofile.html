@@ -1,0 +1,114 @@
+{% extends "general/components/layout.html" %}
+{% load static %}
+{% block title %}{% endblock %}
+{% block nav %}
+{% include "general/components/navbar.html" %}
+{% endblock %}
+{% block content %}
+
+<section class="min-h-screen flex items-start justify-center space-x-8 mt-24">
+    {% include "users/components/cardprofileedit.html" %}
+    <main class="w-3/5 mt-14 bg-white border border-gray-200 rounded-lg shadow p-12 flex flex-col">
+        <h1 class="text-3xl text-left kanit-black-italic">แก้ไขโปรไฟล์</h1>
+        <form method="POST" enctype="multipart/form-data">
+            {% csrf_token %}
+            <!-- User Information -->
+
+
+            <article class="flex mb-4 mt-8">
+
+                <div>
+                    {% if user.userprofile.profile_picture %}
+                    <!-- ไม่ต้องเขียนใน views เพราะมีการใช้ AbstactUser เพื่อเชื่อมต่อกับข้อมูลอยู่แล้ว -->
+                    <img class="h-24 w-24 rounded-full cursor-pointer" src="{{ user.userprofile.profile_picture.url }}"
+                        alt="Profile Picture">
+                    {% else %}
+                    <img class="h-24 w-24 rounded-full cursor-pointer"
+                        src="{% static 'general/pic/default_profile.jpg' %}" alt="Default Profile Picture">
+                    {% endif %}
+                </div>
+
+                <div class="ml-8">
+                    <label for="{{ form.profile_picture.id_for_label }}" class="kanit-small">อัปโหลดรูปโปรไฟล์</label>
+                    {{ form.profile_picture }}
+                </div>
+
+            </article>
+
+            <label for="{{ form.username.id_for_label }}" class="kanit-small">ชื่อผู้ใช้:</label>
+            {{ form.username }}
+            <!-- ใช้การ check ระดับ filed -->
+            {% if form.username.errors %}
+            <div class="text-red-700 kanit-small">{{ form.username.errors.as_text }}</div>
+            {% endif %}
+
+
+            <article class="grid grid-cols-2 gap-16 mb-4 mt-4">
+                <div>
+                    <label for="{{ form.first_name.id_for_label }}" class="kanit-small">ชื่อจริง:</label>
+                    {{ form.first_name }}
+                    {% if form.first_name.errors %}
+                    <div class="text-red-700 kanit-small">{{ form.first_name.errors.as_text }}</div>
+                    {% endif %}
+                </div>
+
+                <div>
+                    <label for="{{ form.last_name.id_for_label }}" class="kanit-small">นามสกุล:</label>
+                    {{ form.last_name }}
+                    {% if form.last_name.errors %}
+                    <div class="text-red-700 kanit-small">{{ form.last_name.errors.as_text }}</div>
+                    {% endif %}
+                </div>
+            </article>
+
+            <article class="grid grid-cols-2 gap-16 mb-4 mt-4">
+                <div>
+                    <label for="{{ form.email.id_for_label }}" class="kanit-small">อีเมล:</label>
+                    {{ form.email }}
+                    {% if form.telephone.errors %}
+                    <div class="text-red-700 kanit-small">{{ form.telephone.errors.as_text }}</div>
+                    {% endif %}
+                </div>
+
+                <div>
+                    <label for="{{ form.telephone.id_for_label }}" class="kanit-small">หมายเลขโทรศัพท์:</label>
+                    {{ form.telephone }}
+                    {% if form.telephone.errors %}
+                    <div class="text-red-700 kanit-small">{{ form.telephone.errors.as_text }}</div>
+                    {% endif %}
+                </div>
+
+            </article>
+            <article class="grid grid-cols-2 gap-16 mb-4 mt-4">
+                <div>
+                    <label for="{{ form.date_of_birth.id_for_label }}" class="kanit-small">วันเกิด:</label>
+                    {{ form.date_of_birth }}
+                    {% if form.date_of_birth.errors %}
+                    <div class="text-red-700 kanit-small">{{ form.date_of_birth.errors.as_text }}</div>
+                    {% endif %}
+                </div>
+                <div>
+                    <div class="mb-4">
+                        <label for="{{ form.gender.id_for_label }}" class="kanit-small">เพศ:</label>
+                        {{ form.gender }}
+                        {% if form.gender.errors %}
+                        <div class="text-red-700 kanit-small">{{ form.gender.errors.as_text }}</div>
+                        {% endif %}
+                    </div>
+                </div>
+            </article>
+
+            <button type="submit"
+                class="w-full bg-green-500 hover:bg-green-700 text-white font-bold py-2 rounded kanit-small">บันทึก</button>
+        </form>
+    </main>
+</section>
+
+{% endblock %}
+{% block script %}
+<script src="{% static 'general/js/navbar.js' %}"></script>
+{% endblock %}
+
+{% block footer %}
+{% include "general/components/footer.html" %}
+{% endblock %}
