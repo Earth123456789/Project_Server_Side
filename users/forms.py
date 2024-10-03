@@ -6,7 +6,7 @@ from django.core.exceptions import ValidationError
 from django.utils import timezone
 from datetime import timedelta
 from django.core.validators import RegexValidator
-from django.contrib.auth.forms import AuthenticationForm, PasswordChangeForm
+from django.contrib.auth.forms import AuthenticationForm, PasswordChangeForm, PasswordResetForm
 
 class UserRegistrationForm(ModelForm):
 
@@ -138,7 +138,7 @@ class UserLoginForm(AuthenticationForm):
 class ChangePasswordForm(forms.Form):
 
     email = forms.EmailField(label='อีเมล', widget=forms.TextInput(attrs={'class': 'bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 kanit-small', 
-                                             'placeholder': 'กรอกอีเมล'}))
+                                             'placeholder': 'กรอกอีเมลของคุณ'}))
 
     def clean_email(self):
         # ดึงค่า email และ ตรวจสอบ + ทำความสะอาดข้อมูล

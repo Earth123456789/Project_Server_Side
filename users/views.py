@@ -407,7 +407,51 @@ class UserChangePassword(LoginRequiredMixin, View):
             'form': form
         }
 
+        return render(request, 'users/userprofilepassword.html', context)
+    
+    def post(self, request, user_id):
+        form = ChangePasswordForm(request.POST)
+        
+        if form.is_valid():
+            email = form.cleaned_data['email']
+            user = User.objects.get(email=email)
+            
+            # ส่งอีเมลยืนยันการเปลี่ยนรหัสผ่าน
+            self.send_email(user, request)
+            return redirect('changepassword')
+        
+        print(form.errors)
+
+        context = {
+            'form': form
+        }
 
         return render(request, 'users/userprofilepassword.html', context)
+
+    def send_email(self, user, request):
+        
+        subject = 'เปลี่ยนรหัสผ่าน'
+
+        # ดึง domain จาก request
+        domain = request.get_host()
+        # สร้าง token ที่ไม่ซ้ำกันสำหรับผู้ใช้ (เป็นของ django)
+        token = default_token_generator.make_token(user)
+        # เข้ารหัส Primary Key ของผู้ใช้ให้ปลอดภัย (แบบ BASE 64)
+        uid = urlsafe_base64_encode(force_bytes(user.pk))
+        link = f'http://{domain}/user/password_reset_confirm/{uid}/{token}/'
+        reset_link = f"{link}"
+
+        # render template เป็น string โดยไม่ต้องส่ง response
+        message = render_to_string('users/password_reset_email.html', {
+            'user': user,
+            'reset_link': reset_link,
+        })
+
+        from_email = settings.DEFAULT_FROM_EMAIL
+        recipient_list = [user.email]
+
+
+        email = EmailMessage(subject, message, from_email, recipient_list)
+        email.send()
     
 
