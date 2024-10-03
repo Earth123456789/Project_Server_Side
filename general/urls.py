@@ -5,6 +5,7 @@ from django.conf.urls.static import static
 
 
 urlpatterns = [
+    # Event
     path("", HomepageView.as_view(), name="homepage"),
     path("event/<int:event_id>/", EventView.as_view(), name="event"),
     path("event/<int:event_id>/followers/<int:user_id>/", EventView.as_view(), name="follower"),

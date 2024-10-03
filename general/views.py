@@ -74,3 +74,5 @@ class EventView(View):
         user.followed_events.remove(event)
         return JsonResponse({'status':'remove_susecss'}, status=200)
 
+
+

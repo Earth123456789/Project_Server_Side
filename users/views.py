@@ -5,6 +5,7 @@ from django.db import transaction
 from django.contrib.auth import logout, login
 from django.contrib import messages
 from django.core.mail import EmailMessage
+from django.core.exceptions import PermissionDenied
 from django.conf import settings
 from django.contrib.auth.tokens import default_token_generator
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
@@ -12,9 +13,8 @@ from django.utils.encoding import force_str
 from django.utils.encoding import force_bytes
 from django.template.loader import render_to_string
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
-from django.http import JsonResponse
 
-from users.forms import UserRegistrationForm, UserLoginForm, ChangePasswordForm, UserPasswordChangeForm, AttendeeForm, UserProfileForm
+from users.forms import UserRegistrationForm, UserLoginForm, ChangePasswordForm, UserPasswordChangeForm, AttendeeForm, UserProfileForm, UserSetPasswordForm
 from users.models import UserProfile, User, EventParticipant, Ticket
 
 from organizers.models import Event
@@ -161,7 +161,7 @@ class PasswordResetConfirmView(View):
         uid = force_str(urlsafe_base64_decode(uidb64))
         user = User.objects.get(pk=uid)
 
-        form = UserPasswordChangeForm(user)
+        form = UserSetPasswordForm(user)
         print(user)
 
         context = {
@@ -175,7 +175,7 @@ class PasswordResetConfirmView(View):
         uid = force_str(urlsafe_base64_decode(uidb64))
         user = User.objects.get(pk=uid)
 
-        form = UserPasswordChangeForm(user, request.POST)
+        form = UserSetPasswordForm(user, request.POST)
         if form.is_valid():
             form.save()  
             return redirect('login')
@@ -344,6 +344,10 @@ class UserProfileView(LoginRequiredMixin, View):
 
     def get(self, request, user_id):
 
+        # ตรวจสอบว่า user_id ตรงกับผู้ใช้ที่กำลังเข้าสู่ระบบหรือไม่ (ตรวจ request ที่เข้ามาตรงกับ user_id ไหม)
+        if request.user.id != user_id:
+            raise PermissionDenied(f"เข้าได้เฉพาะผู้ใช้งานที่กำหนดไว้")
+        
         user = User.objects.get(pk=user_id)
         try:
             user_profile = UserProfile.objects.get(user=user)
@@ -368,6 +372,10 @@ class UserProfileView(LoginRequiredMixin, View):
         return render(request, 'users/userprofile.html', context)
     
     def post(self, request, user_id):
+
+        # ตรวจสอบว่า user_id ตรงกับผู้ใช้ที่กำลังเข้าสู่ระบบหรือไม่ (ตรวจ request ที่เข้ามาตรงกับ user_id ไหม)
+        if request.user.id != user_id:
+            raise PermissionDenied(f"เข้าได้เฉพาะผู้ใช้งานที่กำหนดไว้")
 
         user = User.objects.get(pk=user_id)
         try:
@@ -400,7 +408,13 @@ class UserProfileView(LoginRequiredMixin, View):
 class UserChangePassword(LoginRequiredMixin, View):
     login_url = 'login'
 
+    
+
     def get(self, request, user_id):
+
+        if request.user.id != user_id:
+            raise PermissionDenied(f"เข้าได้เฉพาะผู้ใช้งานที่กำหนดไว้")
+        
         form = ChangePasswordForm()
 
         context = {
@@ -410,6 +424,10 @@ class UserChangePassword(LoginRequiredMixin, View):
         return render(request, 'users/userprofilepassword.html', context)
     
     def post(self, request, user_id):
+
+        if request.user.id != user_id:
+            raise PermissionDenied(f"เข้าได้เฉพาะผู้ใช้งานที่กำหนดไว้")
+        
         form = ChangePasswordForm(request.POST)
         
         if form.is_valid():
@@ -453,5 +471,38 @@ class UserChangePassword(LoginRequiredMixin, View):
 
         email = EmailMessage(subject, message, from_email, recipient_list)
         email.send()
+
+class PasswordChangeConfirmView(View):
+
+    def get(self, request, uidb64, token):
+        # ถอดรหัสข้อมูล เพื่อดึงข้อมูล User มาใช้งาน ถอดรหัสจะเป็น (user.pk) ที่ส่ง request เข้ามา
+        uid = force_str(urlsafe_base64_decode(uidb64))
+        user = User.objects.get(pk=uid)
+
+        form = UserChangePassword(user)
+        print(user)
+
+        context = {
+            'form': form,
+            'valid_token': True
+        }
+
+        return render(request, 'users/password_change_form.html', context)
     
+    def post(self, request, uidb64, token):
+        uid = force_str(urlsafe_base64_decode(uidb64))
+        user = User.objects.get(pk=uid)
+
+        form = UserChangePassword(user, request.POST)
+        if form.is_valid():
+            form.save()  
+            return redirect('login')
+        else:
+
+            context = {
+                'form': form,
+                'valid_token': True
+            }
+
+            return render(request, 'users/password_change_form.html', context)
 
