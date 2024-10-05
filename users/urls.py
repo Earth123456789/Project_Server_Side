@@ -23,7 +23,7 @@ urlpatterns = [
     path("ticket/<int:user_id>/detail/<int:ticket_id>/", TicketDeatilView.as_view(), name="ticketdetail" ),
     path("ticket/past/<int:user_id>/", TicketPastView.as_view(), name="ticketpast" ),
     path("change_password/<int:user_id>/", UserChangePassword.as_view(), name="changepassword" ),
-    path("password_reset_confirm/<str:uidb64>/<str:token>/", PasswordChangeConfirmView.as_view(), name="password_reset_confirm"),
+    path("password_change_confirm/<str:uidb64>/<str:token>/", PasswordChangeConfirmView.as_view(), name="password_change_confirm"),
 ] 
 
 # ตั้งค่าเพื่อให้ใช้ รูปที่มาจาก media (imagefiled) ได้

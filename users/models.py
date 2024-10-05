@@ -66,12 +66,12 @@ class Ticket(models.Model):
         Expired = 'Expired'
 
     event_participant = models.OneToOneField('users.EventParticipant', on_delete=models.CASCADE)
-    qr_code = models.CharField(max_length=255)
+    qr_code = models.CharField(max_length=255, null=True, blank=True)
     qr_code_image = models.URLField(null=True, blank=True)
     status = models.CharField(
         max_length=15,
         choices=StatusChoices.choices,  
-        default=StatusChoices.Valid  
+        default=StatusChoices.Valid
     )
     issue_date = models.DateField(auto_now_add=True)
     # แก้ข้อมูลไม่ได้

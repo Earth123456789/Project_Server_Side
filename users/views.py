@@ -207,6 +207,20 @@ class ReceiveTicketView(LoginRequiredMixin, View):
         user = request.user
         token = default_token_generator.make_token(user)
         uid = urlsafe_base64_encode(force_bytes(user.pk))
+        event = Event.objects.get(pk=event_id)
+
+        # (get ค่าจาก name="ticket_quantity" ใน template) ค่าเริ่มต้นที่ 1
+        ticket_quantity = int(request.POST.get("ticket_quantity", 1))
+
+        print(ticket_quantity)
+        
+        for participations in range(ticket_quantity):
+            participation = EventParticipant(
+                user=user,
+                event=event,
+                status="Attended"
+            )
+            participation.save()
 
         return redirect('attendent', event_id=event_id, uidb64=uid, token=token)
 
@@ -328,16 +342,17 @@ class SuccessView(View):
         for event_participant in event_participants:
             event_participant.status = 'Register'
             event_participant.save() 
-
-
-        ticket = Ticket(
+            ticket = Ticket(
             event_participant=event_participant,
-        )
-        qr_data = ticket.entry_code  
-        qr_code_url = f"https://api.qrserver.com/v1/create-qr-code/?data={qr_data}&size=300x300"
-        ticket.qr_code = qr_data
-        ticket.qr_code_image = qr_code_url
-        ticket.save()
+            )
+            qr_data = ticket.entry_code  
+            qr_code_url = f"https://api.qrserver.com/v1/create-qr-code/?data={qr_data}&size=300x300"
+            ticket.qr_code = qr_data
+            ticket.qr_code_image = qr_code_url
+            ticket.save()
+
+
+        
 
         return redirect('homepage')
     
@@ -460,11 +475,11 @@ class UserChangePassword(LoginRequiredMixin, View):
         token = default_token_generator.make_token(user)
         # เข้ารหัส Primary Key ของผู้ใช้ให้ปลอดภัย (แบบ BASE 64)
         uid = urlsafe_base64_encode(force_bytes(user.pk))
-        link = f'http://{domain}/user/password_reset_confirm/{uid}/{token}/'
+        link = f'http://{domain}/user/password_change_confirm/{uid}/{token}/'
         reset_link = f"{link}"
 
         # render template เป็น string โดยไม่ต้องส่ง response
-        message = render_to_string('users/password_reset_email.html', {
+        message = render_to_string('users/password_change_email.html', {
             'user': user,
             'reset_link': reset_link,
         })
@@ -484,7 +499,7 @@ class PasswordChangeConfirmView(LoginRequiredMixin, View):
         uid = force_str(urlsafe_base64_decode(uidb64))
         user = User.objects.get(pk=uid)
 
-        form = UserChangePassword(user)
+        form = UserPasswordChangeForm(user)
         print(user)
 
         context = {
@@ -498,7 +513,7 @@ class PasswordChangeConfirmView(LoginRequiredMixin, View):
         uid = force_str(urlsafe_base64_decode(uidb64))
         user = User.objects.get(pk=uid)
 
-        form = UserChangePassword(user, request.POST)
+        form = UserPasswordChangeForm(user, request.POST)
         if form.is_valid():
             form.save()  
             return redirect('login')

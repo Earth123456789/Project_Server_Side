@@ -11,7 +11,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMix
 class HomepageView(View):
     def get(self, request):
 
-        # รับค่าหมวดหมู่จาก query parameters แทน session
+        # รับค่าหมวดหมู่จาก query parameters (get ค่าจาก name="category" ใน template)
         category_name = request.GET.get('category', None)
 
         search = request.GET.get('search', None)
