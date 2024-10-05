@@ -525,7 +525,7 @@ class TicketView(LoginRequiredMixin, View):
 
         tickets = Ticket.objects.filter(
             event_participant__user=user, 
-            event_participant__event__end_date__gte=current_time
+            event_participant__event__start_date__gte=current_time
         )
 
         context = {
@@ -540,14 +540,13 @@ class TicketDeatilView(LoginRequiredMixin, View):
 
     def get(self, request, user_id, ticket_id):
 
-        current_time = timezone.now() 
-
         if request.user.id != user_id:
             raise PermissionDenied(f"เข้าได้เฉพาะผู้ใช้งานที่กำหนดไว้")
         
         user = User.objects.get(pk=user_id)
 
         ticket = Ticket.objects.get(pk=ticket_id)
+        
 
         context = {
             'user': user,
@@ -555,3 +554,28 @@ class TicketDeatilView(LoginRequiredMixin, View):
         }
 
         return render(request, 'users/ticketdetailview.html', context)
+    
+
+class TicketPastView(LoginRequiredMixin, View):
+    login_url = 'login'
+
+    def get(self, request, user_id):
+
+        current_time = timezone.now() 
+
+        if request.user.id != user_id:
+            raise PermissionDenied(f"เข้าได้เฉพาะผู้ใช้งานที่กำหนดไว้")
+        
+        user = User.objects.get(pk=user_id)
+
+        tickets = Ticket.objects.filter(
+            event_participant__user=user, 
+            event_participant__event__start_date__lt=current_time
+        )
+
+        context = {
+            'user': user,
+            'tickets': tickets
+        }
+
+        return render(request, 'users/ticketviewpast.html', context)

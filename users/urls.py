@@ -1,6 +1,6 @@
 # users/url.py
 from django.urls import path
-from users.views import RegisterView, LoginView, LogoutView, ChangePasswordView, PasswordResetConfirmView, ReceiveTicketView, AttendeeView, SuccessView, UserProfileView, UserChangePassword, PasswordChangeConfirmView, TicketView, TicketDeatilView
+from users.views import RegisterView, LoginView, LogoutView, ChangePasswordView, PasswordResetConfirmView, ReceiveTicketView, AttendeeView, SuccessView, UserProfileView, UserChangePassword, PasswordChangeConfirmView, TicketView, TicketDeatilView, TicketPastView
 from django.conf import settings
 from django.conf.urls.static import static
 
@@ -21,6 +21,7 @@ urlpatterns = [
     path("<int:user_id>/", UserProfileView.as_view(), name="userprofile" ),
     path("ticket/<int:user_id>/", TicketView.as_view(), name="ticket" ),
     path("ticket/<int:user_id>/detail/<int:ticket_id>/", TicketDeatilView.as_view(), name="ticketdetail" ),
+    path("ticket/past/<int:user_id>/", TicketPastView.as_view(), name="ticketpast" ),
     path("change_password/<int:user_id>/", UserChangePassword.as_view(), name="changepassword" ),
     path("password_reset_confirm/<str:uidb64>/<str:token>/", PasswordChangeConfirmView.as_view(), name="password_reset_confirm"),
 ] 

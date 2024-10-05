@@ -2,11 +2,11 @@
 <main class="w-3/5 mt-14 bg-white border border-gray-200 rounded-lg shadow p-12 flex flex-col">
     <h1 class="text-3xl text-left kanit-black-italic">บัตร</h1>
     <article class="flex space-x-32 mb-8 mt-8">
-        <a href="#" class="flex items-center">
-            <div class="w-2 h-8 bg-green-500 mr-4"></div>
+        <a href="{% url 'ticket' user.id  %}" class="flex items-center">
             <h1 class="text-xl text-left kanit-black">งานที่กำลังจะเกิดขึ้น</h1>
         </a>
-        <a href="{% url 'ticketpast' user.id  %}" class="flex items-center">
+        <a href="#" class="flex items-center">
+            <div class="w-2 h-8 bg-green-500 mr-4"></div>
             <h1 class="text-xl text-left kanit-black">งานที่ผ่านไปแล้ว</h1>
         </a>
     </article>
