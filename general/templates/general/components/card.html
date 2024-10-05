@@ -4,6 +4,12 @@
 
 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-24 ">
     {% for event in events %}
+    {% if event.is_full %}
+    <div class="p-4">
+        <h2 class="text-xl font-bold text-red-500">{{ event.name }}</h2>
+        <p class="text-gray-700">อีเว้นต์นี้เต็มแล้ว</p>
+    </div>
+    {% else %}    
     <a href="{% url 'event' event.id %}">
         <div class="max-w-sm bg-white rounded-lg flex flex-col items-center">
             <img class="rounded-lg object-cover" style="width: 375px; height: 375px;" src="{{ event.image.url }}"
@@ -25,6 +31,7 @@
             </div>
         </div>
     </a>
+    {% endif %}
     {% endfor %}
 </div>
 </a>

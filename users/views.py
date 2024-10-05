@@ -228,32 +228,33 @@ class AttendeeView(LoginRequiredMixin, View):
     login_url = 'login'
 
     def get(self, request, event_id, uidb64, token):
-        # ถอดรหัสข้อมูล 
+        # Decode the user ID from the URL
         uid = force_str(urlsafe_base64_decode(uidb64))
-        user = User.objects.get(pk=uid)
-        
-        try:
-            user_profile = UserProfile.objects.get(user=user)
-        except UserProfile.DoesNotExist:
-            user_profile = None
-            
-   
-        form = AttendeeForm(instance=user)
-        # ตั้งค่าค่าเริ่มต้น field ให้ใส่ userprofile ได้
-        if user_profile:
-            form.fields['telephone'].initial = user_profile.telephone
-            form.fields['date_of_birth'].initial = user_profile.date_of_birth.strftime('%Y-%m-%d')
-        else:
-            form.fields['telephone'].initial = ''
-            form.fields['date_of_birth'].initial = ''
 
-        print(user_profile.date_of_birth)
+        try:
+            user = User.objects.get(pk=uid)
+            user_profile = UserProfile.objects.get(user=user)
+        except User.DoesNotExist:
+            return render(request, 'users/error.html', {'message': 'User not found.'})
+        except UserProfile.DoesNotExist:
+            user_profile = None  
+
+        form = AttendeeForm(instance=user)
+
+        
+        if user_profile:
+            form.fields['date_of_birth'].initial = user_profile.date_of_birth.strftime('%Y-%m-%d')
+            form.fields['telephone'].initial = user_profile.telephone 
+        else:
+            form.fields['date_of_birth'].initial = ''  
+            form.fields['telephone'].initial = ''
+
         context = {
-        'user': user,
-        'valid_token': True,
-        'form': form
+            'user': user,
+            'valid_token': True,
+            'form': form
         }
-        print(user)
+
         return render(request, 'users/attendee.html', context)
         
     # จัดการข้อผิดพลาด ทำให้ไม่ต้องทำความสะอาดฐานข้อมูลด้วยตัวเอง บันทึกข้อมูลในครั้งเดียวแทนที่จะบันทึกทีละรายการ
@@ -360,24 +361,25 @@ class UserProfileView(LoginRequiredMixin, View):
     login_url = 'login'
 
     def get(self, request, user_id):
-
         # ตรวจสอบว่า user_id ตรงกับผู้ใช้ที่กำลังเข้าสู่ระบบหรือไม่ (ตรวจ request ที่เข้ามาตรงกับ user_id ไหม)
         if request.user.id != user_id:
-            raise PermissionDenied(f"เข้าได้เฉพาะผู้ใช้งานที่กำหนดไว้")
-        
+            raise PermissionDenied("เข้าได้เฉพาะผู้ใช้งานที่กำหนดไว้")
+
         user = User.objects.get(pk=user_id)
         try:
             user_profile = UserProfile.objects.get(user=user)
         except UserProfile.DoesNotExist:
             user_profile = None
 
-        form = UserProfileForm(instance=user) 
-        
+        form = UserProfileForm(instance=user)
+
+       
         if user_profile:
             form.fields['gender'].initial = user_profile.gender
             form.fields['telephone'].initial = user_profile.telephone
             form.fields['date_of_birth'].initial = user_profile.date_of_birth.strftime('%Y-%m-%d')
         else:
+            form.fields['gender'].initial = ''
             form.fields['telephone'].initial = ''
             form.fields['date_of_birth'].initial = ''
         
@@ -389,16 +391,16 @@ class UserProfileView(LoginRequiredMixin, View):
         return render(request, 'users/userprofile.html', context)
     
     def post(self, request, user_id):
-
         # ตรวจสอบว่า user_id ตรงกับผู้ใช้ที่กำลังเข้าสู่ระบบหรือไม่ (ตรวจ request ที่เข้ามาตรงกับ user_id ไหม)
         if request.user.id != user_id:
-            raise PermissionDenied(f"เข้าได้เฉพาะผู้ใช้งานที่กำหนดไว้")
+            raise PermissionDenied("เข้าได้เฉพาะผู้ใช้งานที่กำหนดไว้")
 
         user = User.objects.get(pk=user_id)
+
         try:
             user_profile = UserProfile.objects.get(user=user)
         except UserProfile.DoesNotExist:
-            user_profile = None
+            user_profile = UserProfile(user=user)  
 
         # ต้องใช้ enctype="multipart/form-data" (กำหนดชนิดการเข้ารหัส เพื่อให้ sever file ที่เข้ามา)  file จะถูกผ่าน request.FILES
         form = UserProfileForm(request.POST, request.FILES, instance=user)
@@ -406,9 +408,11 @@ class UserProfileView(LoginRequiredMixin, View):
         if form.is_valid():
             form.save()
 
+            
             if 'profile_picture' in request.FILES:
                 user_profile.profile_picture = request.FILES['profile_picture']
                 
+           
             user_profile.gender = form.cleaned_data.get('gender')
             user_profile.telephone = form.cleaned_data.get('telephone')
             user_profile.date_of_birth = form.cleaned_data.get('date_of_birth')
@@ -416,13 +420,14 @@ class UserProfileView(LoginRequiredMixin, View):
 
             return redirect('userprofile', user.id)
         else:
-            
             context = {
                 'user': user,
                 'form': form
             }
-            
             return render(request, 'users/userprofile.html', context)
+        
+        
+         
     
 class UserChangePassword(LoginRequiredMixin, View):
     login_url = 'login'
