@@ -1,0 +1,24 @@
+{% extends "general/components/layout.html" %}
+{% load static %}
+{% block title %}{% endblock %}
+{% block nav %}
+{% include "general/components/navbar.html" %}
+{% endblock %}
+{% block content %}
+
+<section class="min-h-screen flex items-start justify-center space-x-8 mt-24">
+    {% include "users/components/cardticket.html" %}
+    <div class="flex flex-col w-3/5 mt-14 space-y-8">
+        {% include "users/components/cardticketdetailview.html" %}
+        {% include "users/components/cardticketqr.html" %}
+    </div>
+</section>
+
+{% endblock %}
+{% block script %}
+<script src="{% static 'general/js/navbar.js' %}"></script>
+{% endblock %}
+
+{% block footer %}
+{% include "general/components/footer.html" %}
+{% endblock %}

@@ -534,3 +534,24 @@ class TicketView(LoginRequiredMixin, View):
         }
 
         return render(request, 'users/ticketview.html', context)
+
+class TicketDeatilView(LoginRequiredMixin, View):
+    login_url = 'login'
+
+    def get(self, request, user_id, ticket_id):
+
+        current_time = timezone.now() 
+
+        if request.user.id != user_id:
+            raise PermissionDenied(f"เข้าได้เฉพาะผู้ใช้งานที่กำหนดไว้")
+        
+        user = User.objects.get(pk=user_id)
+
+        ticket = Ticket.objects.get(pk=ticket_id)
+
+        context = {
+            'user': user,
+            'ticket': ticket
+        }
+
+        return render(request, 'users/ticketdetailview.html', context)

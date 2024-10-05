@@ -1,0 +1,30 @@
+{% load static %}
+<main class="bg-white border border-gray-200 rounded-lg shadow p-12 flex flex-col min-h-96 relative">
+    <h1 class="text-3xl text-left kanit-black-italic">รายละเอียด</h1>
+    <p class="text-l text-left kanit-black text-red-500 mt-4">บัตรนี้เป็นประเภท E-Ticket กรุณาแสดง QR เพื่อเข้างาน และอย่าแชร์ QR นี้ให้กับคนอื่น</p>
+    <img class="h-32 w-32 cursor-pointer absolute top-8 right-8" src="{{ ticket.qr_code_image }}" alt="{{ ticket.qr_code }}">
+    <div class="flex mt-8">
+        <p class="text-xl text-left kanit-black text-gray-500">ชื่อเจ้าของ: </p>
+        <p class="text-xl text-left kanit-black ml-4">{{ ticket.event_participant.user.full_name }}</p>
+    </div>
+    <div class="flex mt-8">
+        <p class="text-xl text-left kanit-black text-gray-500">อีเมล: </p>
+        <p class="text-xl text-left kanit-black ml-4">{{ ticket.event_participant.user.email }}</p>
+    </div>
+    <div class="flex mt-8">
+        <p class="text-xl text-left kanit-black text-gray-500">เบอร์โทร: </p>
+        <p class="text-xl text-left kanit-black ml-4">{{ ticket.event_participant.user.userprofile.telephone }}</p>
+    </div>
+    <div class="flex mt-8">
+        <p class="text-xl text-left kanit-black text-gray-500">เพศ: </p>
+        <p class="text-xl text-left kanit-black ml-4">
+            {% if ticket.event_participant.user.userprofile.gender == "M" %}
+                ชาย
+            {% elif ticket.event_participant.user.userprofile.gender == "F" %}
+                หญิง
+            {% else %}
+                อื่นๆ
+            {% endif %}
+        </p>
+    </div>
+</main>

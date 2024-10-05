@@ -1,20 +1,9 @@
 {% load static %}
-<main class="w-3/5 mt-14 bg-white border border-gray-200 rounded-lg shadow p-12 flex flex-col">
+<main class="bg-white border border-gray-200 rounded-lg shadow p-12 flex flex-col">
     <h1 class="text-3xl text-left kanit-black-italic">บัตร</h1>
-    <article class="flex space-x-32 mb-8 mt-8">
-        <a href="#" class="flex items-center">
-            <div class="w-2 h-8 bg-green-500 mr-4"></div>
-            <h1 class="text-xl text-left kanit-black">งานที่กำลังจะเกิดขึ้น</h1>
-        </a>
-        <a href="#" class="flex items-center">
-            <h1 class="text-xl text-left kanit-black">งานที่ผ่านไปแล้ว</h1>
-        </a>
-    </article>
-    {% for ticket in tickets %}
     <article class="flex items-start mb-8 mt-8">
         <img class="rounded-lg object-cover mr-8" style="width: 200px; height: 200px;"
             src="{{ ticket.event_participant.event.image.url }}" alt="{{ ticket.event_participant.event.name }}" />
-
         <article>
             <h5 class="mb-4 text-l font-bold tracking-tight text-gray-900 dark:text-white kanit-black">
                 {{ ticket.event_participant.event.name }}
@@ -39,25 +28,6 @@
                 </svg>
                 <p class="ml-4 kanit-regular">{{ ticket.event_participant.event.location.name }}</p>
             </div>
-            <a href="{% url 'ticketdetail' user.id ticket.id %}">
-            <button type="button"
-                class="mt-4 text-white bg-gradient-to-r from-cyan-500 to-blue-500 hover:bg-gradient-to-bl focus:ring-4 focus:outline-none focus:ring-cyan-300 dark:focus:ring-cyan-800 font-medium rounded-lg text-sm px-5 py-2.5 text-center me-2 mb-2">ดูรายละเอียด</button>
-            </a>
         </article>
     </article>
-    {% empty %}
-    <div class="flex flex-col justify-center items-center mt-8">
-        <?xml version="1.0" encoding="utf-8"?>
-        <svg width="84" height="84" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M9 17C9.85038 16.3697 10.8846 16 12 16C13.1154 16 14.1496 16.3697 15 17" stroke="#1C274C"
-                stroke-width="1.5" stroke-linecap="round" />
-            <ellipse cx="15" cy="10.5" rx="1" ry="1.5" fill="#1C274C" />
-            <ellipse cx="9" cy="10.5" rx="1" ry="1.5" fill="#1C274C" />
-            <path
-                d="M7 3.33782C8.47087 2.48697 10.1786 2 12 2C17.5228 2 22 6.47715 22 12C22 17.5228 17.5228 22 12 22C6.47715 22 2 17.5228 2 12C2 10.1786 2.48697 8.47087 3.33782 7"
-                stroke="#1C274C" stroke-width="1.5" stroke-linecap="round" />
-        </svg>
-        <h1 class="text-2xl text-center kanit-black mt-8">คุณยังไม่มีตั๋ว</h1>
-    </div>
-    {% endfor %}
 </main>
