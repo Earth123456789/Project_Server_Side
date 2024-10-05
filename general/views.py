@@ -4,6 +4,7 @@ from django.views import View
 from organizers.models import Event, Category
 from django.db.models import Count
 from users.models import UserProfile, User
+from django.utils import timezone
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
 # Create your views here.
 
@@ -15,11 +16,13 @@ class HomepageView(View):
 
         search = request.GET.get('search', None)
 
+        current_time = timezone.now() 
+
         # ดึง Event ตามหมวดหมู่ที่ระบุ
         if category_name:
-            events = Event.objects.filter(category__name=category_name)
+            events = Event.objects.filter(category__name=category_name, end_date__gte=current_time)
         else:
-            events = Event.objects.all()
+            events = Event.objects.filter(end_date__gte=current_time)
         
         if search:
             # คืนค่าทุกเหตุการณ์ไม่ว่าจะเป็นตัวพิมพ์ใหญ่หรือตัวพิมพ์เล็ก
@@ -33,8 +36,8 @@ class HomepageView(View):
         most_followed_event = None
         slider_events = None
         if not search:
-            most_followed_event = Event.objects.annotate(num_followers=Count('followers')).order_by('-num_followers')[:3]
-            slider_events = Event.objects.all()[:5]
+            most_followed_event = Event.objects.annotate(num_followers=Count('followers')).filter(end_date__gte=current_time).order_by('-num_followers')[:3]
+            slider_events = Event.objects.filter(end_date__gte=current_time)[:5]
     
         # homepage.html
         categories = Category.objects.all()

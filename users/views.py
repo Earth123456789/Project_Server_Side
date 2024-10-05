@@ -6,12 +6,14 @@ from django.contrib.auth import logout, login
 from django.contrib import messages
 from django.core.mail import EmailMessage
 from django.core.exceptions import PermissionDenied
+from django.db.models import Count
 from django.conf import settings
 from django.contrib.auth.tokens import default_token_generator
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.utils.encoding import force_str
 from django.utils.encoding import force_bytes
 from django.template.loader import render_to_string
+from django.utils import timezone
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
 
 from users.forms import UserRegistrationForm, UserLoginForm, ChangePasswordForm, UserPasswordChangeForm, AttendeeForm, UserProfileForm, UserSetPasswordForm
@@ -389,7 +391,9 @@ class UserProfileView(LoginRequiredMixin, View):
         if form.is_valid():
             form.save()
 
-            user_profile.profile_picture = request.FILES['profile_picture']
+            if 'profile_picture' in request.FILES:
+                user_profile.profile_picture = request.FILES['profile_picture']
+                
             user_profile.gender = form.cleaned_data.get('gender')
             user_profile.telephone = form.cleaned_data.get('telephone')
             user_profile.date_of_birth = form.cleaned_data.get('date_of_birth')
@@ -472,7 +476,8 @@ class UserChangePassword(LoginRequiredMixin, View):
         email = EmailMessage(subject, message, from_email, recipient_list)
         email.send()
 
-class PasswordChangeConfirmView(View):
+class PasswordChangeConfirmView(LoginRequiredMixin, View):
+    login_url = 'login'
 
     def get(self, request, uidb64, token):
         # ถอดรหัสข้อมูล เพื่อดึงข้อมูล User มาใช้งาน ถอดรหัสจะเป็น (user.pk) ที่ส่ง request เข้ามา
@@ -506,3 +511,26 @@ class PasswordChangeConfirmView(View):
 
             return render(request, 'users/password_change_form.html', context)
 
+class TicketView(LoginRequiredMixin, View):
+    login_url = 'login'
+
+    def get(self, request, user_id):
+
+        current_time = timezone.now() 
+
+        if request.user.id != user_id:
+            raise PermissionDenied(f"เข้าได้เฉพาะผู้ใช้งานที่กำหนดไว้")
+        
+        user = User.objects.get(pk=user_id)
+
+        tickets = Ticket.objects.filter(
+            event_participant__user=user, 
+            event_participant__event__end_date__gte=current_time
+        )
+
+        context = {
+            'user': user,
+            'tickets': tickets
+        }
+
+        return render(request, 'users/ticketview.html', context)

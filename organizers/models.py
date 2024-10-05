@@ -30,6 +30,12 @@ class Location(models.Model):
         return self.name
 
 class Event(models.Model):
+    class EventStatus(models.Choices):
+        Show = 'Show'
+        Close = 'Close'
+        Past = 'Past'
+
+
     location = models.ForeignKey("organizers.Location", on_delete=models.CASCADE)
     name = models.CharField(max_length=100)
     description = models.TextField(blank=True ,null=True)
@@ -42,6 +48,7 @@ class Event(models.Model):
     created_date = models.DateTimeField(auto_now_add=True)
     category = models.ManyToManyField(Category)
     company = models.ForeignKey(Company, on_delete=models.CASCADE) 
+    status = models.CharField(max_length=10, choices=EventStatus.choices, default=EventStatus.Show)
     ticket_price = models.DecimalField(max_digits=8, decimal_places=2, default=0.00)   # ราคาต่อใบ
 
      # ทำให้เห็นใน หน้า admin
