@@ -228,7 +228,7 @@ class AttendeeView(LoginRequiredMixin, View):
     login_url = 'login'
 
     def get(self, request, event_id, uidb64, token):
-        # Decode the user ID from the URL
+        # ถอดรหัสข้อมูล
         uid = force_str(urlsafe_base64_decode(uidb64))
 
         try:
@@ -241,7 +241,7 @@ class AttendeeView(LoginRequiredMixin, View):
 
         form = AttendeeForm(instance=user)
 
-        
+        # ตั้งค่าค่าเริ่มต้น field ให้ใส่ userprofile ได้
         if user_profile:
             form.fields['date_of_birth'].initial = user_profile.date_of_birth.strftime('%Y-%m-%d')
             form.fields['telephone'].initial = user_profile.telephone 
@@ -343,16 +343,19 @@ class SuccessView(View):
         for event_participant in event_participants:
             event_participant.status = 'Register'
             event_participant.save() 
-            ticket = Ticket(
-            event_participant=event_participant,
-            )
-            qr_data = ticket.entry_code  
+            # QR code data
+            qr_data = f"entry_code_for_participant_{event_participant.id}"
             qr_code_url = f"https://api.qrserver.com/v1/create-qr-code/?data={qr_data}&size=300x300"
-            ticket.qr_code = qr_data
-            ticket.qr_code_image = qr_code_url
-            ticket.save()
 
+            # ใช้ get_or_create จัดการกับ pk ที่ซ้ำ 
+            ticket, created = Ticket.objects.get_or_create(
+                event_participant=event_participant,
+                qr_code=qr_data,
+                qr_code_image=qr_code_url
+            )
 
+            if created:
+                print(event_participant.id)
         
 
         return redirect('homepage')

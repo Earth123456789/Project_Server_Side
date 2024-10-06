@@ -5,9 +5,28 @@
 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-24 ">
     {% for event in events %}
     {% if event.is_full %}
-    <div class="p-4">
-        <h2 class="text-xl font-bold text-red-500">{{ event.name }}</h2>
-        <p class="text-gray-700">อีเว้นต์นี้เต็มแล้ว</p>
+    <div class="max-w-sm bg-white rounded-lg flex flex-col items-center">
+        <div class="relative" style="width: 375px; height: 375px;">
+            <img class="rounded-lg object-cover opacity-50" style="width: 375px; height: 375px;" src="{{ event.image.url }}"
+                alt="{{ event.name }}" />
+            <div class="absolute top-0 left-0 right-0 bottom-0 flex items-center justify-center">
+                <span class="kanit-regular bg-red-600 text-white text-2xl font-bold px-4 py-2 rounded-lg">บัตรหมด</span>
+            </div>
+        </div>
+        <div class="pt-5 w-full text-left">
+            <!-- เรียก function ผ่าน custom_filters (template ที่สร้างขึ้นมา) -->
+            <p class="font-semibold kanit-regular" style="color: red;">{{ event.start_date|custom_date:event.end_date }}</p>
+            <h5 class="mb-4 mt-2 text-2xl font-bold tracking-tight text-gray-900 dark:text-white kanit-black-italic">
+                {{ event.name|truncatewords:10 }}</h5>
+            <div class="flex">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="grey"
+                    class="bi bi-geo-alt-fill" viewBox="0 0 16 16">
+                    <path d="M8 16s6-5.686 6-10A6 6 0 0 0 2 6c0 4.314 6 10 6 10m0-7a3 3 0 1 1 0-6 3 3 0 0 1 0 6" />
+                </svg>
+                <!-- truncatewords:5  ใช้เพื่อจำกัดคำให้ออกมาแค่ 5 คำที่เป็น .. -->
+                <p class="text-gray-500 ml-4 kanit-regular">{{ event.location.name|truncatewords:5 }}</p>
+            </div>
+        </div>
     </div>
     {% else %}    
     <a href="{% url 'event' event.id %}">
