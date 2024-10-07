@@ -6,7 +6,7 @@ from django.contrib.auth import logout, login
 from django.contrib import messages
 from django.core.mail import EmailMessage
 from django.core.exceptions import PermissionDenied
-from django.db.models import Count
+from django.db.models import Q
 from django.conf import settings
 from django.contrib.auth.tokens import default_token_generator
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
@@ -541,15 +541,16 @@ class TicketView(LoginRequiredMixin, View):
 
         current_time = timezone.now() 
 
+        event_filter = Q(event_participant__event__end_date__gt=current_time) | Q(event_participant__event__end_date__isnull=True, event_participant__event__start_date__gt=current_time)
+
         if request.user.id != user_id:
             raise PermissionDenied(f"เข้าได้เฉพาะผู้ใช้งานที่กำหนดไว้")
         
         user = User.objects.get(pk=user_id)
 
         tickets = Ticket.objects.filter(
-            event_participant__user=user, 
-            event_participant__event__start_date__gte=current_time
-        )
+            event_participant__user=user
+        ).filter(event_filter)
 
         context = {
             'user': user,
@@ -557,6 +558,7 @@ class TicketView(LoginRequiredMixin, View):
         }
 
         return render(request, 'users/ticketview.html', context)
+    
 
 class TicketDeatilView(LoginRequiredMixin, View):
     login_url = 'login'
