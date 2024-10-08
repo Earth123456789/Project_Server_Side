@@ -7,6 +7,7 @@ from django.utils import timezone
 class User(AbstractUser): 
     email = models.EmailField(unique=True)
     followed_events = models.ManyToManyField('organizers.Event', related_name='followers', blank=True)
+    
 
 
     # ทำให้เห็นใน หน้า admin
@@ -76,6 +77,7 @@ class Ticket(models.Model):
     issue_date = models.DateField(auto_now_add=True)
     # แก้ข้อมูลไม่ได้
     entry_code = models.UUIDField(default=uuid4, editable=False, unique=True)
+    
 
 
     def __str__(self):

@@ -15,11 +15,16 @@ from django.utils.encoding import force_bytes
 from django.template.loader import render_to_string
 from django.utils import timezone
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
+from django.http import JsonResponse
+from django.contrib.auth.models import Group
 
 from users.forms import UserRegistrationForm, UserLoginForm, ChangePasswordForm, UserPasswordChangeForm, AttendeeForm, UserProfileForm, UserSetPasswordForm
 from users.models import UserProfile, User, EventParticipant, Ticket
 
 from organizers.models import Event
+
+import json
+
 
 
 # register.html, login.html, forms.py, models.py
@@ -52,6 +57,9 @@ class RegisterView(View):
             )
             user_profile.save()
 
+            user_group = Group.objects.get(name='Users')
+            user.groups.add(user_group)
+
             return redirect('login')
         
         context = {
@@ -77,6 +85,10 @@ class LoginView(View):
         if form.is_valid():
             # backends.py (มีการแก้เพิ่ม)
             user = form.get_user() 
+
+            user_group = Group.objects.get(name='Users')
+            user.groups.add(user_group) 
+
             print(user) # test  
             # login + สร้าง session
             login(request,user)
@@ -203,6 +215,7 @@ class ReceiveTicketView(LoginRequiredMixin, View):
 
         return render(request, "users/receive.html", context)
     
+    @transaction.atomic
     def post(self, request, event_id):
         user = request.user
         token = default_token_generator.make_token(user)
@@ -234,8 +247,6 @@ class AttendeeView(LoginRequiredMixin, View):
         try:
             user = User.objects.get(pk=uid)
             user_profile = UserProfile.objects.get(user=user)
-        except User.DoesNotExist:
-            return render(request, 'users/error.html', {'message': 'User not found.'})
         except UserProfile.DoesNotExist:
             user_profile = None  
 
@@ -268,18 +279,26 @@ class AttendeeView(LoginRequiredMixin, View):
         if form.is_valid():
             form.save()
             
-            user_profile = UserProfile.objects.get(user=user)
-
+            user_profile, created = UserProfile.objects.get_or_create(user=user)
+            
             user_profile.telephone = form.cleaned_data.get('telephone')  
             user_profile.date_of_birth = form.cleaned_data.get('date_of_birth')
             user_profile.gender = form.cleaned_data.get('gender')
             user_profile.save()
-            participation = EventParticipant(
+
+            participation = EventParticipant.objects.filter(
                 user=user,
                 event=event,
-                status="Attended" 
+                status="Attended"
             )
-            participation.save()
+
+            if not participation:
+                participation = EventParticipant(
+                    user=user,
+                    event=event,
+                    status="Attended"
+                )
+                participation.save()
 
             context = {
                 'user': user,
@@ -354,7 +373,7 @@ class SuccessView(View):
                 qr_code_image=qr_code_url
             )
 
-            if created:
+            if created:   
                 print(event_participant.id)
         
 
@@ -393,6 +412,7 @@ class UserProfileView(LoginRequiredMixin, View):
 
         return render(request, 'users/userprofile.html', context)
     
+    @transaction.atomic
     def post(self, request, user_id):
         # ตรวจสอบว่า user_id ตรงกับผู้ใช้ที่กำลังเข้าสู่ระบบหรือไม่ (ตรวจ request ที่เข้ามาตรงกับ user_id ไหม)
         if request.user.id != user_id:
@@ -558,7 +578,44 @@ class TicketView(LoginRequiredMixin, View):
         }
 
         return render(request, 'users/ticketview.html', context)
-    
+
+class TicketSent(LoginRequiredMixin, View):
+    login_url = 'login'
+
+    @transaction.atomic
+    def post(self, request, user_id, ticket_id):
+
+        # เอาข้อมูลที่ user
+        data = json.loads(request.body)
+        email = data.get('email')
+        print(data)
+        print(email)
+
+        if not email:
+           return JsonResponse({'status':'email-error'}, status=400)
+
+        try:
+            ticket = Ticket.objects.get(id=ticket_id, event_participant__user_id=user_id)
+            print(ticket)
+            try:
+                # เอาข้อมูลของ USER จากการ get form ตรง sweetalter2
+                new_owner = User.objects.get(email=email)
+                print(new_owner)
+            except User.DoesNotExist:
+                return JsonResponse({'status':'email-error'}, status=400)
+            
+            # ส่งตั๋วให้คนอื่น (new_owner) ที่ get มาจาก form ตรง sweetalter2
+            ticket.event_participant.user = new_owner
+            ticket.event_participant.save()  
+
+            return JsonResponse({'success': True, 'message': 'ส่งตั๋วสำเร็จ!'}, status=200)
+
+        except Ticket.DoesNotExist:
+            return JsonResponse({'success': False, 'message': 'ตั๋วไม่พบหรือคุณไม่มีสิทธิ์ส่ง.'}, status=404)
+
+
+
+        
 
 class TicketDeatilView(LoginRequiredMixin, View):
     login_url = 'login'
