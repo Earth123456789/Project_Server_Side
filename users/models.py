@@ -1,7 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
-from uuid import uuid4
-from django.utils import timezone
+import random
+import string
 
 
 class User(AbstractUser): 
@@ -76,9 +76,25 @@ class Ticket(models.Model):
     )
     issue_date = models.DateField(auto_now_add=True)
     # แก้ข้อมูลไม่ได้
-    entry_code = models.UUIDField(default=uuid4, editable=False, unique=True)
-    
+    entry_code = models.CharField(max_length=10, unique=True, editable=False)
 
+    # *args สำหรับ positional arguments ไม่มีชื่อ **kwargs สำหรับ keyword arguments ex.entry_code=123
+    # save คือ ของดั้งเดิมของ django (เราแค่ทำการ override มัน)
+    # https://www.geeksforgeeks.org/overriding-the-save-method-django-models/
+    def save(self, *args, **kwargs):
+        # ดูว่า entry_code ใน model ว่างไหม ถ้าก็จะสร้างขึ้นมา 
+        if not self.entry_code:
+            # entry_code ยังไม่มี จะเรียก generate_entry_code เพื่อสร้างรหัสเข้าใหม่ เองทันที
+            self.entry_code = self.generate_entry_code()
+        # เพื่อขยายการทำงานของ method save ยังคง method save แบบของ Django ไว้  
+        super().save(*args, **kwargs)
+
+    def generate_entry_code(self):
+        # สุ่ม A-Z 6 ตัว
+        letters = ''.join(random.choices(string.ascii_uppercase, k=6))
+        # สุ่ม 0-9 4 ตัว
+        digits = ''.join(random.choices(string.digits, k=4))
+        return letters + digits
 
     def __str__(self):
         return f"Ticket for {self.event_participant.user.username} - {self.event_participant.event }"
