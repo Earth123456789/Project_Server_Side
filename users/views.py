@@ -586,6 +586,7 @@ class TicketSent(LoginRequiredMixin, View):
     def post(self, request, user_id, ticket_id):
 
         # เอาข้อมูลที่ user
+        # body: JSON.stringify({ email: Email })
         data = json.loads(request.body)
         email = data.get('email')
         print(data)
@@ -598,7 +599,7 @@ class TicketSent(LoginRequiredMixin, View):
             ticket = Ticket.objects.get(id=ticket_id, event_participant__user_id=user_id)
             print(ticket)
             try:
-                # เอาข้อมูลของ USER จากการ get form ตรง sweetalter2
+                # เอาข้อมูลของ USER จากการ get form  ตรง sweetalter2
                 new_owner = User.objects.get(email=email)
                 print(new_owner)
             except User.DoesNotExist:
