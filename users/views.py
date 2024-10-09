@@ -363,15 +363,19 @@ class SuccessView(View):
             event_participant.status = 'Register'
             event_participant.save() 
             # QR code data
-            qr_data = f"entry_code_for_participant_{event_participant.id}"
-            qr_code_url = f"https://api.qrserver.com/v1/create-qr-code/?data={qr_data}&size=300x300"
+
 
             # ใช้ get_or_create จัดการกับ pk ที่ซ้ำ 
             ticket, created = Ticket.objects.get_or_create(
                 event_participant=event_participant,
-                qr_code=qr_data,
-                qr_code_image=qr_code_url
             )
+
+            qr_data = f"{ticket.entry_code}"
+            qr_code_url = f"https://api.qrserver.com/v1/create-qr-code/?data={qr_data}&size=300x300"
+
+            ticket.qr_code = qr_data
+            ticket.qr_code_image=qr_code_url
+            ticket.save()
 
             if created:   
                 print(event_participant.id)
@@ -612,7 +616,7 @@ class TicketSent(LoginRequiredMixin, View):
             return JsonResponse({'success': True, 'message': 'ส่งตั๋วสำเร็จ!'}, status=200)
 
         except Ticket.DoesNotExist:
-            return JsonResponse({'success': False, 'message': 'ตั๋วไม่พบหรือคุณไม่มีสิทธิ์ส่ง.'}, status=404)
+            return JsonResponse({'success': False, 'message': 'ตั๋วไม่พบหรือคุณไม่มีสิทธิ์ส่ง'}, status=404)
 
 
 
