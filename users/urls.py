@@ -18,6 +18,7 @@ urlpatterns = [
     path("event/receive/<int:event_id>/", ReceiveTicketView.as_view(), name="receive_ticket" ),
     path("event/attendent/<int:event_id>/<str:uidb64>/<str:token>/", AttendeeView.as_view(), name="attendent"),
     path("event/payment/<int:event_id>/<str:uidb64>/<str:token>/", PaymentView.as_view(), name='payment'),
+    # path("event/payment/<int:event_id>/<str:uidb64>/<str:token>/", PaymentView.as_view(), name='validate'),
     path("event/success/<int:event_id>/<str:uidb64>/<str:token>/", SuccessView.as_view(), name="success"),
 
 

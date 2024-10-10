@@ -152,7 +152,9 @@ class ChangePasswordView(View):
         domain = request.get_host()
         # สร้าง token ที่ไม่ซ้ำกันสำหรับผู้ใช้ (เป็นของ django)
         token = default_token_generator.make_token(user)
-        # เข้ารหัส Primary Key ของผู้ใช้ให้ปลอดภัย (แบบ BASE 64)
+        # เข้ารหัส Primary Key ของผู้ใช้ให้ปลอดภัย (แบบ BASE 64) 
+        # force_bytes แปลงข้อมูลเป็น bytes b'' เพื่อ encode 
+        # https://docs.djangoproject.com/en/5.1/ref/utils/
         uid = urlsafe_base64_encode(force_bytes(user.pk))
         link = f'http://{domain}/user/password_reset_confirm/{uid}/{token}/'
         reset_link = f"{link}"
@@ -353,15 +355,6 @@ class PaymentView(LoginRequiredMixin, View):
         
         amount = total_amount
         payload = qrcode.generate_payload(phone_number, amount)
-        
-        payment = Payment(
-            event_id=event_id,
-            user=user,
-            ticket_quantity=ticket_count,  # ใช้จำนวนผู้เข้าร่วมที่นับได้
-            amount=amount
-        )
-
-        payment.save()
 
         path = f"media/qrcodes/{user.pk}-{event_id}.png"
         # https://pypi.org/project/promptpay/ (ที่มาของ tofile)
@@ -377,7 +370,79 @@ class PaymentView(LoginRequiredMixin, View):
 
         return render(request, 'users/payment.html', context)
     
-    # def post(self, request, event_id):
+    def post(self, request, event_id):
+        user = request.user
+        event = Event.objects.get(pk=event_id)
+        event_amount = event.ticket_price
+        print(event_amount)
+
+        # สร้าง QR Code สำหรับการชำระเงิน
+        event_participants = EventParticipant.objects.filter(event_id=event_id, user=user)
+        ticket_count = event_participants.count()
+        print(ticket_count)
+        total_amount = ticket_count * event_amount
+        
+        amount = total_amount
+        
+        payment = Payment(
+            event_id=event_id,
+            user=user,
+            ticket_quantity=ticket_count,  # ใช้จำนวนผู้เข้าร่วมที่นับได้
+            amount=amount
+        )
+
+        payment.save()
+
+        token = default_token_generator.make_token(user)
+        uid = urlsafe_base64_encode(force_bytes(user.pk))
+        return redirect('validate', event_id=event_id, uidb64=uid, token=token)
+        
+
+
+# class ValidateView(LoginRequiredMixin, View):
+#     login_url = 'login'
+
+#     def get(self, request, event_id, uidb64, token):
+#         user = request.user
+#         event = Event.objects.get(pk=event_id)
+#         company = event.company
+#         event_amount = event.ticket_price
+
+#         print(company)
+#         print(event_amount)
+#         # สร้าง QR Code สำหรับการชำระเงิน
+        
+#         event_participants = EventParticipant.objects.filter(event_id=event_id, user=user)
+#         ticket_count = event_participants.count()
+#         print(ticket_count)
+#         total_amount = ticket_count * event_amount
+#         phone_number = company.telephone
+        
+#         amount = total_amount
+#         payload = qrcode.generate_payload(phone_number, amount)
+        
+#         payment = Payment(
+#             event_id=event_id,
+#             user=user,
+#             ticket_quantity=ticket_count,  # ใช้จำนวนผู้เข้าร่วมที่นับได้
+#             amount=amount
+#         )
+
+#         payment.save()
+
+#         path = f"media/qrcodes/{user.pk}-{event_id}.png"
+#         # https://pypi.org/project/promptpay/ (ที่มาของ tofile)
+#         qrcode.to_file(payload, path)
+
+#         qrcode_url = f"{settings.MEDIA_URL}qrcodes/{user.pk}-{event_id}.png"
+
+#         context = {
+#             'event_id': event_id,
+#             'qrcode': qrcode_url,
+#             'total': amount
+#         }
+
+#         return render(request, 'users/validate.html', context)
 
 
 class SuccessView(View):
@@ -622,6 +687,7 @@ class TicketView(LoginRequiredMixin, View):
         }
 
         return render(request, 'users/ticketview.html', context)
+        
 
 class TicketSent(LoginRequiredMixin, View):
     login_url = 'login'
