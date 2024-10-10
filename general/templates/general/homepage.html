@@ -36,9 +36,11 @@
 </section>
 
 <!-- Slider  -->
+{% if slider_events %}
 <section class="mt-24">
     {% include "general/components/slider.html" %}
 </section>
+{% endif %}
 
 <!-- Card Most Follower -->
 {% if most_followed_event %}

@@ -1,6 +1,6 @@
 # users/url.py
 from django.urls import path
-from users.views import RegisterView, LoginView, LogoutView, ChangePasswordView, PasswordResetConfirmView, ReceiveTicketView, AttendeeView, SuccessView, UserProfileView, UserChangePassword, PasswordChangeConfirmView, TicketView, TicketDeatilView, TicketPastView, TicketSent
+from users.views import RegisterView, LoginView, LogoutView, ChangePasswordView, PasswordResetConfirmView, ReceiveTicketView, AttendeeView, PaymentView ,SuccessView, UserProfileView, UserChangePassword, PasswordChangeConfirmView, TicketView, TicketDeatilView, TicketPastView, TicketSent
 from django.conf import settings
 from django.conf.urls.static import static
 
@@ -17,7 +17,7 @@ urlpatterns = [
     # User Ticket Path
     path("event/receive/<int:event_id>/", ReceiveTicketView.as_view(), name="receive_ticket" ),
     path("event/attendent/<int:event_id>/<str:uidb64>/<str:token>/", AttendeeView.as_view(), name="attendent"),
-    # path("event/payment/<int:event_id>/", PaymentView.as_view(), name='payment'),
+    path("event/payment/<int:event_id>/<str:uidb64>/<str:token>/", PaymentView.as_view(), name='payment'),
     path("event/success/<int:event_id>/<str:uidb64>/<str:token>/", SuccessView.as_view(), name="success"),
 
 

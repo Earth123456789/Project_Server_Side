@@ -27,7 +27,7 @@ class EventAdmin(admin.ModelAdmin):
 
 @admin.register(Payment)
 class EventAdmin(admin.ModelAdmin):
-    list_display = ('event', 'user', 'amount', 'payment_date', 'payment_method', 'is_successful')  
+    list_display = ('event', 'user', 'ticket_quantity', 'amount', 'status', 'payment_date')  
 
    
 

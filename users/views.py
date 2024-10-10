@@ -21,9 +21,13 @@ from django.contrib.auth.models import Group
 from users.forms import UserRegistrationForm, UserLoginForm, ChangePasswordForm, UserPasswordChangeForm, AttendeeForm, UserProfileForm, UserSetPasswordForm
 from users.models import UserProfile, User, EventParticipant, Ticket
 
-from organizers.models import Event
+from organizers.models import Event, Payment, Company
 
+from promptpay import qrcode
 import json
+import os
+
+
 
 
 
@@ -314,7 +318,10 @@ class AttendeeView(LoginRequiredMixin, View):
                 uid = urlsafe_base64_encode(force_bytes(request_user.pk))
                 return redirect('success', event_id=event_id, uidb64=uid, token=token)
             else:
-                return redirect('payment', event_id=event_id)
+                request_user = request.user
+                token = default_token_generator.make_token(request_user)
+                uid = urlsafe_base64_encode(force_bytes(request_user.pk))
+                return redirect('payment', event_id=event_id, uidb64=uid, token=token)
         
         context = {
             'user': user,
@@ -325,19 +332,52 @@ class AttendeeView(LoginRequiredMixin, View):
         return render(request, 'users/attendee.html', context)
 
 # ถ้าทำอันอื่นเสร็จเดี๋ยวกลับมาทำ
-# class PaymentView(LoginRequiredMixin, View):
-#     login_url = 'login'
+class PaymentView(LoginRequiredMixin, View):
+    login_url = 'login'
 
-#     def get(self, request, event_id):
+    def get(self, request, event_id, uidb64, token):
+        user = request.user
+        event = Event.objects.get(pk=event_id)
+        company = event.company
+        event_amount = event.ticket_price
 
-#         user = request.user
-         
-#         is_registered = EventParticipant.objects.filter(user=user, event_id=event_id).exists()
-
-#         if not is_registered:
-#             return redirect('attendent', event_id=event_id, uidb64=urlsafe_base64_encode(force_bytes(user.pk)), token=default_token_generator.make_token(user))
+        print(company)
+        print(event_amount)
+        # สร้าง QR Code สำหรับการชำระเงิน
         
-#         return render(request, 'users/payment.html', {'event_id': event_id})
+        event_participants = EventParticipant.objects.filter(event_id=event_id, user=user)
+        ticket_count = event_participants.count()
+        print(ticket_count)
+        total_amount = ticket_count * event_amount
+        phone_number = company.telephone
+        
+        amount = total_amount
+        payload = qrcode.generate_payload(phone_number, amount)
+        
+        payment = Payment(
+            event_id=event_id,
+            user=user,
+            ticket_quantity=ticket_count,  # ใช้จำนวนผู้เข้าร่วมที่นับได้
+            amount=amount
+        )
+
+        payment.save()
+
+        path = f"media/qrcodes/{user.pk}-{event_id}.png"
+        # https://pypi.org/project/promptpay/ (ที่มาของ tofile)
+        qrcode.to_file(payload, path)
+
+        qrcode_url = f"{settings.MEDIA_URL}qrcodes/{user.pk}-{event_id}.png"
+
+        context = {
+            'event_id': event_id,
+            'qrcode': qrcode_url,
+            'total': amount
+        }
+
+        return render(request, 'users/payment.html', context)
+    
+    # def post(self, request, event_id):
 
 
 class SuccessView(View):

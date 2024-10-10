@@ -65,6 +65,7 @@ class Ticket(models.Model):
         Valid = 'Valid'
         Used = 'Used'
         Expired = 'Expired'
+        
 
     event_participant = models.OneToOneField('users.EventParticipant', on_delete=models.CASCADE)
     qr_code = models.CharField(max_length=255, null=True, blank=True)
