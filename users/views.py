@@ -246,6 +246,7 @@ class ReceiveTicketView(LoginRequiredMixin, View):
 class AttendeeView(LoginRequiredMixin, View):
     login_url = 'login'
 
+    @transaction.atomic
     def get(self, request, event_id, uidb64, token):
         # ถอดรหัสข้อมูล
         uid = force_str(urlsafe_base64_decode(uidb64))
@@ -337,6 +338,7 @@ class AttendeeView(LoginRequiredMixin, View):
 class PaymentView(LoginRequiredMixin, View):
     login_url = 'login'
 
+    @transaction.atomic
     def get(self, request, event_id, uidb64, token):
         user = request.user
         event = Event.objects.get(pk=event_id)
@@ -370,7 +372,8 @@ class PaymentView(LoginRequiredMixin, View):
 
         return render(request, 'users/payment.html', context)
     
-    def post(self, request, event_id):
+    @transaction.atomic
+    def post(self, request, event_id, uidb64, token):
         user = request.user
         event = Event.objects.get(pk=event_id)
         event_amount = event.ticket_price
@@ -399,50 +402,51 @@ class PaymentView(LoginRequiredMixin, View):
         
 
 
-# class ValidateView(LoginRequiredMixin, View):
-#     login_url = 'login'
+class ValidateView(LoginRequiredMixin, View):
+    login_url = 'login'
 
-#     def get(self, request, event_id, uidb64, token):
-#         user = request.user
-#         event = Event.objects.get(pk=event_id)
-#         company = event.company
-#         event_amount = event.ticket_price
+    @transaction.atomic
+    def get(self, request, event_id, uidb64, token):
+        user = request.user
+        event = Event.objects.get(pk=event_id)
+        company = event.company
+        event_amount = event.ticket_price
 
-#         print(company)
-#         print(event_amount)
-#         # สร้าง QR Code สำหรับการชำระเงิน
+        print(company)
+        print(event_amount)
+        # สร้าง QR Code สำหรับการชำระเงิน
         
-#         event_participants = EventParticipant.objects.filter(event_id=event_id, user=user)
-#         ticket_count = event_participants.count()
-#         print(ticket_count)
-#         total_amount = ticket_count * event_amount
-#         phone_number = company.telephone
+        event_participants = EventParticipant.objects.filter(event_id=event_id, user=user)
+        ticket_count = event_participants.count()
+        print(ticket_count)
+        total_amount = ticket_count * event_amount
+        phone_number = company.telephone
         
-#         amount = total_amount
-#         payload = qrcode.generate_payload(phone_number, amount)
+        amount = total_amount
+        payload = qrcode.generate_payload(phone_number, amount)
         
-#         payment = Payment(
-#             event_id=event_id,
-#             user=user,
-#             ticket_quantity=ticket_count,  # ใช้จำนวนผู้เข้าร่วมที่นับได้
-#             amount=amount
-#         )
+        payment = Payment(
+            event_id=event_id,
+            user=user,
+            ticket_quantity=ticket_count,  # ใช้จำนวนผู้เข้าร่วมที่นับได้
+            amount=amount
+        )
 
-#         payment.save()
+        payment.save()
 
-#         path = f"media/qrcodes/{user.pk}-{event_id}.png"
-#         # https://pypi.org/project/promptpay/ (ที่มาของ tofile)
-#         qrcode.to_file(payload, path)
+        path = f"media/qrcodes/{user.pk}-{event_id}.png"
+        # https://pypi.org/project/promptpay/ (ที่มาของ tofile)
+        qrcode.to_file(payload, path)
 
-#         qrcode_url = f"{settings.MEDIA_URL}qrcodes/{user.pk}-{event_id}.png"
+        qrcode_url = f"{settings.MEDIA_URL}qrcodes/{user.pk}-{event_id}.png"
 
-#         context = {
-#             'event_id': event_id,
-#             'qrcode': qrcode_url,
-#             'total': amount
-#         }
+        context = {
+            'event_id': event_id,
+            'qrcode': qrcode_url,
+            'total': amount
+        }
 
-#         return render(request, 'users/validate.html', context)
+        return render(request, 'users/validate.html', context)
 
 
 class SuccessView(View):
@@ -723,9 +727,6 @@ class TicketSent(LoginRequiredMixin, View):
 
         except Ticket.DoesNotExist:
             return JsonResponse({'success': False, 'message': 'ตั๋วไม่พบหรือคุณไม่มีสิทธิ์ส่ง'}, status=404)
-
-
-
         
 
 class TicketDeatilView(LoginRequiredMixin, View):

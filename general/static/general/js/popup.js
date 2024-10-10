@@ -29,7 +29,7 @@ function showData(company) {
                 </div>
                 <div class="flex flex-col">
                     <h1 class="kanit-black underline text-left text-xl">เบอร์โทรศัพท์:</h1>
-                    <p class="kanit-regular mt-1 text-left text-gray-700">${company.phone}</p>
+                    <p class="kanit-regular mt-1 text-left text-gray-700">${company.telephone}</p>
                 </div>
             </div>
         `,

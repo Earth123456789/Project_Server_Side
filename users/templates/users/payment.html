@@ -14,7 +14,8 @@
         <h1 class="kanit-black text-l">ราคารวม {{ total }} บาท </h1>
         <div class="flex mt-8 justify-center mt-8 space-x-4">
             <form action="" method="post">
-                <button type="button"
+                {% csrf_token %}
+                <button type="submit"
                     class="kanit-small text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800">ชำระเงินเสร็จสิ้น</button>
             </form>
         </div>
