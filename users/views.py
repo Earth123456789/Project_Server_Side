@@ -405,48 +405,8 @@ class PaymentView(LoginRequiredMixin, View):
 class ValidateView(LoginRequiredMixin, View):
     login_url = 'login'
 
-    @transaction.atomic
     def get(self, request, event_id, uidb64, token):
-        user = request.user
-        event = Event.objects.get(pk=event_id)
-        company = event.company
-        event_amount = event.ticket_price
-
-        print(company)
-        print(event_amount)
-        # สร้าง QR Code สำหรับการชำระเงิน
-        
-        event_participants = EventParticipant.objects.filter(event_id=event_id, user=user)
-        ticket_count = event_participants.count()
-        print(ticket_count)
-        total_amount = ticket_count * event_amount
-        phone_number = company.telephone
-        
-        amount = total_amount
-        payload = qrcode.generate_payload(phone_number, amount)
-        
-        payment = Payment(
-            event_id=event_id,
-            user=user,
-            ticket_quantity=ticket_count,  # ใช้จำนวนผู้เข้าร่วมที่นับได้
-            amount=amount
-        )
-
-        payment.save()
-
-        path = f"media/qrcodes/{user.pk}-{event_id}.png"
-        # https://pypi.org/project/promptpay/ (ที่มาของ tofile)
-        qrcode.to_file(payload, path)
-
-        qrcode_url = f"{settings.MEDIA_URL}qrcodes/{user.pk}-{event_id}.png"
-
-        context = {
-            'event_id': event_id,
-            'qrcode': qrcode_url,
-            'total': amount
-        }
-
-        return render(request, 'users/validate.html', context)
+        return render(request, 'users/validate.html')
 
 
 class SuccessView(View):
@@ -593,7 +553,8 @@ class UserChangePassword(LoginRequiredMixin, View):
         if form.is_valid():
             email = form.cleaned_data['email']
             user = User.objects.get(email=email)
-            
+
+            # instance ของ UserChangePassword
             # ส่งอีเมลยืนยันการเปลี่ยนรหัสผ่าน
             self.send_email(user, request)
             return redirect('changepassword')
@@ -773,3 +734,139 @@ class TicketPastView(LoginRequiredMixin, View):
         }
 
         return render(request, 'users/ticketviewpast.html', context)
+    
+
+class TransactionSuccessView(LoginRequiredMixin, View):
+    login_url = 'login'
+
+    def get(self, request, user_id):
+        if request.user.id != user_id:
+            raise PermissionDenied("เข้าได้เฉพาะผู้ใช้งานที่กำหนดไว้")
+        
+        user = User.objects.get(pk=user_id)
+        payments = Payment.objects.filter(user=user, status='Successful')
+
+        context = {
+            'user': user,
+            'payments': payments
+        }
+
+        return render(request, 'users/transactionsuccess.html', context)
+    
+    def post(self, request, user_id):
+        if request.user.id != user_id:
+            raise PermissionDenied("เข้าได้เฉพาะผู้ใช้งานที่กำหนดไว้")
+        
+        payment = Payment.objects.filter(user=user_id, status='Successful').last()
+        payment_id = payment.id
+        
+        return redirect('transaction-deatil', user_id, payment_id)
+    
+# อยู่ ฝั่ง ผู้จัด event
+    # def post(self, request, user_id):
+    #     if request.user.id != user_id:
+    #         raise PermissionDenied("เข้าได้เฉพาะผู้ใช้งานที่กำหนดไว้")
+        
+    #     user = User.objects.get(pk=user_id)
+
+    #     # สมมติว่ามีการส่ง event_id มาจาก request
+    #     payment = Payment.objects.filter(user=user, status='Successful').last()
+    #     event_id = payment.event.id
+
+    #     # ส่งอีเมลยืนยันการเข้าร่วมงานพร้อมกับ event_id และ request
+    #     self.send_email(user, event_id, request)  # เพิ่ม request เป็นพารามิเตอร์ที่สาม
+
+    #     # หลังจากส่งอีเมลเสร็จ จะ redirect ไปยังหน้า success-mail
+    #     return redirect('success-mail', user_id=user_id)
+    
+    # def send_email(self, user, event_id, request):
+    #     subject = 'ยืนยันการเข้าร่วมงาน'
+
+    #     # ดึง domain จาก request
+    #     domain = request.get_host()
+
+    #     # สร้าง token และ uid เพื่อใช้ในการสร้างลิงก์
+    #     token = default_token_generator.make_token(user)
+    #     uid = urlsafe_base64_encode(force_bytes(user.pk))
+
+    #     # ลิงก์สำหรับยืนยันการเข้าร่วมงาน โดยใช้ event_id
+    #     link = f'http://{domain}/user/event/success/{event_id}/{uid}/{token}/'
+
+    #     # Render template อีเมลเป็นข้อความ string
+    #     message = render_to_string('users/email_ticket.html', {
+    #         'user': user,
+    #         'event_id': event_id,
+    #         'link': link,
+    #     })
+
+    #     # ตั้งค่าผู้ส่งและผู้รับอีเมล
+    #     from_email = settings.DEFAULT_FROM_EMAIL
+    #     recipient_list = [user.email]
+
+    #     # สร้างและส่งอีเมล
+    #     email = EmailMessage(subject, message, from_email, recipient_list)
+    #     email.send()
+
+
+class TransactionVerificationView(LoginRequiredMixin, View):
+    login_url = 'login'
+
+    def get(self, request, user_id):
+        
+        if request.user.id != user_id:
+            raise PermissionDenied(f"เข้าได้เฉพาะผู้ใช้งานที่กำหนดไว้")
+        
+        user = User.objects.get(pk=user_id)
+
+        payments = Payment.objects.filter(user=user, status='Verification')
+
+
+        context = {
+            'user': user,
+            'payments': payments
+        }
+
+        return render(request, 'users/transactionverification.html', context)
+
+class TransactionFailedView(LoginRequiredMixin, View):
+    login_url = 'login'
+
+    def get(self, request, user_id):
+        
+        if request.user.id != user_id:
+            raise PermissionDenied(f"เข้าได้เฉพาะผู้ใช้งานที่กำหนดไว้")
+        
+        user = User.objects.get(pk=user_id)
+
+        payments = Payment.objects.filter(user=user, status='Failed')
+
+
+        context = {
+            'user': user,
+            'payments': payments
+        }
+
+        return render(request, 'users/transactionfailed.html', context)
+
+
+class TransactionDetailView(LoginRequiredMixin, View):
+    login_url = 'login'
+
+    def get(self, request, user_id, payment_id):
+        
+        if request.user.id != user_id:
+            raise PermissionDenied(f"เข้าได้เฉพาะผู้ใช้งานที่กำหนดไว้")
+        
+        user = User.objects.get(pk=user_id)
+
+        payment = Payment.objects.get(pk=payment_id)
+
+        print(payment.ticket_quantity)
+
+
+        context = {
+            'user': user,
+            'payment': payment
+        }
+
+        return render(request, 'users/transactiondetail.html', context)

@@ -1,6 +1,6 @@
 {% extends "general/components/layout.html" %}
 {% load static %}
-{% block title %}ชำระเงิน - {% endblock %}
+{% block title %}รอการตรวจสอบ - {% endblock %}
 {% block nav %}
 {% include "general/components/navbar.html" %}
 {% endblock %}
@@ -61,7 +61,7 @@
                 </button>
             </a>
             <!--เดี๋ยวมาเพิ่ม-->
-            <a href="#">
+            <a href="{% url 'transaction-verification' user.id %}">
                 <button
                     class="kanit-small relative inline-flex items-center justify-center p-0.5 mb-2 me-2 overflow-hidden text-sm font-medium text-gray-900 rounded-lg group bg-gradient-to-br from-pink-500 to-orange-400 group-hover:from-pink-500 group-hover:to-orange-400 hover:text-white dark:text-white focus:ring-4 focus:outline-none focus:ring-pink-200 dark:focus:ring-pink-800">
                     <span

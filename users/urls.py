@@ -1,6 +1,6 @@
 # users/url.py
 from django.urls import path
-from users.views import RegisterView, LoginView, LogoutView, ChangePasswordView, PasswordResetConfirmView, ReceiveTicketView, AttendeeView, PaymentView , ValidateView ,SuccessView, UserProfileView, UserChangePassword, PasswordChangeConfirmView, TicketView, TicketDeatilView, TicketPastView, TicketSent
+from users.views import RegisterView, LoginView, LogoutView, ChangePasswordView, PasswordResetConfirmView, ReceiveTicketView, AttendeeView, PaymentView , ValidateView ,SuccessView, UserProfileView, UserChangePassword, PasswordChangeConfirmView, TicketView, TicketDeatilView, TicketPastView, TicketSent, TransactionSuccessView, TransactionVerificationView, TransactionFailedView, TransactionDetailView
 from django.conf import settings
 from django.conf.urls.static import static
 
@@ -30,6 +30,13 @@ urlpatterns = [
     path("ticket/past/<int:user_id>/", TicketPastView.as_view(), name="ticketpast" ),
     path("change_password/<int:user_id>/", UserChangePassword.as_view(), name="changepassword" ),
     path("password_change_confirm/<str:uidb64>/<str:token>/", PasswordChangeConfirmView.as_view(), name="password_change_confirm"),
+    path("transaction/<int:user_id>/success/", TransactionSuccessView.as_view(), name="transaction-success"),
+    path("transaction/<int:user_id>/verification/", TransactionVerificationView.as_view(), name="transaction-verification"),
+    path("transaction/<int:user_id>/failed/", TransactionFailedView.as_view(), name="transaction-failed"),
+     path("transaction/<int:user_id>/detail/<int:payment_id>/", TransactionDetailView.as_view(), name="transaction-deatil"),
+
+    # Test - When Event Success อยู่ ผู้จัด Event
+    path("success/<int:user_id>/", TransactionSuccessView.as_view(), name="success-mail" ),
 ] 
 
 # ตั้งค่าเพื่อให้ใช้ รูปที่มาจาก media (imagefiled) ได้
