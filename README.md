@@ -7,7 +7,7 @@ myvenv\Scripts\activate.bat
 
 pip install django
 
-pip install psycopg2 cryptography PyJWT requests django-allauth pillow djangorestframework python-dotenv
+pip install psycopg2 cryptography PyJWT requests django-allauth pillow djangorestframework python-dotenv promptpay
 
 ```
 
