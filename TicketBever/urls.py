@@ -25,5 +25,6 @@ urlpatterns = [
     path('', include('general.urls')),
     path('user/', include('users.urls')),
     path('accounts/', include('allauth.urls')), 
+    path('creators/', include('organizers.urls')), 
       
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT) # เรียกใช้รูป จาก os (Local)

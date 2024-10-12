@@ -1,12 +1,15 @@
 from django.shortcuts import render, redirect
 from django.http import HttpResponse, JsonResponse
 from django.views import View
-from organizers.models import Event, Category
 from django.db.models import Count
-from users.models import UserProfile, User
 from django.utils import timezone
 from django.db.models import Q
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
+
+from users.models import UserProfile, User
+
+from organizers.models import Event, Category, Company
+
 # Create your views here.
 
 class HomepageView(View):
@@ -30,6 +33,17 @@ class HomepageView(View):
         if search:
             # คืนค่าทุกเหตุการณ์ไม่ว่าจะเป็นตัวพิมพ์ใหญ่หรือตัวพิมพ์เล็ก
             events = Event.objects.filter(name__icontains=search).filter(event_filter)
+
+        
+        has_company = False
+        company = None
+        if request.user.is_authenticated:
+            # ตรวจสอบว่าผู้ใช้ มี Company ไหม
+            try:
+                company = Company.objects.get(user=request.user)
+                has_company = True
+            except Company.DoesNotExist:
+                has_company = False
             
 
 
@@ -52,6 +66,8 @@ class HomepageView(View):
             "most_followed_event" : most_followed_event,
             "categories": categories,
             "selected_category": category_name,
+            "has_company": has_company,
+            "company": company,
         }
 
         return render(request, 'general/homepage.html', context)

@@ -1,0 +1,13 @@
+{% load static %}
+<nav class="navbar bg-transparent fixed top-0 w-full z-10 backdrop-blur-xl text-primary bg-white shadow-2xl">
+    <div class="max-w-7xl mx-auto p-2">
+        <div class="flex justify-between items-center">
+            <div class="flex items-center space-x-2"> <!-- ใช้ flex ที่นี่ -->
+                <a href="{% url 'homepage' %}">
+                    <img class="h-16 w-16" src="{% static 'general/pic/logo.png' %}" alt="Logo">
+                </a>
+                <h1 class="text-2xl kanit-regular">For <span class="text-indigo-700">Organizers</span></h1>
+            </div>
+        </div>
+    </div>
+</nav>

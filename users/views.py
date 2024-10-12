@@ -3,7 +3,6 @@ from django.shortcuts import render, redirect
 from django.views import View
 from django.db import transaction
 from django.contrib.auth import logout, login
-from django.contrib import messages
 from django.core.mail import EmailMessage
 from django.core.exceptions import PermissionDenied
 from django.db.models import Q
@@ -14,18 +13,17 @@ from django.utils.encoding import force_str
 from django.utils.encoding import force_bytes
 from django.template.loader import render_to_string
 from django.utils import timezone
-from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import JsonResponse
 from django.contrib.auth.models import Group
 
 from users.forms import UserRegistrationForm, UserLoginForm, ChangePasswordForm, UserPasswordChangeForm, AttendeeForm, UserProfileForm, UserSetPasswordForm
 from users.models import UserProfile, User, EventParticipant, Ticket
 
-from organizers.models import Event, Payment, Company
+from organizers.models import Event, Payment
 
 from promptpay import qrcode
 import json
-import os
 
 
 
@@ -470,6 +468,7 @@ class UserProfileView(LoginRequiredMixin, View):
 
        
         if user_profile:
+            # initial คือ ใส่ value ใน html
             form.fields['gender'].initial = user_profile.gender
             form.fields['telephone'].initial = user_profile.telephone
             form.fields['date_of_birth'].initial = user_profile.date_of_birth.strftime('%Y-%m-%d')

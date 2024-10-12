@@ -1,0 +1,73 @@
+{% extends "general/components/layout.html" %}
+{% load static %}
+{% block title %}ลงทะเบียนผู้จัดอีเวนต์ - {% endblock %}
+{% block content %}
+<link rel="stylesheet" href="{% static 'users/css/style.css' %}">
+<section>
+    <div class="flex items-center justify-end mr-48">
+        <div class="bg-white rounded-lg shadow-lg p-6 max-w-sm w-full mt-8">
+            <article>
+                <form method="POST" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <h2 class="text-3xl font-bold mb-4 kanit-black">ลงทะเบียนผู้จัดอีเวนต์</h2>
+                    <div class="mb-4">
+                        <label for="{{ form.name.id_for_label }}" class="kanit-small">ชื่อผู้ใช้:</label>
+                        {{ form.name }}
+                        <!-- ใช้การ check ระดับ filed -->
+                        {% if form.name.errors %}
+                        <div class="text-red-700 kanit-small">{{ form.name.errors.as_text }}</div>
+                        {% endif %}
+                    </div>
+                    <div class="mb-4">
+                        <label for="{{ form.telephone.id_for_label }}" class="kanit-small">เบอร์โทร:</label>
+                        {{ form.telephone }}
+                        {% if form.telephone.errors %}
+                        <div class="text-red-700 kanit-small">{{ form.telephone.errors.as_text }}</div>
+                        {% endif %}
+                    </div>
+                    <div class="mb-4">
+                        <label for="{{ form.email.id_for_label }}" class="kanit-small">อีเมล:</label>
+                        {{ form.email }}
+                        {% if form.email.errors %}
+                        <div class="text-red-700 kanit-small">{{ form.email.errors.as_text }}</div>
+                        {% endif %}
+                    </div>
+                    <div class="mb-4">
+                        <label for="{{ form.contact.id_for_label }}" class="kanit-small">ช่องทางติดต่อ:</label>
+                        {{ form.contact }}
+                        {% if form.contact.errors %}
+                        <div class="text-red-700 kanit-small">{{ form.contact.errors.as_text }}</div>
+                        {% endif %}
+                    </div>
+                    <div class="mb-4">
+                        <label for="{{ form.type.id_for_label }}"
+                            class="kanit-small">ประเภทบริษัท:</label>
+                        {{ form.type }}
+                        {% if form.type.errors %}
+                        <div class="text-red-700 kanit-small">{{ form.type.errors.as_text }}</div>
+                        {% endif %}
+                    </div>
+                    <div class="mb-4">
+                        {{ form.agree_terms }}
+                        <label for="{{ form.agree_terms.id_for_label }}"
+                            class="ml-2 kanit-small">ฉันยอมรับข้อตกลงของเว็บไซต์
+                            Ticket Bever</label>
+                        {% if form.agree_terms.errors %}
+                        <div class="text-red-700 kanit-small">{{ form.agree_terms.errors.as_text }}</div>
+                        {% endif %}
+                    </div>
+                    
+
+                    <button type="submit"
+                        class="w-full bg-green-500 hover:bg-green-700 text-white font-bold py-2 rounded kanit-small">สมัครสมาชิก</button>
+                </form>
+            </article>
+            <div class="flex justify-center text-center mt-4">
+                <h1 class="kanit-small mt-4">เป็นสมาชิกแล้ว? <a href="{% url 'login' %}"
+                        class="text-blue-500 underline">เข้าสู่ระบบ
+                    </a></h1>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

@@ -10,11 +10,16 @@ class Category(models.Model):
         return self.name
 
 class Company(models.Model):
+    class Companytype(models.Choices):
+        Company = 'บริษัท'
+        Individual = 'บุคคล'
+
+    user = models.OneToOneField('users.User', on_delete=models.CASCADE, default=1)
     name = models.CharField(max_length=50)
-    description = models.TextField(blank=True ,null=True)
     email = models.EmailField(unique=True ,blank=True, null=True)
-    telephone = models.CharField(max_length=15, blank=True, null=True)
+    telephone = models.CharField(max_length=15, default="0000000000")
     contact = models.URLField(max_length=200, blank=True, null=True)
+    type = models.CharField(max_length=10, choices=Companytype.choices, default='บุคคล')
 
      # ทำให้เห็นใน หน้า admin
     def __str__(self):
@@ -36,7 +41,7 @@ class Event(models.Model):
         Past = 'Past'
 
 
-    location = models.ForeignKey("organizers.Location", on_delete=models.CASCADE)
+    location = models.ForeignKey('organizers.Location', on_delete=models.CASCADE)
     name = models.CharField(max_length=100)
     description = models.TextField(blank=True ,null=True)
     start_date = models.DateField()
@@ -67,8 +72,8 @@ class Payment(models.Model):
         Successful = 'Successful'
         Failed  = 'Failed'
 
-    event = models.ForeignKey("organizers.Event", on_delete=models.CASCADE)
-    user = models.ForeignKey("users.User", on_delete=models.CASCADE)
+    event = models.ForeignKey('organizers.Event', on_delete=models.CASCADE)
+    user = models.ForeignKey('users.User', on_delete=models.CASCADE)
     ticket_quantity = models.PositiveIntegerField(default=1)  
     amount = models.DecimalField(max_digits=10, decimal_places=2)  # ราคารวม
     payment_date = models.DateTimeField(auto_now_add=True)
