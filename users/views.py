@@ -14,7 +14,7 @@ from django.utils.encoding import force_bytes
 from django.template.loader import render_to_string
 from django.utils import timezone
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpResponse
 from django.contrib.auth.models import Group
 
 from users.forms import UserRegistrationForm, UserLoginForm, ChangePasswordForm, UserPasswordChangeForm, AttendeeForm, UserProfileForm, UserSetPasswordForm
@@ -24,6 +24,9 @@ from organizers.models import Event, Payment, Company
 
 from promptpay import qrcode
 import json
+
+from reportlab.pdfgen import canvas
+from reportlab.lib.pagesizes import A4
 
 
 
@@ -615,8 +618,6 @@ class UserProfileView(LoginRequiredMixin, View):
 class UserChangePassword(LoginRequiredMixin, View):
     login_url = 'login'
 
-    
-
     def get(self, request, user_id):
 
         has_company = False
@@ -1012,6 +1013,10 @@ class TransactionDetailView(LoginRequiredMixin, View):
 
         payment = Payment.objects.get(pk=payment_id)
 
+        # ตรวจสอบว่าถ้าผู้ใช้ต้องการดาวน์โหลด PDF
+        if request.GET.get('action') == 'download_pdf':
+            return self.generate_pdf(payment)
+
         print(payment.ticket_quantity)
 
 
@@ -1023,3 +1028,28 @@ class TransactionDetailView(LoginRequiredMixin, View):
         }
 
         return render(request, 'users/transactiondetail.html', context)
+    
+    # https://www.geeksforgeeks.org/generate-a-pdf-in-django/
+    def generate_pdf(self, payment):
+        # สร้าง response ให้เป็นไฟล์ PDF ประเภทของเนื้อหา เป็น  pdf (HTTP header)
+        # https://medium.com/quintuples/%E0%B8%AA%E0%B8%B4%E0%B9%88%E0%B8%87%E0%B8%97%E0%B8%B5%E0%B9%88%E0%B8%95%E0%B9%89%E0%B8%AD%E0%B8%87%E0%B8%A3%E0%B8%B9%E0%B9%89%E0%B8%97%E0%B8%B3%E0%B8%84%E0%B8%A7%E0%B8%B2%E0%B8%A1%E0%B9%80%E0%B8%82%E0%B9%89%E0%B8%B2%E0%B9%83%E0%B8%88%E0%B8%81%E0%B9%88%E0%B8%AD%E0%B8%99%E0%B9%80%E0%B8%82%E0%B8%B5%E0%B8%A2%E0%B8%99-test-rest-apis-with-postman-a85a274992b5
+        response = HttpResponse(content_type='application/pdf')
+
+        # สร้าง PDF ด้วย canvas
+        pdf = canvas.Canvas(response, pagesize=A4)
+        width, height = A4
+
+        # สร้างข้อมูลที่ต้องการแสดงใน PDF
+        pdf.drawString(100, height - 100, f"Payment ID: {payment.id}")
+        pdf.drawString(100, height - 150, f"Name: {payment.user.first_name} {payment.user.last_name}")
+        pdf.drawString(100, height - 200, f"Event Name: {payment.event.name}")
+        pdf.drawString(100, height - 250, f"Payment Date: {payment.payment_date.strftime('%d/%m/%Y %H:%M')}")
+        pdf.drawString(100, height - 300, f"Ticket Price: {payment.event.ticket_price} Bath")
+        pdf.drawString(100, height - 350, f"Ticket Quantity: {payment.ticket_quantity}")
+        pdf.drawString(100, height - 400, f"Total Amount: {payment.amount} Bath")
+        
+        # สั่งปิดหน้า PDF
+        pdf.showPage()
+        pdf.save()
+
+        return response

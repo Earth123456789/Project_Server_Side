@@ -39,6 +39,8 @@
 
             {% endif %}
         </div>
+
+        {% if transaction.status == "Verification" %}
         <div class="px-6 pt-4 pb-4 flex space-x-4">
             <!-- ปุ่มยกเลิก ใช้ SweetAlert2 -->
             <!-- ฟอร์มสำหรับยืนยันรายการ -->
@@ -59,6 +61,8 @@
                 ยกเลิกรายการ
             </button>
         </div>
+
+        {% endif %}
 
     </div>
     {% endfor %}

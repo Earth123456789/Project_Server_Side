@@ -34,10 +34,11 @@ urlpatterns = [
     path("transaction/<int:user_id>/success/", TransactionSuccessView.as_view(), name="transaction-success"),
     path("transaction/<int:user_id>/verification/", TransactionVerificationView.as_view(), name="transaction-verification"),
     path("transaction/<int:user_id>/failed/", TransactionFailedView.as_view(), name="transaction-failed"),
-     path("transaction/<int:user_id>/detail/<int:payment_id>/", TransactionDetailView.as_view(), name="transaction-deatil"),
-
+    path("transaction/<int:user_id>/detail/<int:payment_id>/", TransactionDetailView.as_view(), name="transaction-deatil"),
+    
     # Test - When Event Success อยู่ ผู้จัด Event
     path("success/<int:user_id>/", TransactionSuccessView.as_view(), name="success-mail" ),
+    
 ] 
 
 # ตั้งค่าเพื่อให้ใช้ รูปที่มาจาก media (imagefiled) ได้

@@ -11,7 +11,7 @@
                     {% csrf_token %}
                     <h2 class="text-3xl font-bold mb-4 kanit-black">ลงทะเบียนผู้จัดอีเวนต์</h2>
                     <div class="mb-4">
-                        <label for="{{ form.name.id_for_label }}" class="kanit-small">ชื่อผู้ใช้:</label>
+                        <label for="{{ form.name.id_for_label }}" class="kanit-small">ชื่อบริษัท:</label>
                         {{ form.name }}
                         <!-- ใช้การ check ระดับ filed -->
                         {% if form.name.errors %}
