@@ -22,7 +22,7 @@ from users.models import UserProfile, User, EventParticipant, Ticket
 
 from organizers.models import Event, Payment, Company
 
-from promptpay import qrcode
+# from promptpay import qrcode
 import json
 
 
@@ -65,13 +65,13 @@ class RegisterView(View):
             user.groups.add(user_group)
 
             return redirect('login')
-        
+
         context = {
             'form': form
         }
 
         return render(request, 'registration/register.html', context)
-    
+
 # register.html, login.html, forms.py, backends.py, signals.py, models.py
 class LoginView(View):
     
@@ -99,8 +99,6 @@ class LoginView(View):
             login(request,user)
             
             return redirect('homepage')  
-        
-        print(form.errors)
 
         context = {
             'form': form
