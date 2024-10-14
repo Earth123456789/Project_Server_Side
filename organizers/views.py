@@ -66,9 +66,14 @@ class DashBoardView(LoginRequiredMixin, View):
         # ตรวจสอบว่าเป็น "Organizers"
         if not user.groups.filter(name='Organizers').exists():
             raise PermissionDenied("เข้าได้เฉพาะผู้ใช้งานที่กำหนดไว้")
-
+        
+        # ไม่ได้ลงทะเบียนเป็นบริษัท
         if not Company.objects.filter(user=user).exists():
             return redirect('organizer-register')  
+        
+        # เจ้าของบริษัทจริงๆ
+        if company.user != user:
+            raise PermissionDenied("เข้าได้เฉพาะเจ้าของบริษัทเท่านั้น")
 
         # ไม่ได้เข้าสู่ระบบ 
         if user.is_anonymous:
@@ -77,4 +82,34 @@ class DashBoardView(LoginRequiredMixin, View):
         context = {
             "company": company
         }
-        return render(request, 'organizers/dashboard.html', context)  # เปลี่ยนไปที่หน้าแดชบอร์ดที่คุณต้องการแสดง
+        return render(request, 'organizers/dashboard.html', context)  
+    
+
+class TransactionView(LoginRequiredMixin, View):
+    login_url = 'login'
+
+    def get(self, request, company_id):
+        user = request.user
+
+        company = Company.objects.get(pk=company_id)
+
+        # ตรวจสอบว่าเป็น "Organizers"
+        if not user.groups.filter(name='Organizers').exists():
+            raise PermissionDenied("เข้าได้เฉพาะผู้ใช้งานที่กำหนดไว้")
+        
+        # ไม่ได้ลงทะเบียนเป็นบริษัท
+        if not Company.objects.filter(user=user).exists():
+            return redirect('organizer-register')  
+        
+        # เจ้าของบริษัทจริงๆ
+        if company.user != user:
+            raise PermissionDenied("เข้าได้เฉพาะเจ้าของบริษัทเท่านั้น")
+
+        # ไม่ได้เข้าสู่ระบบ 
+        if user.is_anonymous:
+            return redirect('login')
+
+        context = {
+            "company": company
+        }
+        return render(request, 'organizers/transaction.html', context)  

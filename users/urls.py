@@ -1,8 +1,9 @@
 # users/url.py
 from django.urls import path
-from users.views import RegisterView, LoginView, LogoutView, ChangePasswordView, PasswordResetConfirmView, ReceiveTicketView, AttendeeView, PaymentView , ValidateView ,SuccessView, UserProfileView, UserChangePassword, PasswordChangeConfirmView, TicketView, TicketDeatilView, TicketPastView, TicketSent, TransactionSuccessView, TransactionVerificationView, TransactionFailedView, TransactionDetailView
 from django.conf import settings
 from django.conf.urls.static import static
+
+from users.views import RegisterView, LoginView, LogoutView, ChangePasswordView, PasswordResetConfirmView, ReceiveTicketView, AttendeeView, PaymentView , ValidateView ,SuccessView, UserProfileView, UserChangePassword, PasswordChangeConfirmView, TicketView, TicketDeatilView, TicketPastView, TicketSent, TransactionSuccessView, TransactionVerificationView, TransactionFailedView, TransactionDetailView
 
 
 urlpatterns = [
