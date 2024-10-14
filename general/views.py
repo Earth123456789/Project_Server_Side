@@ -76,10 +76,22 @@ class EventView(View):
      
 
     def get(self, request, event_id):
+
+        has_company = False
+        company = None
+        if request.user.is_authenticated:
+            # ตรวจสอบว่าผู้ใช้ มี Company ไหม
+            try:
+                company = Company.objects.get(user=request.user)
+                has_company = True
+            except Company.DoesNotExist:
+                has_company = False
          
         event = Event.objects.get(pk=event_id)
         context = {
-            'event' : event
+            "event" : event,
+            "has_company": has_company,
+            "company": company,
         }
 
         return render(request, "general/event_detail.html", context)

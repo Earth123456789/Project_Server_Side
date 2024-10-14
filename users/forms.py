@@ -1,12 +1,14 @@
 # users/forms.py
 from django import forms
-from users.models import User, UserProfile
 from django.forms import ModelForm
 from django.core.exceptions import ValidationError
 from django.utils import timezone
-from datetime import timedelta
 from django.core.validators import RegexValidator
 from django.contrib.auth.forms import AuthenticationForm, PasswordChangeForm, SetPasswordForm
+
+from users.models import User, UserProfile
+
+from datetime import timedelta
 
 class UserRegistrationForm(ModelForm):
 

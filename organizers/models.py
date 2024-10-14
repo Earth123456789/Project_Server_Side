@@ -73,6 +73,7 @@ class Payment(models.Model):
         Failed  = 'Failed'
 
     event = models.ForeignKey('organizers.Event', on_delete=models.CASCADE)
+    company = models.ForeignKey('organizers.Company', on_delete=models.CASCADE)
     user = models.ForeignKey('users.User', on_delete=models.CASCADE)
     ticket_quantity = models.PositiveIntegerField(default=1)  
     amount = models.DecimalField(max_digits=10, decimal_places=2)  # ราคารวม
@@ -81,7 +82,7 @@ class Payment(models.Model):
     cancel_text = models.TextField(blank=True, null=True)
 
     def __str__(self):
-        return f"Payment by {self.user} for {self.event} - {self.amount}"
+        return f"Payment by {self.user} for {self.company} - {self.amount}"
     
     
 

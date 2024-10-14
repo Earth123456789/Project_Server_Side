@@ -3,10 +3,21 @@ from django.views import View
 from django.contrib.auth.models import Group
 from django.db import transaction
 from django.core.exceptions import PermissionDenied
-from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.http import JsonResponse
+from django.core.mail import EmailMessage
+from django.template.loader import render_to_string
+from django.utils.http import urlsafe_base64_encode
+from django.utils.encoding import force_bytes
+from django.contrib.auth.tokens import default_token_generator
+from django.conf import settings
 
 from organizers.forms import CompanyRegistrationForm
-from organizers.models import Company
+from organizers.models import Company, Payment
+
+from users.models import User, EventParticipant, Ticket
+
+import json
 
 class OrganizerRegisterView(LoginRequiredMixin, View):
     login_url = 'login'
@@ -93,6 +104,11 @@ class TransactionView(LoginRequiredMixin, View):
 
         company = Company.objects.get(pk=company_id)
 
+        transactions = Payment.objects.filter(company=company_id)
+
+        print(transactions)
+
+
         # ตรวจสอบว่าเป็น "Organizers"
         if not user.groups.filter(name='Organizers').exists():
             raise PermissionDenied("เข้าได้เฉพาะผู้ใช้งานที่กำหนดไว้")
@@ -108,8 +124,129 @@ class TransactionView(LoginRequiredMixin, View):
         # ไม่ได้เข้าสู่ระบบ 
         if user.is_anonymous:
             return redirect('login')
-
+        
+        print(transactions)
         context = {
-            "company": company
+            "company": company,
+            "transactions": transactions
         }
         return render(request, 'organizers/transaction.html', context)  
+    
+    def post(self, request, company_id):
+        transaction_id = request.POST.get('transaction_id')  
+        transaction = Payment.objects.get(pk=transaction_id)
+
+        # เปลี่ยนสถานะ
+        if transaction.status == "Verification":
+            transaction.status = "Successful"
+            transaction.save()
+        
+        # ส่งอีเมลยืนยันการเข้าร่วมงาน
+        # ส่งให้ตาม transaction.user และ ดู event ที่ transaction.event.id
+        self.send_email(transaction.user, transaction.event.id, request)
+
+        return redirect('transaction', company_id=company_id)  
+    
+    def send_email(self, user, event_id, request):
+
+        subject = 'ยืนยันการเข้าร่วมงาน'
+        
+        # ดึง domain จาก request
+        domain = request.get_host()
+
+        # สร้าง token และ uid เพื่อใช้ในการสร้างลิงก์ยืนยัน
+        token = default_token_generator.make_token(user)
+        uid = urlsafe_base64_encode(force_bytes(user.pk))
+
+        # สร้างลิงก์ยืนยันการเข้าร่วมงาน โดยใช้ event_id
+        link = f'http://{domain}/user/event/success/{event_id}/{uid}/{token}/'
+
+        # ใช้ template อีเมลเพื่อสร้างข้อความอีเมล
+        message = render_to_string('users/email_ticket.html', {
+            'user': user,
+            'event_id': event_id,
+            'link': link,
+        })
+
+        # กำหนดข้อมูลการส่งอีเมล
+        from_email = settings.DEFAULT_FROM_EMAIL
+        recipient_list = [user.email]
+
+        # ส่งอีเมล
+        email = EmailMessage(subject, message, from_email, recipient_list)
+        email.send()
+    
+# อยู่ ฝั่ง ผู้จัด event
+    # def post(self, request, user_id):
+    #     if request.user.id != user_id:
+    #         raise PermissionDenied("เข้าได้เฉพาะผู้ใช้งานที่กำหนดไว้")
+        
+    #     user = User.objects.get(pk=user_id)
+
+    #     # สมมติว่ามีการส่ง event_id มาจาก request
+    #     payment = Payment.objects.filter(user=user, status='Successful').last()
+    #     event_id = payment.event.id
+
+    #     # ส่งอีเมลยืนยันการเข้าร่วมงานพร้อมกับ event_id และ request
+    #     self.send_email(user, event_id, request)  # เพิ่ม request เป็นพารามิเตอร์ที่สาม
+
+    #     # หลังจากส่งอีเมลเสร็จ จะ redirect ไปยังหน้า success-mail
+    #     return redirect('success-mail', user_id=user_id)
+    
+    # def send_email(self, user, event_id, request):
+    #     subject = 'ยืนยันการเข้าร่วมงาน'
+
+    #     # ดึง domain จาก request
+    #     domain = request.get_host()
+
+    #     # สร้าง token และ uid เพื่อใช้ในการสร้างลิงก์
+    #     token = default_token_generator.make_token(user)
+    #     uid = urlsafe_base64_encode(force_bytes(user.pk))
+
+    #     # ลิงก์สำหรับยืนยันการเข้าร่วมงาน โดยใช้ event_id
+    #     link = f'http://{domain}/user/event/success/{event_id}/{uid}/{token}/'
+
+    #     # Render template อีเมลเป็นข้อความ string
+    #     message = render_to_string('users/email_ticket.html', {
+    #         'user': user,
+    #         'event_id': event_id,
+    #         'link': link,
+    #     })
+
+    #     # ตั้งค่าผู้ส่งและผู้รับอีเมล
+    #     from_email = settings.DEFAULT_FROM_EMAIL
+    #     recipient_list = [user.email]
+
+    #     # สร้างและส่งอีเมล
+    #     email = EmailMessage(subject, message, from_email, recipient_list)
+    #     email.send()
+
+class CancelTransactionView(View):
+    def post(self, request, company_id):
+
+        # เอาข้อมูลที่ user
+        #  body: JSON.stringify({ 'transaction_id': transactionId, 'cancel_text': result.value  })
+        data = json.loads(request.body)
+        transaction_id = data.get('transaction_id')
+        cancel_text = data.get('cancel_text')
+
+        print(transaction_id)
+        print(cancel_text)
+
+        # ตรวจสอบว่าได้ transaction_id หรือไม่
+        if not transaction_id:
+            return JsonResponse({'success': False, 'message': 'ไม่มี transaction_id'}, status=404)
+
+        # ดึง Payment object จาก transaction_id
+        transaction = Payment.objects.get(pk=transaction_id)
+
+        # ถ้ามีเหตุผลการยกเลิก ให้เปลี่ยนสถานะเป็น "Failed"
+        if transaction.status == "Verification":
+            if cancel_text:
+                transaction.status = "Failed"
+                transaction.cancel_text = cancel_text
+                transaction.save()
+            return JsonResponse({'success': True, 'message': 'ยกเลิกรายการสำเร็จ'}, status=200)
+        else:
+            return JsonResponse({'success': False, 'message': 'ไม่มีเหตุผลการยกเลิก'}, status=404)
+    

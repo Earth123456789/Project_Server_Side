@@ -1,5 +1,6 @@
 from django.contrib.auth.models import Group
 from django.dispatch import receiver
+
 from allauth.account.signals import user_signed_up, user_logged_in
 
 # signals.py ใช้เพื่อจัดการ app ของ django ช่วยให้ app แยกส่วนการทำงานกัน

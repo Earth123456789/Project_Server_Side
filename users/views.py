@@ -20,7 +20,7 @@ from django.contrib.auth.models import Group
 from users.forms import UserRegistrationForm, UserLoginForm, ChangePasswordForm, UserPasswordChangeForm, AttendeeForm, UserProfileForm, UserSetPasswordForm
 from users.models import UserProfile, User, EventParticipant, Ticket
 
-from organizers.models import Event, Payment
+from organizers.models import Event, Payment, Company
 
 from promptpay import qrcode
 import json
@@ -32,6 +32,7 @@ import json
 # register.html, login.html, forms.py, models.py
 class RegisterView(View):
     def get(self, request):
+
         form = UserRegistrationForm()
 
         context = {
@@ -43,6 +44,7 @@ class RegisterView(View):
     # จัดการข้อผิดพลาด ทำให้ไม่ต้องทำความสะอาดฐานข้อมูลด้วยตัวเอง บันทึกข้อมูลในครั้งเดียวแทนที่จะบันทึกทีละรายการ
     @transaction.atomic
     def post(self, request):
+
         form = UserRegistrationForm(request.POST)
         if form.is_valid():
             user = form.save()
@@ -74,6 +76,7 @@ class RegisterView(View):
 class LoginView(View):
     
     def get(self, request):
+
         form = UserLoginForm()
 
         context = {
@@ -115,6 +118,7 @@ class LogoutView(View):
 class ChangePasswordView(View):
 
     def get(self, request):
+
         form = ChangePasswordForm()
 
         context = {
@@ -211,10 +215,22 @@ class ReceiveTicketView(LoginRequiredMixin, View):
     login_url = 'login'
 
     def get(self, request, event_id):
+
+        has_company = False
+        company = None
+        if request.user.is_authenticated:
+            # ตรวจสอบว่าผู้ใช้ มี Company ไหม
+            try:
+                company = Company.objects.get(user=request.user)
+                has_company = True
+            except Company.DoesNotExist:
+                has_company = False
         
         event = Event.objects.get(pk=event_id)
         context = {
-            'event' : event
+            'event' : event,
+            'has_company' : has_company,
+            'company' : company
         }
 
         return render(request, "users/receive.html", context)
@@ -225,6 +241,7 @@ class ReceiveTicketView(LoginRequiredMixin, View):
         token = default_token_generator.make_token(user)
         uid = urlsafe_base64_encode(force_bytes(user.pk))
         event = Event.objects.get(pk=event_id)
+
 
         # (get ค่าจาก name="ticket_quantity" ใน template) ค่าเริ่มต้นที่ 1
         ticket_quantity = int(request.POST.get("ticket_quantity", 1))
@@ -246,6 +263,17 @@ class AttendeeView(LoginRequiredMixin, View):
 
     @transaction.atomic
     def get(self, request, event_id, uidb64, token):
+
+        has_company = False
+        company = None
+        if request.user.is_authenticated:
+            # ตรวจสอบว่าผู้ใช้ มี Company ไหม
+            try:
+                company = Company.objects.get(user=request.user)
+                has_company = True
+            except Company.DoesNotExist:
+                has_company = False
+
         # ถอดรหัสข้อมูล
         uid = force_str(urlsafe_base64_decode(uidb64))
 
@@ -268,7 +296,9 @@ class AttendeeView(LoginRequiredMixin, View):
         context = {
             'user': user,
             'valid_token': True,
-            'form': form
+            'form': form,
+            'has_company' : has_company,
+            'company' : company
         }
 
         return render(request, 'users/attendee.html', context)
@@ -338,6 +368,17 @@ class PaymentView(LoginRequiredMixin, View):
 
     @transaction.atomic
     def get(self, request, event_id, uidb64, token):
+
+        has_company = False
+        company = None
+        if request.user.is_authenticated:
+            # ตรวจสอบว่าผู้ใช้ มี Company ไหม
+            try:
+                company = Company.objects.get(user=request.user)
+                has_company = True
+            except Company.DoesNotExist:
+                has_company = False
+
         user = request.user
         event = Event.objects.get(pk=event_id)
         company = event.company
@@ -365,7 +406,9 @@ class PaymentView(LoginRequiredMixin, View):
         context = {
             'event_id': event_id,
             'qrcode': qrcode_url,
-            'total': amount
+            'total': amount,
+            'has_company' : has_company,
+            'company' : company
         }
 
         return render(request, 'users/payment.html', context)
@@ -382,11 +425,14 @@ class PaymentView(LoginRequiredMixin, View):
         ticket_count = event_participants.count()
         print(ticket_count)
         total_amount = ticket_count * event_amount
-        
+
+        company_id = event.company.id
+
         amount = total_amount
         
         payment = Payment(
             event_id=event_id,
+            company_id=company_id,
             user=user,
             ticket_quantity=ticket_count,  # ใช้จำนวนผู้เข้าร่วมที่นับได้
             amount=amount
@@ -404,23 +450,52 @@ class ValidateView(LoginRequiredMixin, View):
     login_url = 'login'
 
     def get(self, request, event_id, uidb64, token):
-        return render(request, 'users/validate.html')
+
+        has_company = False
+        company = None
+        if request.user.is_authenticated:
+            # ตรวจสอบว่าผู้ใช้ มี Company ไหม
+            try:
+                company = Company.objects.get(user=request.user)
+                has_company = True
+            except Company.DoesNotExist:
+                has_company = False
+        
+        context = {
+            'has_company' : has_company,
+            'company' : company
+        }
+        return render(request, 'users/validate.html', context)
 
 
 class SuccessView(View):
 
     def get(self, request, event_id, uidb64, token):
+
+        has_company = False
+        company = None
+        if request.user.is_authenticated:
+            # ตรวจสอบว่าผู้ใช้ มี Company ไหม
+            try:
+                company = Company.objects.get(user=request.user)
+                has_company = True
+            except Company.DoesNotExist:
+                has_company = False
+
         # ถอดรหัสข้อมูล 
         uid = force_str(urlsafe_base64_decode(uidb64))
         user = User.objects.get(pk=uid)
         context = {
-            'user': user
+            'user': user,
+            'has_company' : has_company,
+            'company' : company
         }
         return render(request, 'users/success.html', context)
     
     # จัดการข้อผิดพลาด ทำให้ไม่ต้องทำความสะอาดฐานข้อมูลด้วยตัวเอง บันทึกข้อมูลในครั้งเดียวแทนที่จะบันทึกทีละรายการ
     @transaction.atomic
     def post(self, request, event_id, uidb64, token):
+
         # ถอดรหัสข้อมูล 
         uid = force_str(urlsafe_base64_decode(uidb64))
         user = User.objects.get(pk=uid)
@@ -454,6 +529,17 @@ class UserProfileView(LoginRequiredMixin, View):
     login_url = 'login'
 
     def get(self, request, user_id):
+
+        has_company = False
+        company = None
+        if request.user.is_authenticated:
+            # ตรวจสอบว่าผู้ใช้ มี Company ไหม
+            try:
+                company = Company.objects.get(user=request.user)
+                has_company = True
+            except Company.DoesNotExist:
+                has_company = False
+
         # ตรวจสอบว่า user_id ตรงกับผู้ใช้ที่กำลังเข้าสู่ระบบหรือไม่ (ตรวจ request ที่เข้ามาตรงกับ user_id ไหม)
         if request.user.id != user_id:
             raise PermissionDenied("เข้าได้เฉพาะผู้ใช้งานที่กำหนดไว้")
@@ -479,7 +565,9 @@ class UserProfileView(LoginRequiredMixin, View):
         
         context = {
             'user': user,
-            'form': form
+            'form': form,
+            'has_company' : has_company,
+            'company' : company
         }
 
         return render(request, 'users/userprofile.html', context)
@@ -531,13 +619,25 @@ class UserChangePassword(LoginRequiredMixin, View):
 
     def get(self, request, user_id):
 
+        has_company = False
+        company = None
+        if request.user.is_authenticated:
+            # ตรวจสอบว่าผู้ใช้ มี Company ไหม
+            try:
+                company = Company.objects.get(user=request.user)
+                has_company = True
+            except Company.DoesNotExist:
+                has_company = False
+
         if request.user.id != user_id:
             raise PermissionDenied(f"เข้าได้เฉพาะผู้ใช้งานที่กำหนดไว้")
         
         form = ChangePasswordForm()
 
         context = {
-            'form': form
+            'form': form,
+            'has_company' : has_company,
+            'company' : company
         }
 
         return render(request, 'users/userprofilepassword.html', context)
@@ -555,6 +655,7 @@ class UserChangePassword(LoginRequiredMixin, View):
 
             # instance ของ UserChangePassword
             # ส่งอีเมลยืนยันการเปลี่ยนรหัสผ่าน
+            # ส่งตามที่ user (user = User.objects.get(email=email))
             self.send_email(user, request)
             return redirect('changepassword')
         
@@ -596,6 +697,18 @@ class PasswordChangeConfirmView(LoginRequiredMixin, View):
     login_url = 'login'
 
     def get(self, request, uidb64, token):
+
+        has_company = False
+        company = None
+        if request.user.is_authenticated:
+            # ตรวจสอบว่าผู้ใช้ มี Company ไหม
+            try:
+                company = Company.objects.get(user=request.user)
+                has_company = True
+            except Company.DoesNotExist:
+                has_company = False
+
+        
         # ถอดรหัสข้อมูล เพื่อดึงข้อมูล User มาใช้งาน ถอดรหัสจะเป็น (user.pk) ที่ส่ง request เข้ามา
         uid = force_str(urlsafe_base64_decode(uidb64))
         user = User.objects.get(pk=uid)
@@ -605,7 +718,9 @@ class PasswordChangeConfirmView(LoginRequiredMixin, View):
 
         context = {
             'form': form,
-            'valid_token': True
+            'valid_token': True,
+            'has_company' : has_company,
+            'company' : company
         }
 
         return render(request, 'users/password_change_form.html', context)
@@ -632,6 +747,16 @@ class TicketView(LoginRequiredMixin, View):
 
     def get(self, request, user_id):
 
+        has_company = False
+        company = None
+        if request.user.is_authenticated:
+            # ตรวจสอบว่าผู้ใช้ มี Company ไหม
+            try:
+                company = Company.objects.get(user=request.user)
+                has_company = True
+            except Company.DoesNotExist:
+                has_company = False
+
         current_time = timezone.now() 
 
         event_filter = Q(event_participant__event__end_date__gt=current_time) | Q(event_participant__event__end_date__isnull=True, event_participant__event__start_date__gt=current_time)
@@ -647,7 +772,9 @@ class TicketView(LoginRequiredMixin, View):
 
         context = {
             'user': user,
-            'tickets': tickets
+            'tickets': tickets,
+            'has_company' : has_company,
+            'company' : company
         }
 
         return render(request, 'users/ticketview.html', context)
@@ -667,7 +794,7 @@ class TicketSent(LoginRequiredMixin, View):
         print(email)
 
         if not email:
-           return JsonResponse({'status':'email-error'}, status=400)
+           return JsonResponse({'status':'email-error'}, status=404)
 
         try:
             ticket = Ticket.objects.get(id=ticket_id, event_participant__user_id=user_id)
@@ -677,7 +804,7 @@ class TicketSent(LoginRequiredMixin, View):
                 new_owner = User.objects.get(email=email)
                 print(new_owner)
             except User.DoesNotExist:
-                return JsonResponse({'status':'email-error'}, status=400)
+                return JsonResponse({'status':'email-error'}, status=404)
             
             # ส่งตั๋วให้คนอื่น (new_owner) ที่ get มาจาก form ตรง sweetalter2
             ticket.event_participant.user = new_owner
@@ -694,6 +821,16 @@ class TicketDeatilView(LoginRequiredMixin, View):
 
     def get(self, request, user_id, ticket_id):
 
+        has_company = False
+        company = None
+        if request.user.is_authenticated:
+            # ตรวจสอบว่าผู้ใช้ มี Company ไหม
+            try:
+                company = Company.objects.get(user=request.user)
+                has_company = True
+            except Company.DoesNotExist:
+                has_company = False
+
         if request.user.id != user_id:
             raise PermissionDenied(f"เข้าได้เฉพาะผู้ใช้งานที่กำหนดไว้")
         
@@ -704,7 +841,9 @@ class TicketDeatilView(LoginRequiredMixin, View):
 
         context = {
             'user': user,
-            'ticket': ticket
+            'ticket': ticket,
+            'has_company' : has_company,
+            'company' : company
         }
 
         return render(request, 'users/ticketdetailview.html', context)
@@ -714,6 +853,16 @@ class TicketPastView(LoginRequiredMixin, View):
     login_url = 'login'
 
     def get(self, request, user_id):
+
+        has_company = False
+        company = None
+        if request.user.is_authenticated:
+            # ตรวจสอบว่าผู้ใช้ มี Company ไหม
+            try:
+                company = Company.objects.get(user=request.user)
+                has_company = True
+            except Company.DoesNotExist:
+                has_company = False
 
         current_time = timezone.now() 
 
@@ -729,7 +878,9 @@ class TicketPastView(LoginRequiredMixin, View):
 
         context = {
             'user': user,
-            'tickets': tickets
+            'tickets': tickets,
+            'has_company' : has_company,
+            'company' : company
         }
 
         return render(request, 'users/ticketviewpast.html', context)
@@ -739,6 +890,17 @@ class TransactionSuccessView(LoginRequiredMixin, View):
     login_url = 'login'
 
     def get(self, request, user_id):
+
+        has_company = False
+        company = None
+        if request.user.is_authenticated:
+            # ตรวจสอบว่าผู้ใช้ มี Company ไหม
+            try:
+                company = Company.objects.get(user=request.user)
+                has_company = True
+            except Company.DoesNotExist:
+                has_company = False
+
         if request.user.id != user_id:
             raise PermissionDenied("เข้าได้เฉพาะผู้ใช้งานที่กำหนดไว้")
         
@@ -747,7 +909,9 @@ class TransactionSuccessView(LoginRequiredMixin, View):
 
         context = {
             'user': user,
-            'payments': payments
+            'payments': payments,
+            'has_company' : has_company,
+            'company' : company
         }
 
         return render(request, 'users/transactionsuccess.html', context)
@@ -760,57 +924,21 @@ class TransactionSuccessView(LoginRequiredMixin, View):
         payment_id = payment.id
         
         return redirect('transaction-deatil', user_id, payment_id)
-    
-# อยู่ ฝั่ง ผู้จัด event
-    # def post(self, request, user_id):
-    #     if request.user.id != user_id:
-    #         raise PermissionDenied("เข้าได้เฉพาะผู้ใช้งานที่กำหนดไว้")
-        
-    #     user = User.objects.get(pk=user_id)
-
-    #     # สมมติว่ามีการส่ง event_id มาจาก request
-    #     payment = Payment.objects.filter(user=user, status='Successful').last()
-    #     event_id = payment.event.id
-
-    #     # ส่งอีเมลยืนยันการเข้าร่วมงานพร้อมกับ event_id และ request
-    #     self.send_email(user, event_id, request)  # เพิ่ม request เป็นพารามิเตอร์ที่สาม
-
-    #     # หลังจากส่งอีเมลเสร็จ จะ redirect ไปยังหน้า success-mail
-    #     return redirect('success-mail', user_id=user_id)
-    
-    # def send_email(self, user, event_id, request):
-    #     subject = 'ยืนยันการเข้าร่วมงาน'
-
-    #     # ดึง domain จาก request
-    #     domain = request.get_host()
-
-    #     # สร้าง token และ uid เพื่อใช้ในการสร้างลิงก์
-    #     token = default_token_generator.make_token(user)
-    #     uid = urlsafe_base64_encode(force_bytes(user.pk))
-
-    #     # ลิงก์สำหรับยืนยันการเข้าร่วมงาน โดยใช้ event_id
-    #     link = f'http://{domain}/user/event/success/{event_id}/{uid}/{token}/'
-
-    #     # Render template อีเมลเป็นข้อความ string
-    #     message = render_to_string('users/email_ticket.html', {
-    #         'user': user,
-    #         'event_id': event_id,
-    #         'link': link,
-    #     })
-
-    #     # ตั้งค่าผู้ส่งและผู้รับอีเมล
-    #     from_email = settings.DEFAULT_FROM_EMAIL
-    #     recipient_list = [user.email]
-
-    #     # สร้างและส่งอีเมล
-    #     email = EmailMessage(subject, message, from_email, recipient_list)
-    #     email.send()
-
 
 class TransactionVerificationView(LoginRequiredMixin, View):
     login_url = 'login'
 
     def get(self, request, user_id):
+
+        has_company = False
+        company = None
+        if request.user.is_authenticated:
+            # ตรวจสอบว่าผู้ใช้ มี Company ไหม
+            try:
+                company = Company.objects.get(user=request.user)
+                has_company = True
+            except Company.DoesNotExist:
+                has_company = False
         
         if request.user.id != user_id:
             raise PermissionDenied(f"เข้าได้เฉพาะผู้ใช้งานที่กำหนดไว้")
@@ -822,7 +950,9 @@ class TransactionVerificationView(LoginRequiredMixin, View):
 
         context = {
             'user': user,
-            'payments': payments
+            'payments': payments,
+            'has_company' : has_company,
+            'company' : company
         }
 
         return render(request, 'users/transactionverification.html', context)
@@ -831,6 +961,16 @@ class TransactionFailedView(LoginRequiredMixin, View):
     login_url = 'login'
 
     def get(self, request, user_id):
+
+        has_company = False
+        company = None
+        if request.user.is_authenticated:
+            # ตรวจสอบว่าผู้ใช้ มี Company ไหม
+            try:
+                company = Company.objects.get(user=request.user)
+                has_company = True
+            except Company.DoesNotExist:
+                has_company = False
         
         if request.user.id != user_id:
             raise PermissionDenied(f"เข้าได้เฉพาะผู้ใช้งานที่กำหนดไว้")
@@ -842,7 +982,9 @@ class TransactionFailedView(LoginRequiredMixin, View):
 
         context = {
             'user': user,
-            'payments': payments
+            'payments': payments,
+            'has_company' : has_company,
+            'company' : company
         }
 
         return render(request, 'users/transactionfailed.html', context)
@@ -852,6 +994,16 @@ class TransactionDetailView(LoginRequiredMixin, View):
     login_url = 'login'
 
     def get(self, request, user_id, payment_id):
+
+        has_company = False
+        company = None
+        if request.user.is_authenticated:
+            # ตรวจสอบว่าผู้ใช้ มี Company ไหม
+            try:
+                company = Company.objects.get(user=request.user)
+                has_company = True
+            except Company.DoesNotExist:
+                has_company = False
         
         if request.user.id != user_id:
             raise PermissionDenied(f"เข้าได้เฉพาะผู้ใช้งานที่กำหนดไว้")
@@ -865,7 +1017,9 @@ class TransactionDetailView(LoginRequiredMixin, View):
 
         context = {
             'user': user,
-            'payment': payment
+            'payment': payment,
+            'has_company' : has_company,
+            'company' : company
         }
 
         return render(request, 'users/transactiondetail.html', context)
