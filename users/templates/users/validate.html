@@ -8,6 +8,7 @@
 
 <div class="min-h-screen flex flex-col justify-center items-center mt-8">
     {% include "users/components/validate_step.html" %}
+    {% if valid_token %}
     <section class="flex flex-col justify-center items-center mt-8 text-center">
         <h2 class="kanit-black-italic text-3xl mb-12">โปรดรอการตรวจสอบจากผู้จัดอีเว้นต์</h2>
         <?xml version="1.0" encoding="iso-8859-1"?>
@@ -72,6 +73,9 @@
             </a>
         </div>
     </section>
+    {% else %}
+    <p class="mt-12 text-center text-red-700 kanit-small">Token ไม่ถูกต้องหรือหมดอายุ โปรดลองอีกครั้ง</p>
+    {% endif %}
 </div>
 
 

@@ -186,6 +186,10 @@ class PasswordResetConfirmView(View):
         uid = force_str(urlsafe_base64_decode(uidb64))
         user = User.objects.get(pk=uid)
 
+        # ตรวจ token
+        if not default_token_generator.check_token(user, token):
+            return render(request, 'users/password_reset_form.html', {'valid_token': False})
+
         form = UserSetPasswordForm(user)
         print(user)
 
@@ -271,6 +275,7 @@ class AttendeeView(LoginRequiredMixin, View):
         company = None
         if request.user.is_authenticated:
             # ตรวจสอบว่าผู้ใช้ มี Company ไหม
+            
             try:
                 company = Company.objects.get(user=request.user)
                 has_company = True
@@ -284,7 +289,11 @@ class AttendeeView(LoginRequiredMixin, View):
             user = User.objects.get(pk=uid)
             user_profile = UserProfile.objects.get(user=user)
         except UserProfile.DoesNotExist:
-            user_profile = None  
+            user_profile = None 
+
+        # ตรวจ token
+        if not default_token_generator.check_token(user, token):
+            return render(request, 'users/attendee.html', {'valid_token': False})
 
         form = AttendeeForm(instance=user)
 
@@ -372,20 +381,26 @@ class PaymentView(LoginRequiredMixin, View):
     @transaction.atomic
     def get(self, request, event_id, uidb64, token):
 
+        user = request.user
+
         has_company = False
         company = None
         if request.user.is_authenticated:
             # ตรวจสอบว่าผู้ใช้ มี Company ไหม
             try:
-                company = Company.objects.get(user=request.user)
+                company = Company.objects.get(user=user)
                 has_company = True
             except Company.DoesNotExist:
                 has_company = False
+        
 
-        user = request.user
         event = Event.objects.get(pk=event_id)
         company = event.company
         event_amount = event.ticket_price
+
+        # ตรวจ token
+        if not default_token_generator.check_token(user, token):
+            return render(request, 'users/payment.html', {'valid_token': False})
 
         print(company)
         print(event_amount)
@@ -408,6 +423,7 @@ class PaymentView(LoginRequiredMixin, View):
 
         context = {
             'event_id': event_id,
+            'valid_token': True,
             'qrcode': qrcode_url,
             'total': amount,
             'has_company' : has_company,
@@ -454,19 +470,26 @@ class ValidateView(LoginRequiredMixin, View):
 
     def get(self, request, event_id, uidb64, token):
 
+        user = request.user
+
         has_company = False
         company = None
-        if request.user.is_authenticated:
+        if user.is_authenticated:
             # ตรวจสอบว่าผู้ใช้ มี Company ไหม
             try:
-                company = Company.objects.get(user=request.user)
+                company = Company.objects.get(user=user)
                 has_company = True
             except Company.DoesNotExist:
                 has_company = False
         
+        # ตรวจ token
+        if not default_token_generator.check_token(user, token):
+            return render(request, 'users/validate.html', {'valid_token': False})
+        
         context = {
             'has_company' : has_company,
-            'company' : company
+            'company' : company,
+            'valid_token': True
         }
         return render(request, 'users/validate.html', context)
 
@@ -475,21 +498,28 @@ class SuccessView(View):
 
     def get(self, request, event_id, uidb64, token):
 
+        user = request.user
+
         has_company = False
         company = None
         if request.user.is_authenticated:
             # ตรวจสอบว่าผู้ใช้ มี Company ไหม
             try:
-                company = Company.objects.get(user=request.user)
+                company = Company.objects.get(user=user)
                 has_company = True
             except Company.DoesNotExist:
                 has_company = False
+        
+        # ตรวจ token
+        if not default_token_generator.check_token(user, token):
+            return render(request, 'users/success.html', {'valid_token': False})
 
         # ถอดรหัสข้อมูล 
         uid = force_str(urlsafe_base64_decode(uidb64))
         user = User.objects.get(pk=uid)
         context = {
             'user': user,
+            'valid_token': True,
             'has_company' : has_company,
             'company' : company
         }
@@ -713,6 +743,10 @@ class PasswordChangeConfirmView(LoginRequiredMixin, View):
         # ถอดรหัสข้อมูล เพื่อดึงข้อมูล User มาใช้งาน ถอดรหัสจะเป็น (user.pk) ที่ส่ง request เข้ามา
         uid = force_str(urlsafe_base64_decode(uidb64))
         user = User.objects.get(pk=uid)
+
+        # ตรวจ token
+        if not default_token_generator.check_token(user, token):
+            return render(request, 'users/password_change_form.html', {'valid_token': False})
 
         form = UserPasswordChangeForm(user)
         print(user)

@@ -1,6 +1,6 @@
 {% load static %}
 <main
-    class="w-1/5 ml-16 bg-white border border-gray-200 rounded-lg shadow p-12 flex flex-col items-center justify-center">
+    class="w-1/5 md:w-1/3 lg:w-1/5 bg-white border border-gray-200 rounded-lg shadow p-8 md:p-12 flex flex-col items-center justify-center">
     {% if user.userprofile.profile_picture %}
     <!-- ไม่ต้องเขียนใน views เพราะมีการใช้ AbstactUser เพื่อเชื่อมต่อกับข้อมูลอยู่แล้ว -->
     <img class="h-16 w-16 rounded-full cursor-pointer" src="{{ user.userprofile.profile_picture.url }}"

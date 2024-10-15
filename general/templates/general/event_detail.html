@@ -7,25 +7,26 @@
 {% endblock %}
 {% block content %}
 <section>
-    <article class="flex ml-36 space-x-8 mt-36">
+    <article class="flex flex-col md:flex-row ml-6 md:ml-36 space-y-8 md:space-y-0 md:space-x-8 mt-12 md:mt-36">
         {% include "users/components/cardevent.html" %}
-            <div class="flex mt-4">
-                <p class="kanit-regular"> {% if event.ticket_price > 0 %}
+        <div class="flex mt-4">
+            <p class="kanit-regular"> 
+                {% if event.ticket_price > 0 %}
                     บัตร ราคา {{ event.ticket_price }} บาท
-                    {% else %}
+                {% else %}
                     บัตร ฟรี
-                    {% endif %}</p>
-            </div>
-            <div class="mt-8">
-                <div class="flex space-x-2">
-                    {% if user.is_authenticated %}
+                {% endif %}
+            </p>
+        </div>
+        <div class="mt-8">
+            <div class="flex space-x-2">
+                {% if user.is_authenticated %}
                     <button id="follow-button" data-event-id="{{ event.id }}"
                         class="flex items-center text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800"
                         onclick="follow('{{ user.id }}', '{{ event.id }}', '{{ csrf_token }}', this)">
                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
                             class="bi bi-bell-fill mr-2" viewBox="0 0 16 16">
-                            <path
-                                d="M8 16a2 2 0 0 0 2-2H6a2 2 0 0 0 2 2m.995-14.901a1 1 0 1 0-1.99 0A5 5 0 0 0 3 6c0 1.098-.5 6-2 7h14c-1.5-1-2-5.902-2-7 0-2.42-1.72-4.44-4.005-4.901" />
+                            <path d="M8 16a2 2 0 0 0 2-2H6a2 2 0 0 0 2 2m.995-14.901a1 1 0 1 0-1.99 0A5 5 0 0 0 3 6c0 1.098-.5 6-2 7h14c-1.5-1-2-5.902-2-7 0-2.42-1.72-4.44-4.005-4.901" />
                         </svg>
                         <p class='kanit-regular'>ติดตาม</p>
                     </button>
@@ -34,19 +35,17 @@
                             class="flex items-center text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800">
                             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
                                 class="bi bi-ticket-fill mr-2" viewBox="0 0 16 16">
-                                <path
-                                    d="M1.5 3A1.5 1.5 0 0 0 0 4.5V6a.5.5 0 0 0 .5.5 1.5 1.5 0 1 1 0 3 .5.5 0 0 0-.5.5v1.5A1.5 1.5 0 0 0 1.5 13h13a1.5 1.5 0 0 0 1.5-1.5V10a.5.5 0 0 0-.5-.5 1.5 1.5 0 0 1 0-3A.5.5 0 0 0 16 6V4.5A1.5 1.5 0 0 0 14.5 3z" />
+                                <path d="M1.5 3A1.5 1.5 0 0 0 0 4.5V6a.5.5 0 0 0 .5.5 1.5 1.5 0 1 1 0 3 .5.5 0 0 0-.5.5v1.5A1.5 1.5 0 0 0 1.5 13h13a1.5 1.5 0 0 0 1.5-1.5V10a.5.5 0 0 0-.5-.5 1.5 1.5 0 0 1 0-3A.5.5 0 0 0 16 6V4.5A1.5 1.5 0 0 0 14.5 3z" />
                             </svg>
                             <p class='kanit-regular'>ลงทะเบียนรับตั๋ว</p>
                         </button>
                     </a>
-                    {% else %}
+                {% else %}
                     <button type="button" onclick="showLoginAlert()"
                         class="flex items-center text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800">
                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
                             class="bi bi-bell-fill mr-2" viewBox="0 0 16 16">
-                            <path
-                                d="M8 16a2 2 0 0 0 2-2H6a2 2 0 0 0 2 2m.995-14.901a1 1 0 1 0-1.99 0A5 5 0 0 0 3 6c0 1.098-.5 6-2 7h14c-1.5-1-2-5.902-2-7 0-2.42-1.72-4.44-4.005-4.901" />
+                            <path d="M8 16a2 2 0 0 0 2-2H6a2 2 0 0 0 2 2m.995-14.901a1 1 0 1 0-1.99 0A5 5 0 0 0 3 6c0 1.098-.5 6-2 7h14c-1.5-1-2-5.902-2-7 0-2.42-1.72-4.44-4.005-4.901" />
                         </svg>
                         ติดตาม
                     </button>
@@ -54,26 +53,26 @@
                         class="flex items-center text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800">
                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
                             class="bi bi-ticket-fill mr-2" viewBox="0 0 16 16">
-                            <path
-                                d="M1.5 3A1.5 1.5 0 0 0 0 4.5V6a.5.5 0 0 0 .5.5 1.5 1.5 0 1 1 0 3 .5.5 0 0 0-.5.5v1.5A1.5 1.5 0 0 0 1.5 13h13a1.5 1.5 0 0 0 1.5-1.5V10a.5.5 0 0 0-.5-.5 1.5 1.5 0 0 1 0-3A.5.5 0 0 0 16 6V4.5A1.5 1.5 0 0 0 14.5 3z" />
+                            <path d="M1.5 3A1.5 1.5 0 0 0 0 4.5V6a.5.5 0 0 0 .5.5 1.5 1.5 0 1 1 0 3 .5.5 0 0 0-.5.5v1.5A1.5 1.5 0 0 0 1.5 13h13a1.5 1.5 0 0 0 1.5-1.5V10a.5.5 0 0 0-.5-.5 1.5 1.5 0 0 1 0-3A.5.5 0 0 0 16 6V4.5A1.5 1.5 0 0 0 14.5 3z" />
                         </svg>
                         ลงทะเบียนรับตั๋ว
                     </button>
-                    {% endif %}
-                </div>
+                {% endif %}
             </div>
         </div>
     </article>
-    <article class="ml-36">
-        <h5 class="mb-4 mt-12 text-2xl font-bold tracking-tight text-gray-900 dark:text-white kanit-black">ข้อมูลงาน
+
+    <article class="ml-6 md:ml-36">
+        <h5 class="mb-4 mt-12 text-xl md:text-2xl font-bold tracking-tight text-gray-900 dark:text-white kanit-black">
+            ข้อมูลงาน
         </h5>
-        <div class="w-4/5 ml-12">
+        <div class="w-full md:w-4/5 ml-0 md:ml-12">
             <p class="kanit-regular text-m">{{ event.description }}</p>
         </div>
-        <div class="block max-w-sm p-6 bg-white border border-gray-200 rounded-lg shadow mt-16 rounded-lg shadow-2xl">
+        <div class="block max-w-full md:max-w-sm p-6 bg-white border border-gray-200 rounded-lg shadow mt-8 md:mt-16 rounded-lg shadow-2xl">
             <div class="flex justify-between items-center">
                 <div class="">
-                    <h5 class="kanit-black mb-2 text-2xl font-bold tracking-tight text-gray-900 dark:text-white">จัดโดย</h5>
+                    <h5 class="kanit-black mb-2 text-xl md:text-2xl font-bold tracking-tight text-gray-900 dark:text-white">จัดโดย</h5>
                     <p class="kanit-regular font-normal text-gray-700 dark:text-gray-400">{{ event.company.name }}</p>
                 </div>
                 <button type="button" onclick='showData({
@@ -82,13 +81,15 @@
                     "contact": "{{ event.company.contact }}",
                     "phone": "{{ event.company.telephone }}",  
                 })'
-                    class="kanit-regular text-white bg-gradient-to-r from-green-400 via-green-500 to-green-600 hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-green-300 dark:focus:ring-green-800 font-medium rounded-lg text-sm px-5 py-2.5 text-center me-2 mb-2">ติดต่อ</button>
+                    class="kanit-regular text-white bg-gradient-to-r from-green-400 via-green-500 to-green-600 hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-green-300 dark:focus:ring-green-800 font-medium rounded-lg text-sm px-5 py-2.5 text-center me-2 mb-2">
+                    ติดต่อ
+                </button>
             </div>
         </div>
     </article>
 </section>
-{% endblock %}
 
+{% endblock %}
 
 {% block script %}
 <script src="{% static 'general/js/popup.js' %}"></script>

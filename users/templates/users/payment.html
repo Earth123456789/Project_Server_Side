@@ -8,6 +8,7 @@
 
 <div class="min-h-screen flex flex-col justify-center items-center mt-8">
     {% include "users/components/payment_step.html" %}
+    {% if valid_token %}
     <section class="mt-4 text-center">
         <h2 class="kanit-black-italic text-2xl text-green-700">QR Code สำหรับชำระเงิน</h2>
         <img src="{{ qrcode }}" alt="QR Code" class="qrcode-image">
@@ -20,6 +21,9 @@
             </form>
         </div>
     </section>
+    {% else %}
+    <p class="mt-12 text-center text-red-700 kanit-small">Token ไม่ถูกต้องหรือหมดอายุ โปรดลองอีกครั้ง</p>
+    {% endif %}
 </div>
 
 
