@@ -4,7 +4,11 @@ from django.views import View
 from django.db.models import Count
 from django.utils import timezone
 from django.db.models import Q
-from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
+from django.core.mail import EmailMessage
+from django.template.loader import render_to_string
+from django.conf import settings
+from datetime import timedelta
+from django.utils import timezone
 
 from users.models import UserProfile, User
 
@@ -100,6 +104,12 @@ class EventView(View):
         event = Event.objects.get(pk = event_id)
         user = User.objects.get(pk = user_id)
         user.followed_events.add(event)
+
+        # ตรวจสอบว่ากิจกรรมใกล้จะถึงภายใน 3 วัน
+        # timedelta ใช้เปรียบเทียบระยะเวลา
+        if event.start_date - timezone.now().date() <= timedelta(days=3):
+            self.send_email(user, event)
+
         return JsonResponse({'status':'add_susecss'}, status=200)
     
     def delete(self, request,  event_id, user_id):
@@ -107,6 +117,21 @@ class EventView(View):
         user = User.objects.get(pk = user_id)
         user.followed_events.remove(event)
         return JsonResponse({'status':'remove_susecss'}, status=200)
+    
+    def send_email(self, user, event):
+        subject = 'ใกล้ถึงเวลาแล้ว!!!!'
+
+        # render template เป็น string โดยไม่ต้องส่ง response
+        message = render_to_string('users/event_reminder_email.html', {
+            'user': user,
+            'event': event,
+        })
+
+        from_email = settings.DEFAULT_FROM_EMAIL
+        recipient_list = [user.email]
+
+        email = EmailMessage(subject, message, from_email, recipient_list)
+        email.send()
 
 
 
