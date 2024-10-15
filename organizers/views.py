@@ -4,6 +4,7 @@ from django.contrib.auth.models import Group
 from django.db import transaction
 from django.core.exceptions import PermissionDenied
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.db.models import Count
 from django.http import JsonResponse
 from django.core.mail import EmailMessage
 from django.template.loader import render_to_string
@@ -13,7 +14,7 @@ from django.contrib.auth.tokens import default_token_generator
 from django.conf import settings
 
 from organizers.forms import CompanyRegistrationForm
-from organizers.models import Company, Payment
+from organizers.models import Company, Payment, Event
 
 from users.models import User, EventParticipant, Ticket
 
@@ -74,6 +75,21 @@ class DashBoardView(LoginRequiredMixin, View):
 
         company = Company.objects.get(pk=company_id)
 
+        event_count = Event.objects.filter(company=company_id).count()
+
+        transaction_count = Payment.objects.filter(company=company_id).count()
+        
+        event_participant_count = EventParticipant.objects.filter(event__company=company).values('event__name').annotate(participant_count=Count('id'))
+
+        # ตาม week 4-5 เลยคร๊าบ
+        event_names = [event['event__name'] for event in event_participant_count]
+        participant_counts = [event['participant_count'] for event in event_participant_count]
+
+        print(event_participant_count)
+        print(event_names)
+        print(participant_counts)
+
+
         # ตรวจสอบว่าเป็น "Organizers"
         if not user.groups.filter(name='Organizers').exists():
             raise PermissionDenied("เข้าได้เฉพาะผู้ใช้งานที่กำหนดไว้")
@@ -91,7 +107,11 @@ class DashBoardView(LoginRequiredMixin, View):
             return redirect('login')
 
         context = {
-            "company": company
+            "company": company,
+            "event": event_count,
+            "transaction": transaction_count,
+            "event_names": event_names,  
+            "participant_counts": participant_counts, 
         }
         return render(request, 'organizers/dashboard.html', context)  
     
@@ -175,51 +195,6 @@ class TransactionView(LoginRequiredMixin, View):
         # ส่งอีเมล
         email = EmailMessage(subject, message, from_email, recipient_list)
         email.send()
-    
-# อยู่ ฝั่ง ผู้จัด event
-    # def post(self, request, user_id):
-    #     if request.user.id != user_id:
-    #         raise PermissionDenied("เข้าได้เฉพาะผู้ใช้งานที่กำหนดไว้")
-        
-    #     user = User.objects.get(pk=user_id)
-
-    #     # สมมติว่ามีการส่ง event_id มาจาก request
-    #     payment = Payment.objects.filter(user=user, status='Successful').last()
-    #     event_id = payment.event.id
-
-    #     # ส่งอีเมลยืนยันการเข้าร่วมงานพร้อมกับ event_id และ request
-    #     self.send_email(user, event_id, request)  # เพิ่ม request เป็นพารามิเตอร์ที่สาม
-
-    #     # หลังจากส่งอีเมลเสร็จ จะ redirect ไปยังหน้า success-mail
-    #     return redirect('success-mail', user_id=user_id)
-    
-    # def send_email(self, user, event_id, request):
-    #     subject = 'ยืนยันการเข้าร่วมงาน'
-
-    #     # ดึง domain จาก request
-    #     domain = request.get_host()
-
-    #     # สร้าง token และ uid เพื่อใช้ในการสร้างลิงก์
-    #     token = default_token_generator.make_token(user)
-    #     uid = urlsafe_base64_encode(force_bytes(user.pk))
-
-    #     # ลิงก์สำหรับยืนยันการเข้าร่วมงาน โดยใช้ event_id
-    #     link = f'http://{domain}/user/event/success/{event_id}/{uid}/{token}/'
-
-    #     # Render template อีเมลเป็นข้อความ string
-    #     message = render_to_string('users/email_ticket.html', {
-    #         'user': user,
-    #         'event_id': event_id,
-    #         'link': link,
-    #     })
-
-    #     # ตั้งค่าผู้ส่งและผู้รับอีเมล
-    #     from_email = settings.DEFAULT_FROM_EMAIL
-    #     recipient_list = [user.email]
-
-    #     # สร้างและส่งอีเมล
-    #     email = EmailMessage(subject, message, from_email, recipient_list)
-    #     email.send()
 
 class CancelTransactionView(View):
     def post(self, request, company_id):

@@ -1072,14 +1072,15 @@ class TransactionDetailView(LoginRequiredMixin, View):
         # สร้าง PDF ด้วย canvas
         pdf = canvas.Canvas(response, pagesize=A4)
         width, height = A4
+        
 
         # สร้างข้อมูลที่ต้องการแสดงใน PDF
         pdf.drawString(100, height - 100, f"Payment ID: {payment.id}")
-        pdf.drawString(100, height - 150, f"Name: {payment.user.first_name} {payment.user.last_name}")
+        pdf.drawString(100, height - 150, f"Payment Date: {payment.payment_date.strftime('%d/%m/%Y')}")
         pdf.drawString(100, height - 200, f"Event Name: {payment.event.name}")
-        pdf.drawString(100, height - 250, f"Payment Date: {payment.payment_date.strftime('%d/%m/%Y %H:%M')}")
+        pdf.drawString(100, height - 250, f"Name: {payment.user.first_name} {payment.user.last_name}")
         pdf.drawString(100, height - 300, f"Ticket Price: {payment.event.ticket_price} Bath")
-        pdf.drawString(100, height - 350, f"Ticket Quantity: {payment.ticket_quantity}")
+        pdf.drawString(100, height - 350, f"Ticket Amount: {payment.ticket_quantity}")
         pdf.drawString(100, height - 400, f"Total Amount: {payment.amount} Bath")
         
         # สั่งปิดหน้า PDF

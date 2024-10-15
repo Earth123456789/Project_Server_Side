@@ -9,6 +9,7 @@
 
 <section class="z-0">
     {% include "organizers/components/sidebar.html" %}
+    
 </section>
 <section>
     {% include "organizers/components/maindashboard.html" %}
@@ -16,5 +17,34 @@
 
 {% endblock %}
 {% block script %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    const ctx = document.getElementById('myChart');
+    const eventname = {{ event_names|safe }};
+    const participantcount = {{ participant_counts|safe }};
+
+    console.log({{ eventname }})
+    console.log({{ participantcount }})
+    new Chart(ctx, {
+      type: 'doughnut',
+      data: {
+        // ทั่วไป Django จะ escape ข้อมูลทั้งหมดเพื่อป้องกันการแสดงข้อมูลผิดรูปแบบ
+        // JSON หรือ JavaScript สามารถถูกส่งไปใช้งานได้ในกรณีที่ปลอดภัย (ไม่มีการเปลี่ยนแปลงจาก User )
+        labels: eventname,  
+        datasets: [{
+          label: 'จำนวนผู้เข้าร่วมกิจกรรม',
+          data: participantcount,  
+          borderWidth: 1
+        }]
+      },
+      options: {
+        scales: {
+          y: {
+            beginAtZero: true
+          }
+        }
+      }
+    });
+</script>
 {% endblock %}
 
