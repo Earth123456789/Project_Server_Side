@@ -11,7 +11,7 @@
     {% include "organizers/components/sidebar.html" %}
 </section>
 <section>
-    <div class="p-4 sm:ml-64">
+    <div class="p-4 m-4 sm:ml-64">
         <div class="p-4 border-2 border-gray-200 border-dashed rounded-lg dark:border-gray-700 mt-14">
             <div class="grid grid-cols-3 gap-4 mb-4">
                 <div class="flex items-center justify-center h-24 rounded bg-red-300 dark:bg-red-800">
@@ -22,7 +22,7 @@
                 </div>
                 <div class="flex items-center justify-center h-24 rounded bg-blue-300 dark:bg-blue-800">
                     <div class="text-center">
-                        <p class="text-xl"> {{ regis }} </p>
+                        <p class="text-xl"> {{ price.total }} </p>
                         <p class="text-sm text-gray-500">รายได้สุทธิ</p>
                     </div>
                 </div>
@@ -45,7 +45,7 @@
                     </p>
                 </div>
                 <div class="flex items-center justify-center rounded bg-gray-50 dark:bg-gray-800">
-                    <div class="text-center">
+                    <div class="text-center py-5">
                         <p class="text-xl text-gray-400 dark:text-gray-500">
                             ผู้เข้าร่วมแต่ละอีเวนต์
                             <div>
@@ -60,46 +60,14 @@
                     </p>
                 </div>
                 <div class="flex items-center justify-center rounded bg-gray-50 dark:bg-gray-800">
-                    <p class="text-2xl text-gray-400 dark:text-gray-500">
-                        
-                    </p>
-                </div>
-            </div>
-            <div class="flex items-center justify-center h-48 mb-4 rounded bg-gray-50 dark:bg-gray-800">
-                <p class="text-2xl text-gray-400 dark:text-gray-500">
-                    <svg class="w-3.5 h-3.5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 18 18">
-                        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 1v16M1 9h16"/>
-                    </svg>
-                </p>
-            </div>
-            <div class="grid grid-cols-2 gap-4">
-                <div class="flex items-center justify-center rounded bg-gray-50 h-28 dark:bg-gray-800">
-                    <p class="text-2xl text-gray-400 dark:text-gray-500">
-                        <svg class="w-3.5 h-3.5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 18 18">
-                            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 1v16M1 9h16"/>
-                        </svg>
-                    </p>
-                </div>
-                <div class="flex items-center justify-center rounded bg-gray-50 h-28 dark:bg-gray-800">
-                    <p class="text-2xl text-gray-400 dark:text-gray-500">
-                        <svg class="w-3.5 h-3.5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 18 18">
-                            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 1v16M1 9h16"/>
-                        </svg>
-                    </p>
-                </div>
-                <div class="flex items-center justify-center rounded bg-gray-50 h-28 dark:bg-gray-800">
-                    <p class="text-2xl text-gray-400 dark:text-gray-500">
-                        <svg class="w-3.5 h-3.5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 18 18">
-                            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 1v16M1 9h16"/>
-                        </svg>
-                    </p>
-                </div>
-                <div class="flex items-center justify-center rounded bg-gray-50 h-28 dark:bg-gray-800">
-                    <p class="text-2xl text-gray-400 dark:text-gray-500">
-                        <svg class="w-3.5 h-3.5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 18 18">
-                            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 1v16M1 9h16"/>
-                        </svg>
-                    </p>
+                    <div class="text-center py-5">
+                        <p class="text-xl text-gray-400 dark:text-gray-500">
+                            กำไรที่ได้รับ
+                            <div>
+                                <canvas id="income"></canvas>
+                            </div>
+                        </p>
+                    </div>
                 </div>
             </div>
         </div>
@@ -115,7 +83,7 @@
             labels: {{ name | safe }},  
             datasets: [{
                 label: "จำนวนผู้เข้าร่วมกิจกรรม",
-                data: {{ participant }},  
+                data: {{ participant | safe }},   
                 borderWidth: 1
             }]
         },
@@ -125,6 +93,51 @@
             scales: {
                 y: {
                     beginAtZero: true
+                }
+            }
+        }
+    });
+    new Chart(ctx = document.getElementById("income"), {
+        type: "bar",
+        data: {
+            labels: [
+            {% for event in price.each.events %}
+                "{{ event | truncatewords:2 }}"{% if not forloop.last %}, {% endif %}
+            {% endfor %}
+            ],  
+            datasets: [{
+                label: "รายได้รวมของอีเวนต์ (บาท)",
+                data: {{ price.each.profit }},
+                borderWidth: 1,
+                barThickness: 40,
+                backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                borderColor: 'rgba(75, 192, 192, 1)',
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        stepSize: 1000
+                    },
+                    max: Math.ceil(Math.max(...{{ price.each.profit | safe }}) / 1000) * 1000,
+                    grid: {
+                        drawBorder: false,
+                        lineWidth: 1,
+                        color: 'rgba(0, 0, 0, 0.1)'
+                    }
+                },
+                x: {
+                    grid: {
+                        display: false
+                    },
+                    ticks: {
+                        maxRotation: 0,
+                        minRoatation: 0,
+                    }
                 }
             }
         }

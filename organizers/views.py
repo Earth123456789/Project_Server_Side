@@ -8,6 +8,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import JsonResponse
 from django.core.mail import EmailMessage
 from django.template.loader import render_to_string
+from django.utils import numberformat
 from django.utils.http import urlsafe_base64_encode
 from django.utils.encoding import force_bytes
 from django.contrib.auth.tokens import default_token_generator
@@ -16,8 +17,9 @@ from django.conf import settings
 from organizers.forms import CompanyRegistrationForm
 from organizers.models import *
 
-from users.models import User, EventParticipant, Ticket
+from users.models import *
 
+from collections import defaultdict
 import json
 
 class OrganizerRegisterView(LoginRequiredMixin, View):
@@ -71,6 +73,11 @@ class DashBoardView(LoginRequiredMixin, View):
 
         company = Company.objects.get(pk=company_id)
         ev_par = EventParticipant.objects.filter(event__company = company).values('event__name').annotate(parcount = Count('id'))
+        register = EventParticipant.objects.filter(status = "Register", event__company = company_id)
+        event_counts = defaultdict(int)
+        
+        for re in register:
+            event_counts[re.event] += 1
 
         # ตรวจสอบว่าเป็น "Organizers"
         if not user.groups.filter(name='Organizers').exists():
@@ -93,7 +100,13 @@ class DashBoardView(LoginRequiredMixin, View):
             "event": Event.objects.filter(company=company_id),
             "name": [event["event__name"] for event in ev_par],
             "participant": [event['parcount'] for event in ev_par],
-            "regis": EventParticipant.objects.filter(status = "Register", event__company = company_id)
+            "price": {
+                "total": f"{sum([count * event.ticket_price for event, count in event_counts.items()]):,.2f} ฿",
+                "each": {
+                    "events": [event.name for event, count in event_counts.items()],
+                    "profit": [float(count * event.ticket_price) for event, count in event_counts.items()]
+                }
+            }
         }
         return render(request, 'organizers/dashboard.html', context)  
     
