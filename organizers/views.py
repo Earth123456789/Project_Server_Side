@@ -2,6 +2,7 @@ from django.shortcuts import render, redirect
 from django.views import View
 from django.contrib.auth.models import Group
 from django.db import transaction
+from django.db.models import Count
 from django.core.exceptions import PermissionDenied
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import JsonResponse
@@ -69,6 +70,7 @@ class DashBoardView(LoginRequiredMixin, View):
         user = request.user
 
         company = Company.objects.get(pk=company_id)
+        ev_par = EventParticipant.objects.filter(event__company = company).values('event__name').annotate(parcount = Count('id'))
 
         # ตรวจสอบว่าเป็น "Organizers"
         if not user.groups.filter(name='Organizers').exists():
@@ -88,7 +90,10 @@ class DashBoardView(LoginRequiredMixin, View):
 
         context = {
             "company": company,
-            "event": Event.objects.filter(company=company_id)
+            "event": Event.objects.filter(company=company_id),
+            "name": [event["event__name"] for event in ev_par],
+            "participant": [event['parcount'] for event in ev_par],
+            "regis": EventParticipant.objects.filter(status = "Register", event__company = company_id)
         }
         return render(request, 'organizers/dashboard.html', context)  
     

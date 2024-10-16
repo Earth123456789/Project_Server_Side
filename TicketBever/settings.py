@@ -94,7 +94,7 @@ DATABASES = {
         "ENGINE": "django.db.backends.postgresql",
         "NAME": "event_db",
         "USER": "postgres",
-        "PASSWORD": "nilfheim",
+        "PASSWORD": "postgres",
         "HOST": "127.0.0.1",
         "PORT": "5432",
     }
@@ -137,10 +137,6 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/5.1/howto/static-files/
 
 STATIC_URL = 'static/'
-
-STATICFILES_DIRS = [
-    BASE_DIR / "static",
-]
 
 MEDIA_URL = '/media/'
 

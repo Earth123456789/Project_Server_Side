@@ -1,5 +1,6 @@
 {% extends "general/components/layout.html" %}
 {% load static %}
+{% load custom_tags %}
 {% block title %}Dashboard - {% endblock %}
 {% block nav %}
 {% include "organizers/components/navbar.html" %}
@@ -9,26 +10,27 @@
 <section class="z-0">
     {% include "organizers/components/sidebar.html" %}
 </section>
-{% if company %}
 <section>
     <div class="p-4 sm:ml-64">
         <div class="p-4 border-2 border-gray-200 border-dashed rounded-lg dark:border-gray-700 mt-14">
             <div class="grid grid-cols-3 gap-4 mb-4">
                 <div class="flex items-center justify-center h-24 rounded bg-red-300 dark:bg-red-800">
-                    <p class="text-xl">
-                        {{ event.count }}
-                        <p class="text-sm">จำนวนอีเวนต์ที่จัดทั้งหมด</p>
-                    </p>
+                    <div class="text-center">
+                        <p class="text-xl"> {{ event.count }} </p>
+                        <p class="text-sm text-gray-500">จำนวนอีเวนต์ที่จัดทั้งหมด</p>
+                    </div>
                 </div>
                 <div class="flex items-center justify-center h-24 rounded bg-blue-300 dark:bg-blue-800">
-                    <p class="text-xl">
-                        รายได้สุทธิ
-                    </p>
+                    <div class="text-center">
+                        <p class="text-xl"> {{ regis }} </p>
+                        <p class="text-sm text-gray-500">รายได้สุทธิ</p>
+                    </div>
                 </div>
                 <div class="flex items-center justify-center h-24 rounded bg-yellow-100 dark:bg-yellow-800">
-                    <p class="text-xl">
-                        ผู้เข้าร่วมทั้งหมด
-                    </p>
+                    <div class="text-center">
+                        <p class="text-xl"> {% sumfunc participant %} </p>
+                        <p class="text-sm text-gray-500">ยอดรวมผู้เข้าร่วมอีเวนต์</p>
+                    </div>
                 </div>
             </div>
             <div class="flex items-center justify-center h-48 mb-4 rounded bg-gray-50 dark:bg-gray-800">
@@ -37,68 +39,95 @@
                 </p>
             </div>
             <div class="grid grid-cols-2 gap-4 mb-4">
+                <div class="flex items-center justify-center rounded bg-gray-50 dark:bg-gray-800">
+                    <p class="text-2xl text-gray-400 dark:text-gray-500">
+                        อีเวนต์ยอดนิยม
+                    </p>
+                </div>
+                <div class="flex items-center justify-center rounded bg-gray-50 dark:bg-gray-800">
+                    <div class="text-center">
+                        <p class="text-xl text-gray-400 dark:text-gray-500">
+                            ผู้เข้าร่วมแต่ละอีเวนต์
+                            <div>
+                                <canvas id="attendee"></canvas>
+                            </div>
+                        </p>
+                    </div>
+                </div>
+                <div class="flex items-center justify-center rounded bg-gray-50 dark:bg-gray-800">
+                    <p class="text-2xl text-gray-400 dark:text-gray-500">
+                        อีเวนต์ที่ผ่านไปแล้ว
+                    </p>
+                </div>
+                <div class="flex items-center justify-center rounded bg-gray-50 dark:bg-gray-800">
+                    <p class="text-2xl text-gray-400 dark:text-gray-500">
+                        
+                    </p>
+                </div>
+            </div>
+            <div class="flex items-center justify-center h-48 mb-4 rounded bg-gray-50 dark:bg-gray-800">
+                <p class="text-2xl text-gray-400 dark:text-gray-500">
+                    <svg class="w-3.5 h-3.5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 18 18">
+                        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 1v16M1 9h16"/>
+                    </svg>
+                </p>
+            </div>
+            <div class="grid grid-cols-2 gap-4">
                 <div class="flex items-center justify-center rounded bg-gray-50 h-28 dark:bg-gray-800">
                     <p class="text-2xl text-gray-400 dark:text-gray-500">
-                        อีเวนต์ที่ขายดีที่สุด
+                        <svg class="w-3.5 h-3.5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 18 18">
+                            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 1v16M1 9h16"/>
+                        </svg>
                     </p>
                 </div>
                 <div class="flex items-center justify-center rounded bg-gray-50 h-28 dark:bg-gray-800">
                     <p class="text-2xl text-gray-400 dark:text-gray-500">
-                        ยอดขายเดือนนี้
+                        <svg class="w-3.5 h-3.5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 18 18">
+                            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 1v16M1 9h16"/>
+                        </svg>
                     </p>
                 </div>
-            <div class="flex items-center justify-center rounded bg-gray-50 h-28 dark:bg-gray-800">
-                <p class="text-2xl text-gray-400 dark:text-gray-500">
-                    อีเวนต์ที่ผ่านไปแล้ว
-                </p>
-            </div>
-            <div class="flex items-center justify-center rounded bg-gray-50 h-28 dark:bg-gray-800">
-                <p class="text-2xl text-gray-400 dark:text-gray-500">
-                    
-                </p>
-            </div>
-        </div>
-        <div class="flex items-center justify-center h-48 mb-4 rounded bg-gray-50 dark:bg-gray-800">
-            <p class="text-2xl text-gray-400 dark:text-gray-500">
-                <svg class="w-3.5 h-3.5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 18 18">
-                    <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 1v16M1 9h16"/>
-                </svg>
-            </p>
-        </div>
-        <div class="grid grid-cols-2 gap-4">
-            <div class="flex items-center justify-center rounded bg-gray-50 h-28 dark:bg-gray-800">
-                <p class="text-2xl text-gray-400 dark:text-gray-500">
-                    <svg class="w-3.5 h-3.5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 18 18">
-                        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 1v16M1 9h16"/>
-                    </svg>
-                </p>
-            </div>
-            <div class="flex items-center justify-center rounded bg-gray-50 h-28 dark:bg-gray-800">
-                <p class="text-2xl text-gray-400 dark:text-gray-500">
-                    <svg class="w-3.5 h-3.5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 18 18">
-                        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 1v16M1 9h16"/>
-                    </svg>
-                </p>
-            </div>
-            <div class="flex items-center justify-center rounded bg-gray-50 h-28 dark:bg-gray-800">
-                <p class="text-2xl text-gray-400 dark:text-gray-500">
-                    <svg class="w-3.5 h-3.5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 18 18">
-                        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 1v16M1 9h16"/>
-                    </svg>
-                </p>
-            </div>
-            <div class="flex items-center justify-center rounded bg-gray-50 h-28 dark:bg-gray-800">
-                <p class="text-2xl text-gray-400 dark:text-gray-500">
-                    <svg class="w-3.5 h-3.5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 18 18">
-                        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 1v16M1 9h16"/>
-                    </svg>
-                </p>
+                <div class="flex items-center justify-center rounded bg-gray-50 h-28 dark:bg-gray-800">
+                    <p class="text-2xl text-gray-400 dark:text-gray-500">
+                        <svg class="w-3.5 h-3.5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 18 18">
+                            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 1v16M1 9h16"/>
+                        </svg>
+                    </p>
+                </div>
+                <div class="flex items-center justify-center rounded bg-gray-50 h-28 dark:bg-gray-800">
+                    <p class="text-2xl text-gray-400 dark:text-gray-500">
+                        <svg class="w-3.5 h-3.5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 18 18">
+                            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 1v16M1 9h16"/>
+                        </svg>
+                    </p>
+                </div>
             </div>
         </div>
     </div>
 </section>
-{% endif %}
-
 {% endblock %}
 {% block script %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    new Chart(ctx = document.getElementById("attendee"), {
+        type: "doughnut",
+        data: {
+            labels: {{ name | safe }},  
+            datasets: [{
+                label: "จำนวนผู้เข้าร่วมกิจกรรม",
+                data: {{ participant }},  
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            }
+        }
+    });
+</script>
 {% endblock %}

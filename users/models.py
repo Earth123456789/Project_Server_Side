@@ -45,8 +45,6 @@ class EventParticipant(models.Model):
     class RegisterStatus(models.Choices):
         Register = 'Register'
         Attended = 'Attended'
-        Cancelled = 'Cancelled'
-        No_Show = 'No Show'
 
     event = models.ForeignKey('organizers.Event', on_delete=models.CASCADE)
     user = models.ForeignKey('users.User', on_delete=models.CASCADE)
@@ -54,7 +52,7 @@ class EventParticipant(models.Model):
     status = models.CharField(
         max_length=30,
         choices=RegisterStatus.choices,  
-        default=RegisterStatus.No_Show
+        default="Attended"
     )
 
     def __str__(self):

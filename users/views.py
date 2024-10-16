@@ -792,7 +792,7 @@ class TicketSent(LoginRequiredMixin, View):
         print(email)
 
         if not email:
-           return JsonResponse({'status':'email-error'}, status=404)
+            return JsonResponse({'status':'email-error'}, status=404)
 
         try:
             ticket = Ticket.objects.get(id=ticket_id, event_participant__user_id=user_id)
@@ -814,7 +814,7 @@ class TicketSent(LoginRequiredMixin, View):
             return JsonResponse({'success': False, 'message': 'ตั๋วไม่พบหรือคุณไม่มีสิทธิ์ส่ง'}, status=404)
         
 
-class TicketDeatilView(LoginRequiredMixin, View):
+class TicketDetailView(LoginRequiredMixin, View):
     login_url = 'login'
 
     def get(self, request, user_id, ticket_id):
@@ -871,7 +871,7 @@ class TicketPastView(LoginRequiredMixin, View):
 
         tickets = Ticket.objects.filter(
             event_participant__user=user, 
-            event_participant__event__start_date__lt=current_time
+            event_participant__event__end_date__lt=current_time
         )
 
         context = {
