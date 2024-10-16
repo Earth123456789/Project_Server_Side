@@ -194,6 +194,7 @@ class TransactionView(LoginRequiredMixin, View):
 
         # ส่งอีเมล
         email = EmailMessage(subject, message, from_email, recipient_list)
+        email.content_subtype = 'html'
         email.send()
 
 class CancelTransactionView(View):

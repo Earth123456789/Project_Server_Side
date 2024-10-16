@@ -28,11 +28,6 @@ import json
 from reportlab.pdfgen import canvas
 from reportlab.lib.pagesizes import A4
 
-
-
-
-
-
 # register.html, login.html, forms.py, models.py
 class RegisterView(View):
     def get(self, request):
@@ -176,7 +171,9 @@ class ChangePasswordView(View):
 
 
         email = EmailMessage(subject, message, from_email, recipient_list)
+        email.content_subtype = 'html'
         email.send()
+        
 
 
 # password_reset_form.html, forms.py, models.py
@@ -723,6 +720,7 @@ class UserChangePassword(LoginRequiredMixin, View):
 
 
         email = EmailMessage(subject, message, from_email, recipient_list)
+        email.content_subtype = 'html'
         email.send()
 
 class PasswordChangeConfirmView(LoginRequiredMixin, View):

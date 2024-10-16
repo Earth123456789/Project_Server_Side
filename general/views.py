@@ -141,6 +141,7 @@ class EventView(View):
         recipient_list = [user.email]
 
         email = EmailMessage(subject, message, from_email, recipient_list)
+        email.content_subtype = 'html'
         email.send()
 
 class ChatView(LoginRequiredMixin, View):
@@ -186,7 +187,7 @@ class ChatBotView(APIView):
             word_category_learn = ["แนะนำอีเวนต์ที่ได้ความรู้หน่อย", "ความรู้", "การเรียนรู้"]
             word_category_lifestyle = ["แนะนำอีเวนต์ที่เกี่ยวชีวิตประจำวันหน่อย", "ชีวิตประจำวัน", "lifestyle"]
 
-            # ตรวจสอบข้อความที่ผู้ใช้ป้อนเข้ามาและกรองอีเวนต์ตามหมวดหมู่
+            # ตรวจสอบข้อความที่ผู้ใช้ป้vpkอนเข้ามาและกรองอีเวนต์ตามหมวดหมู่
             if any(keyword in user_input.lower() for keyword in word_category_sport):
                 # กรองอีเวนต์หมวดกีฬา
                 events = Event.objects.filter(category__name='กีฬา')

@@ -1,18 +1,14 @@
-{% extends "general/components/layout.html" %}
-{% load static %}
-{% block title %}คำร้องเปลี่ยนรหัสผ่าน - {% endblock %}
-{% block nav %}
-{% include "general/components/navbar.html" %}
-{% endblock %}
-{% block content %}
-<section>
-    <p class="text-3xl font-bold mb-4 kanit-black">สวัสดี {{ user.username }},</p>
-    <p class="text-2xl mb-4 kanit-black">ใกล้ถึงเวลาของ {{ event.name }} อย่าลืมมาร่วมมานะ!!!</p>
-</section>
-
-
-
-{% endblock %}
-{% block footer %}
-{% include "general/components/footer.html" %}
-{% endblock %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title></title>
+</head>
+<body>
+    <section>
+        <p class="text-3xl font-bold mb-4 kanit-black">สวัสดี {{ user.username }},</p>
+        <p class="text-2xl mb-4 kanit-black">ใกล้ถึงเวลาของ {{ event.name }} อย่าลืมมาร่วมมานะ!!!</p>
+    </section>
+</body>
+</html>
