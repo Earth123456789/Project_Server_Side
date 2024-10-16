@@ -124,7 +124,7 @@ class TransactionView(LoginRequiredMixin, View):
 
         company = Company.objects.get(pk=company_id)
 
-        transactions = Payment.objects.filter(company=company_id)
+        transactions = Payment.objects.filter(company=company_id).order_by("-status", "payment_date")
 
         print(transactions)
 

@@ -9,6 +9,7 @@ from django.template.loader import render_to_string
 from django.conf import settings
 from datetime import timedelta
 from django.utils import timezone
+from django.contrib.auth.models import Group
 
 from users.models import UserProfile, User
 
@@ -62,7 +63,8 @@ class HomepageView(View):
     
         # homepage.html
         categories = Category.objects.all()
-        
+
+        organizer = request.user.groups.filter(name='Organizers').exists()
 
         context = {
             "events" : events,
@@ -72,6 +74,7 @@ class HomepageView(View):
             "selected_category": category_name,
             "has_company": has_company,
             "company": company,
+            "organizer": organizer
         }
 
         return render(request, 'general/homepage.html', context)
