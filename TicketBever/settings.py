@@ -49,6 +49,7 @@ INSTALLED_APPS = [
     'allauth.socialaccount',
     'allauth.socialaccount.providers.google',
     'rest_framework',
+    "rest_framework.authtoken",
 ]
 
 
@@ -118,11 +119,12 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-
-
-
-# Internationalization
-# https://docs.djangoproject.com/en/5.1/topics/i18n/
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework.authentication.BasicAuthentication',
+        'rest_framework.authentication.TokenAuthentication',
+    ]
+}
 
 LANGUAGE_CODE = "th"
 

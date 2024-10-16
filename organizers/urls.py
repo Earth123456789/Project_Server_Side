@@ -3,7 +3,7 @@ from django.urls import path
 from django.conf import settings
 from django.conf.urls.static import static
 
-from organizers.views import OrganizerRegisterView, DashBoardView, TransactionView, CancelTransactionView
+from organizers.views import *
 
 
 urlpatterns = [
@@ -12,6 +12,8 @@ urlpatterns = [
 
     # Organizers Path
     path("dashboard/<int:company_id>/", DashBoardView.as_view(), name="dashboard"),
+    path("company/<int:company_id>/", CompanyDetailView.as_view(), name="company"),
+    path("event/<int:company_id>/new_event", AddEventView.as_view(), name="add_event"),
     path("transaction/<int:company_id>/", TransactionView.as_view(), name="transaction"),
     path("transaction/cancel/<int:company_id>/", CancelTransactionView.as_view(), name='cancel_transaction'),
 ] 

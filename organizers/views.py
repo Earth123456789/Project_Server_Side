@@ -14,7 +14,7 @@ from django.utils.encoding import force_bytes
 from django.contrib.auth.tokens import default_token_generator
 from django.conf import settings
 
-from organizers.forms import CompanyRegistrationForm
+from organizers.forms import *
 from organizers.models import *
 
 from users.models import *
@@ -42,7 +42,6 @@ class OrganizerRegisterView(LoginRequiredMixin, View):
         }
         return render(request, 'registration/organizer.html', context)
     
-    @transaction.atomic
     def post(self, request):
         # ดึงข้อมูลผู้ใช้จาก request
         user = request.user
@@ -50,13 +49,16 @@ class OrganizerRegisterView(LoginRequiredMixin, View):
         form = CompanyRegistrationForm(request.POST)
 
         if form.is_valid():
-            company = form.save(commit=False)  
-            company.user = user
-            company.save()  
+            try:
+                company = form.save(commit=False)  
+                company.user = user
+                company.save()  
 
-            # เพิ่มผู้ใช้ในกลุ่ม "Organizers"
-            organizer_group, created = Group.objects.get_or_create(name='Organizers')
-            user.groups.add(organizer_group)
+                # เพิ่มผู้ใช้ในกลุ่ม "Organizers"
+                organizer_group, created = Group.objects.get_or_create(name='Organizers')
+                user.groups.add(organizer_group)
+            except Exception as e:
+                print(f"Error: {e}")
 
             return redirect('homepage')  
 
@@ -109,7 +111,74 @@ class DashBoardView(LoginRequiredMixin, View):
             }
         }
         return render(request, 'organizers/dashboard.html', context)  
+
+class AddEventView(LoginRequiredMixin, View):
+    login_url = 'login'
     
+    def get(self, request, company_id):
+        form = EventForm()
+        context = {
+            "form": form,
+            "company": Company.objects.get(pk=company_id)
+        }
+        return render(request, 'organizers/addevent.html', context)
+    
+    def post(self, request, company_id):
+        form = EventForm(request.POST, request.FILES)
+        
+        if form.is_valid():
+            try:
+                with transaction.atomic():
+                    ev = form.save(commit=False)
+                    ev.company = Company.objects.get(pk=company_id)
+                    ev.save()
+            except Exception as e:
+                print(f"Error: {e}")
+            return redirect('dashboard', company_id=company_id)
+        else:
+            context = {
+                "form": form,
+                "company": Company.objects.get(pk=company_id)
+            }
+            return render(request, "organizers/addevent.html", context)
+
+class CompanyDetailView(LoginRequiredMixin, View):
+    login_url = 'login'
+    
+    def get(self, request, company_id):
+        try:
+            comp = Company.objects.get(pk = company_id)
+        except Company.DoesNotExist:
+            comp = None
+        form = CompanyDetailForm(instance = comp)
+        form.fields['name'].initial = comp.name
+        form.fields['email'].initial = comp.email
+        form.fields['telephone'].initial = comp.telephone
+        form.fields['contact'].initial = comp.contact
+        context = {
+                "form": form,
+                "company": Company.objects.get(pk=company_id)
+            }
+        return render(request, "organizers/companyedit.html", context)
+    def post(self, request, company_id):
+        try:
+            comp = Company.objects.get(pk = company_id)
+        except Company.DoesNotExist:
+            comp = None
+        form = CompanyDetailForm(request.POST, instance = comp)
+        if form.is_valid():
+            comp.name = form.cleaned_data.get('name')
+            comp.email = form.cleaned_data.get('email')
+            comp.telephone = form.cleaned_data.get('telephone')
+            comp.contact = form.cleaned_data.get('contact')
+            comp.save()
+            return redirect("company", company_id)
+        else:
+            context = {
+                    "form": form,
+                    "company": Company.objects.get(pk=company_id)
+                }
+            return render(request, "organizers/companyedit.html", context)
 
 class TransactionView(LoginRequiredMixin, View):
     login_url = 'login'
