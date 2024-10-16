@@ -9,11 +9,18 @@ from django.template.loader import render_to_string
 from django.conf import settings
 from datetime import timedelta
 from django.utils import timezone
-from django.contrib.auth.models import Group
+from django.core.exceptions import PermissionDenied
+from django.contrib.auth.mixins import LoginRequiredMixin
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework import status
 
 from users.models import UserProfile, User
 
 from organizers.models import Event, Category, Company
+
+import google.generativeai as genai
+
 
 # Create your views here.
 
@@ -136,5 +143,85 @@ class EventView(View):
         email = EmailMessage(subject, message, from_email, recipient_list)
         email.send()
 
+class ChatView(LoginRequiredMixin, View):
+   login_url = 'login'
 
+   def get(self, request, user_id):
+        
+        if request.user.is_authenticated:
+            # ตรวจสอบว่าผู้ใช้ มี Company ไหม
+            try:
+                company = Company.objects.get(user=request.user)
+                has_company = True
+            except Company.DoesNotExist:
+                has_company = False
+        
+        if request.user.id != user_id:
+            raise PermissionDenied("เข้าได้เฉพาะผู้ใช้งานที่กำหนดไว้")
+        
+        context = {
+            "has_company": has_company,
+            "company": company,
+        }
+        
+        return render(request, "general/chat.html", context)
 
+class ChatBotView(APIView):
+
+    def post(self, request):
+        # รับข้อความจากผู้ใช้
+        user_input = request.data.get('message')
+
+        if not user_input:
+            return Response({"error": "Message is required"}, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            # ตั้งค่า API Key ของ Google
+            genai.configure(api_key='AIzaSyAfMaPwJC5IjVoGau0ZIVWDIeeGSNTp80k')
+
+            # คำแนะนำสำหรับหมวดหมู่อีเวนต์
+            word_recommendation = ["แนะนำอีเวนต์", "Event Recommend"]
+            word_category_sport = ["แนะนำอีเวนต์กีฬาหน่อย", "กีฬา"]
+            word_category_entertain = ["แนะนำอีเวนต์ที่สนุกๆหน่อย", "บันเทิง", "สนุก"]
+            word_category_learn = ["แนะนำอีเวนต์ที่ได้ความรู้หน่อย", "ความรู้", "การเรียนรู้"]
+            word_category_lifestyle = ["แนะนำอีเวนต์ที่เกี่ยวชีวิตประจำวันหน่อย", "ชีวิตประจำวัน", "lifestyle"]
+
+            # ตรวจสอบข้อความที่ผู้ใช้ป้อนเข้ามาและกรองอีเวนต์ตามหมวดหมู่
+            if any(keyword in user_input.lower() for keyword in word_category_sport):
+                # กรองอีเวนต์หมวดกีฬา
+                events = Event.objects.filter(category__name='กีฬา')
+                category = "กีฬา"
+            elif any(keyword in user_input.lower() for keyword in word_category_entertain):
+                # กรองอีเวนต์หมวดบันเทิง
+                events = Event.objects.filter(category__name='บันเทิง')
+                category = "บันเทิง"
+            elif any(keyword in user_input.lower() for keyword in word_category_learn):
+                # กรองอีเวนต์หมวดการเรียนรู้
+                events = Event.objects.filter(category__name='เรียนรู้')
+                category = "เรียนรู้"
+            elif any(keyword in user_input.lower() for keyword in word_category_lifestyle):
+                # กรองอีเวนต์หมวดชีวิตประจำวัน
+                events = Event.objects.filter(category__name='ไลฟ์สไตล์')
+                category = "ไลฟ์สไตล์"
+            elif any(keyword in user_input.lower() for keyword in word_recommendation):
+                # กรองอีเวนต์ทั้งหมด
+                events = Event.objects.all()
+                category = "ทั้งหมด"
+            else:
+                # ถ้าข้อความไม่เกี่ยวข้องกับ Event ให้ใช้ Google Generative AI
+                model = genai.GenerativeModel('gemini-pro')
+                response = model.generate_content(user_input)
+                bot_response = response.text
+                return Response({"message": bot_response}, status=status.HTTP_200_OK)
+
+            # สร้างข้อความแนะนำ Event
+            if events.exists():
+                recommendations = [f"กิจกรรม: {event.name}" for event in events]
+                bot_response = f"กิจกรรม {category}:" + " ".join(recommendations)
+            else:
+                bot_response = f"ไม่มีข้อมูลกิจกรรมในหมวดหมู่ {category} ขณะนี้"
+
+            return Response({"message": bot_response}, status=status.HTTP_200_OK)
+
+        except Exception as e:
+            return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)

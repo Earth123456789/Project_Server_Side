@@ -1,0 +1,97 @@
+{% extends "general/components/layout.html" %}
+{% load static %}
+{% block title %}{% endblock %}
+{% block nav %}
+{% include "general/components/navbar.html" %}
+{% endblock %}
+{% block content %}
+
+<div class="min-h-screen flex items-center justify-center bg-gray-100 dark:bg-gray-900">
+    <div class="w-full max-w-lg p-6 bg-white dark:bg-gray-800 border border-gray-200 rounded-lg shadow-md dark:border-gray-700">
+        <h1 class="text-2xl font-bold mb-4 text-gray-900 dark:text-white text-center">Chatbot</h1>
+        <div id="chat-log" class="h-96 overflow-y-scroll border border-gray-300 p-4 rounded-lg bg-gray-50 dark:bg-gray-700 dark:border-gray-600 mb-4">
+        <form id="chat-form" class="flex items-center space-x-2">
+            {% csrf_token %}
+            <input id="chat-message-input" type="text" class="flex-grow bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 kanit-regular" placeholder="พิมพ์ข้อความ ตัวอย่าง แนะนำอีเวนต์" required>
+            <button id="chat-message-submit" type="submit" class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800 kanit-regular">
+                ส่ง
+            </button>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block script %}
+<script src="{% static 'general/js/navbar.js' %}"></script>
+<script>
+    document.querySelector('#chat-form').onsubmit = function(e) {
+        e.preventDefault(); 
+        const messageInputDom = document.querySelector('#chat-message-input');
+        const message = messageInputDom.value;
+
+        // API จาก urls.py
+        fetch('/api/chat/', {  
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': '{{ csrf_token }}' 
+            },
+            body: JSON.stringify({
+                'message': message
+            })
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok: ' + response.statusText);
+            }
+            return response.json();
+        })
+        .then(data => {
+            const chatLog = document.querySelector('#chat-log');
+            
+            // แสดงข้อความของผู้ใช้ด้วย chat bubble
+            const userBubble = `
+                <div class="flex justify-end mb-4 mt-4">
+                    <div class="bg-blue-500 text-white p-3 rounded-lg rounded-br-none max-w-xs kanit-regular">
+                        <span class="block">${message}</span>
+                    </div>
+                </div>`;
+            chatLog.innerHTML += userBubble;
+            
+            // แสดงข้อความตอบกลับของบอทด้วย chat bubble
+            const botBubble = `
+                <div class="flex justify-start mb-4 mt-4">
+                    <div class="bg-gray-200 text-gray-900 p-3 rounded-lg rounded-bl-none max-w-xs kanit-regular">
+                        <span class="block">${data.message || "No response from Chat."}</span>
+                    </div>
+                </div>`;
+            chatLog.innerHTML += botBubble;
+
+            // เลื่อนหน้าแชทไปที่ข้อความล่าสุด
+            chatLog.scrollTop = chatLog.scrollHeight; 
+        })
+        .catch(error => {
+            console.error('There was a problem with the fetch operation:', error);
+
+            const chatLog = document.querySelector('#chat-log');
+            
+            // แสดงข้อความ error
+            const errorBubble = `
+                <div class="flex justify-start mb-4 mt-4">
+                    <div class="bg-red-500 text-white p-3 rounded-lg rounded-bl-none max-w-xs kanit-regular">
+                        <span class="block">Error: ${error.message}</span>
+                    </div>
+                </div>`;
+            chatLog.innerHTML += errorBubble;
+            
+            // เลื่อนหน้าแชทไปที่ข้อความล่าสุด
+            chatLog.scrollTop = chatLog.scrollHeight;
+        });
+        
+        messageInputDom.value = '';  // เคลียร์ input
+    };
+</script>
+{% endblock %}
+{% block footer %}
+{% include "general/components/footer.html" %}
+{% endblock %}
