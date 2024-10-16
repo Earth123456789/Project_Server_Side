@@ -1,5 +1,5 @@
 {% load static %}
-<main class="w-3/5 mt-14 bg-white border border-gray-200 rounded-lg shadow p-12 flex flex-col">
+<main class="w-full md:w-3/5 mt-8 md:mt-14 bg-white border border-gray-200 rounded-lg shadow p-6 md:p-12 flex flex-col">
     <div class="flex justify-between">
         <h1 class="text-3xl text-left kanit-black-italic">รายละเอียดการชำระเงิน</h1>
         <form action="{% url 'transaction-deatil' user.id payment.id %}" method="get">
