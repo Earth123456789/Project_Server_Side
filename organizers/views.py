@@ -13,7 +13,7 @@ from django.contrib.auth.tokens import default_token_generator
 from django.conf import settings
 
 from organizers.forms import CompanyRegistrationForm
-from organizers.models import Company, Payment
+from organizers.models import *
 
 from users.models import User, EventParticipant, Ticket
 
@@ -24,7 +24,6 @@ class OrganizerRegisterView(LoginRequiredMixin, View):
 
     def get(self, request):
         form = CompanyRegistrationForm()
-
         user = request.user
 
         # ตรวจว่า Company อยู่แล้วไหม
@@ -48,11 +47,8 @@ class OrganizerRegisterView(LoginRequiredMixin, View):
         form = CompanyRegistrationForm(request.POST)
 
         if form.is_valid():
-            # Create, but don't save the company instance. (ทำเพื่อติดตามว่าใครสร้างหรือเชื่อมโยงกับ Company)
-            # https://docs.djangoproject.com/en/dev/topics/forms/modelforms/#the-save-method
             company = form.save(commit=False)  
-            company.user = user  
-            # Now, save the data for the form.
+            company.user = user
             company.save()  
 
             # เพิ่มผู้ใช้ในกลุ่ม "Organizers"
@@ -91,7 +87,8 @@ class DashBoardView(LoginRequiredMixin, View):
             return redirect('login')
 
         context = {
-            "company": company
+            "company": company,
+            "event": Event.objects.filter(company=company_id)
         }
         return render(request, 'organizers/dashboard.html', context)  
     

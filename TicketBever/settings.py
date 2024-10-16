@@ -94,8 +94,8 @@ DATABASES = {
         "ENGINE": "django.db.backends.postgresql",
         "NAME": "event_db",
         "USER": "postgres",
-        "PASSWORD": "Vipat",
-        "HOST": "localhost",
+        "PASSWORD": "nilfheim",
+        "HOST": "127.0.0.1",
         "PORT": "5432",
     }
 }

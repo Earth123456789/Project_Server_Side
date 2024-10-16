@@ -9,7 +9,7 @@
                 {% if user.is_authenticated %}
                 {% if has_company %}
                 <a href="{% url 'dashboard' company.id %}"
-                    class="text-gray-900 inline-flex items-center px-2 pt-1 text-lg kanit-regular">ผู้จัดงานอีเวนต์</a>
+                    class="text-indigo-600 inline-flex items-center px-2 pt-1 text-lg kanit-regular">ผู้จัดงานอีเวนต์</a>
                 {% else %}
                 <a href="{% url 'organizer-register' %}"
                     class="text-gray-900 inline-flex items-center px-2 pt-1 text-lg kanit-regular">ผู้จัดงานอีเวนต์</a>
