@@ -177,7 +177,7 @@ class ChatBotView(APIView):
 
         try:
             # ตั้งค่า API Key ของ Google
-            genai.configure(api_key='AIzaSyAfMaPwJC5IjVoGau0ZIVWDIeeGSNTp80k')
+            genai.configure(api_key=settings.GOOGLE_API_KEY)
 
             # คำแนะนำสำหรับหมวดหมู่อีเวนต์
             word_recommendation = ["แนะนำอีเวนต์", "Event Recommend"]
