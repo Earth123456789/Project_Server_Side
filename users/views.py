@@ -907,10 +907,11 @@ class TicketPastView(LoginRequiredMixin, View):
         
         user = User.objects.get(pk=user_id)
 
+        event_filter = Q(event_participant__event__end_date__lt=current_time) | Q(event_participant__event__end_date__isnull=True, event_participant__event__start_date__lt=current_time)
+
         tickets = Ticket.objects.filter(
-            event_participant__user=user, 
-            event_participant__event__start_date__lt=current_time
-        )
+            event_participant__user=user
+        ).filter(event_filter)
 
         context = {
             'user': user,
