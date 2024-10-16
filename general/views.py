@@ -181,9 +181,9 @@ class ChatBotView(APIView):
             genai.configure(api_key=settings.GOOGLE_API_KEY)
 
             # คำแนะนำสำหรับหมวดหมู่อีเวนต์
-            word_recommendation = ["แนะนำอีเวนต์", "Event Recommend"]
-            word_category_sport = ["แนะนำอีเวนต์กีฬาหน่อย", "กีฬา"]
-            word_category_entertain = ["แนะนำอีเวนต์ที่สนุกๆหน่อย", "บันเทิง", "สนุก"]
+            word_recommendation = ["แนะนำอีเวนต์", "Event Recommend", "แนะนำอะไรสนุกๆหน่อย", "ขออะไรสนุกๆ"]
+            word_category_sport = ["แนะนำอีเวนต์กีฬาหน่อย", "กีฬา", "อยากหาไรสนุกๆ", "แนะนำอะไรสนุกๆหน่อย", "ขออะไรสนุกๆ"]
+            word_category_entertain = ["แนะนำอีเวนต์ที่สนุกๆหน่อย", "บันเทิง", "สนุก", "แนะนำอะไรสนุกๆหน่อย", "ขออะไรสนุกๆ"]
             word_category_learn = ["แนะนำอีเวนต์ที่ได้ความรู้หน่อย", "ความรู้", "การเรียนรู้"]
             word_category_lifestyle = ["แนะนำอีเวนต์ที่เกี่ยวชีวิตประจำวันหน่อย", "ชีวิตประจำวัน", "lifestyle"]
 
