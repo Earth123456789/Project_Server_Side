@@ -1,0 +1,22 @@
+{% extends "general/components/layout.html" %}
+{% load static %}
+{% block title %}คำสั่งซื้อ - {% endblock %}
+{% block nav %}
+{% include "general/components/navbar.html" %}
+{% endblock %}
+{% block content %}
+
+<section class="min-h-screen flex flex-col md:flex-row items-start justify-center md:space-x-8 space-y-8 md:space-y-0 mt-12 md:mt-24 px-4 md:px-0">
+    {% include "users/components/cardprofiletransaction.html" %}
+    {% include "users/components/cardtransactionfailedview.html" %}
+</section>
+
+{% endblock %}
+{% block script %}
+<script src="{% static 'general/js/navbar.js' %}"></script>
+<script src="{% static 'users/js/sendticket.js' %}"></script>
+{% endblock %}
+
+{% block footer %}
+{% include "general/components/footer.html" %}
+{% endblock %}

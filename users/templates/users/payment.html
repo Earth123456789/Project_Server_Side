@@ -1,0 +1,37 @@
+{% extends "general/components/layout.html" %}
+{% load static %}
+{% block title %}ชำระเงิน - {% endblock %}
+{% block nav %}
+{% include "general/components/navbar.html" %}
+{% endblock %}
+{% block content %}
+
+<div class="min-h-screen flex flex-col justify-center items-center mt-8">
+    {% include "users/components/payment_step.html" %}
+    {% if valid_token %}
+    <section class="mt-4 text-center">
+        <h2 class="kanit-black-italic text-2xl text-green-700">QR Code สำหรับชำระเงิน</h2>
+        <img src="{{ qrcode }}" alt="QR Code" class="qrcode-image">
+        <h1 class="kanit-black text-l">ราคารวม {{ total }} บาท </h1>
+        <div class="flex mt-8 justify-center mt-8 space-x-4">
+            <form action="" method="post">
+                {% csrf_token %}
+                <button type="submit"
+                    class="kanit-small text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800">ชำระเงินเสร็จสิ้น</button>
+            </form>
+        </div>
+    </section>
+    {% else %}
+    <p class="mt-12 text-center text-red-700 kanit-small">Token ไม่ถูกต้องหรือหมดอายุ โปรดลองอีกครั้ง</p>
+    {% endif %}
+</div>
+
+
+{% block script %}
+<script src="{% static 'general/js/navbar.js' %}"></script>
+{% endblock %}
+
+{% endblock %}
+{% block footer %}
+{% include "general/components/footer.html" %}
+{% endblock %}

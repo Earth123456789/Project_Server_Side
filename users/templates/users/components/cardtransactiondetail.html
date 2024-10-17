@@ -1,0 +1,56 @@
+{% load static %}
+<main class="w-full md:w-3/5 mt-8 md:mt-14 bg-white border border-gray-200 rounded-lg shadow p-6 md:p-12 flex flex-col">
+    <div class="flex justify-between">
+        <h1 class="text-3xl text-left kanit-black-italic">รายละเอียดการชำระเงิน</h1>
+        <form action="{% url 'transaction-deatil' user.id payment.id %}" method="get">
+            <input type="hidden" name="action" value="download_pdf">
+            <button type="submit"
+                class="kanit-black text-gray-900 hover:text-white border border-gray-800 hover:bg-gray-900 focus:ring-4 focus:outline-none focus:ring-gray-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center me-2 mb-2 dark:border-gray-600 dark:text-gray-400 dark:hover:text-white dark:hover:bg-gray-600 dark:focus:ring-gray-800">
+                ดาวน์โหลดเป็น PDF
+            </button>
+        </form>
+    </div>
+    <div class="relative overflow-x-auto mt-16">
+        <table class="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
+            <thead class="text-gray-700 uppercase bg-gray-100 dark:bg-gray-700 dark:text-gray-400">
+                <tr class="text-l">
+                    <th scope="col" class="px-6 py-3 rounded-s-lg kanit-black-italic text-gray-800">
+                        เลขที่การชำระเงิน
+                    </th>
+                    <th scope="col" class="px-6 py-3 kanit-regular text-gray-800">
+                        วันที่ชำระเงิน
+                    </th>
+                    <th scope="col" class="px-6 py-3 kanit-regular text-gray-800">
+                        ราคา
+                    </th>
+                    <th scope="col" class="px-6 py-3 rounded-e-lg kanit-regular text-gray-800">
+                        จำนวน
+                    </th>
+                    <th scope="col" class="px-6 py-3 rounded-e-lg kanit-black-italic text-gray-800">
+                        ราคารวม
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr class="bg-white dark:bg-gray-800 text-l">
+                    <th scope="row"
+                        class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white kanit-black-italic">
+                        {{ payment.id }}
+                    </th>
+                    <td class="px-6 py-4 kanit-regular text-gray-700">
+                        {{ payment.payment_date|date:"d/m/Y H:i" }}
+                    </td>
+                    <td class="px-6 py-4 kanit-regular text-gray-700">
+                        {{ payment.event.ticket_price }} บาท
+                    </td>
+                    <td class="px-6 py-4 kanit-regular text-gray-700">
+                        {{ payment.ticket_quantity }}
+                    </td>
+                    <td class="px-6 py-4 kanit-black-italic text-gray-700">
+                        {{ payment.amount }} บาท
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</main>

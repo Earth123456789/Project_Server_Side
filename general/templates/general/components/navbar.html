@@ -1,0 +1,70 @@
+{% load static %}
+<nav class="navbar bg-transparent fixed top-0 w-full z-10 backdrop-blur-xl text-primary bg-white shadow-2xl">
+    <div class="max-w-7xl mx-auto p-2">
+        <div class="flex justify-between items-center">
+            <a href="{% url 'homepage' %}">
+                <img class="h-16 w-16" src="{% static 'general/pic/logo.png' %}" alt="Logo">
+            </a>
+            <div class="flex items-center ml-auto text-right">
+                {% if user.is_authenticated %}
+                <a href="{% url 'chatbot' user.id %}"
+                    class="text-gray-900 inline-flex items-center px-2 pt-1 text-lg kanit-regular">Chatbot</a>
+                {% if has_company %}
+                <a href="{% url 'dashboard' company.id %}"
+                    class="text-indigo-600 inline-flex items-center px-2 pt-1 text-lg kanit-regular">ผู้จัดงานอีเวนต์</a>
+                {% else %}
+                <a href="{% url 'organizer-register' %}"
+                    class="text-gray-900 inline-flex items-center px-2 pt-1 text-lg kanit-regular">ผู้จัดงานอีเวนต์</a>
+                {% endif %}
+                <div class="relative flex items-center ml-4">
+                    {% if user.userprofile.profile_picture %}
+                    <!-- ไม่ต้องเขียนใน views เพราะมีการใช้ AbstactUser เพื่อเชื่อมต่อกับข้อมูลอยู่แล้ว -->
+                    <img class="h-10 w-10 rounded-full cursor-pointer" src="{{ user.userprofile.profile_picture.url }}"
+                        alt="Profile Picture" onclick="toggleDropdown()">
+                    {% else %}
+                    <img class="h-10 w-10 rounded-full cursor-pointer"
+                        src="{% static 'general/pic/default_profile.jpg' %}" alt="Default Profile Picture"
+                        onclick="toggleDropdown()">
+                    {% endif %}
+
+                    <div id="profileDropdown"
+                        class="hidden absolute right-0 mt-56 w-48 bg-white border border-gray-200 rounded-md shadow-lg z-20">
+
+                        <div class="flex items-center px-4 py-2 text-gray-800 hover:bg-gray-100">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                                class="bi bi-person mr-2" viewBox="0 0 16 16">
+                                <path
+                                    d="M8 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6m2-3a2 2 0 1 1-4 0 2 2 0 0 1 4 0m4 8c0 1-1 1-1 1H3s-1 0-1-1 1-4 6-4 6 3 6 4m-1-.004c-.001-.246-.154-.986-.832-1.664C11.516 10.68 10.289 10 8 10s-3.516.68-4.168 1.332c-.678.678-.83 1.418-.832 1.664z" />
+                            </svg>
+                            <a href="{% url 'userprofile' user.id  %}">
+                                <p class="text-gray-800 hover:bg-gray-100 kanit-regular">ดูโปรไฟล์</p>
+                            </a>
+                        </div>
+
+                        <div class="flex items-center px-4 py-2 text-gray-800 hover:bg-gray-100">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                                class="bi bi-ticket mr-2" viewBox="0 0 16 16">
+                                <path
+                                    d="M0 4.5A1.5 1.5 0 0 1 1.5 3h13A1.5 1.5 0 0 1 16 4.5V6a.5.5 0 0 1-.5.5 1.5 1.5 0 0 0 0 3 .5.5 0 0 1 .5.5v1.5a1.5 1.5 0 0 1-1.5 1.5h-13A1.5 1.5 0 0 1 0 11.5V10a.5.5 0 0 1 .5-.5 1.5 1.5 0 1 0 0-3A.5.5 0 0 1 0 6zM1.5 4a.5.5 0 0 0-.5.5v1.05a2.5 2.5 0 0 1 0 4.9v1.05a.5.5 0 0 0 .5.5h13a.5.5 0 0 0 .5-.5v-1.05a2.5 2.5 0 0 1 0-4.9V4.5a.5.5 0 0 0-.5-.5z" />
+                            </svg>
+                            <a href="{% url 'ticket' user.id  %}"
+                                class="text-gray-800 hover:bg-gray-100 kanit-regular">ดูตั๋ว</a>
+                        </div>
+
+                        <hr class="my-2 border-gray-300">
+                        <div class="flex justify-center text-center">
+                            <a href="{% url 'logout' %}"
+                                class="block px-4 py-2 text-gray-800 hover:bg-gray-100 kanit-regular">ออกจากระบบ</a>
+                        </div>
+                    </div>
+
+                </div>
+                {% else %}
+                <a href="{% url 'login' %}"
+                    class="text-gray-500 hover:text-gray-700 inline-flex items-center px-2 pt-1 text-lg kanit-regular">ลงทะเบียนผู้ใช้งาน
+                    | เข้าสู่ระบบ</a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</nav>

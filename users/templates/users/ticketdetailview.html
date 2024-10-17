@@ -1,0 +1,24 @@
+{% extends "general/components/layout.html" %}
+{% load static %}
+{% block title %}รายละเอียดตั๋วที่ - {{ ticket.id }} - {% endblock %}
+{% block nav %}
+{% include "general/components/navbar.html" %}
+{% endblock %}
+{% block content %}
+
+<section class="min-h-screen flex items-start justify-center space-x-8 mt-24">
+    {% include "users/components/cardprofileticket.html" %}
+    <div class="flex flex-col w-full md:w-2/3 mt-4 md:mt-14 space-y-8">
+        {% include "users/components/cardticketdetailview.html" %}
+        {% include "users/components/cardticketqr.html" %}
+    </div>
+</section>
+
+{% endblock %}
+{% block script %}
+<script src="{% static 'general/js/navbar.js' %}"></script>
+{% endblock %}
+
+{% block footer %}
+{% include "general/components/footer.html" %}
+{% endblock %}

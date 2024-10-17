@@ -1,0 +1,33 @@
+{% load static %}
+<main class="w-full md:w-3/5 mt-8 md:mt-14 bg-white border border-gray-200 rounded-lg shadow p-6 md:p-12 flex flex-col">
+    <h1 class="text-3xl text-left kanit-black-italic">บัตร</h1>
+    <article class="flex items-start mb-8 mt-8">
+        <img class="rounded-lg object-cover mr-8" style="width: 200px; height: 200px;"
+            src="{{ ticket.event_participant.event.image.url }}" alt="{{ ticket.event_participant.event.name }}" />
+        <article>
+            <h5 class="mb-4 text-l font-bold tracking-tight text-gray-900 dark:text-white kanit-black">
+                {{ ticket.event_participant.event.name }}
+            </h5>
+            <div class="flex items-center mb-4">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                    class="bi bi-calendar" viewBox="0 0 16 16">
+                    <path
+                        d="M3.5 0a.5.5 0 0 1 .5.5V1h8V.5a.5.5 0 0 1 1 0V1h1a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V3a2 2 0 0 1 2-2h1V.5a.5.5 0 0 1 .5-.5M1 4v10a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V4z" />
+                </svg>
+                <p class="font-semibold kanit-regular ml-4">
+                    {{ ticket.event_participant.event.start_date|date:"d M Y" }}
+                    {% if ticket.event_participant.event.end_date %} - {{ ticket.event_participant.event.end_date|date:"d M Y"}} {% endif %}
+                    {% if ticket.event_participant.event.start_time %} เวลา {{ ticket.event_participant.event.start_time|date:"H:i" }} {% endif %}
+                    {% if ticket.event_participant.event.end_time %} - {{ ticket.event_participant.event.end_time|date:"H:i" }} {% endif %}
+                </p>
+            </div>
+            <div class="flex items-center">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                    class="bi bi-geo-alt-fill" viewBox="0 0 16 16">
+                    <path d="M8 16s6-5.686 6-10A6 6 0 0 0 2 6c0 4.314 6 10 6 10m0-7a3 3 0 1 1 0-6 3 3 0 0 1 0 6" />
+                </svg>
+                <p class="ml-4 kanit-regular">{{ ticket.event_participant.event.location.name }}</p>
+            </div>
+        </article>
+    </article>
+</main>

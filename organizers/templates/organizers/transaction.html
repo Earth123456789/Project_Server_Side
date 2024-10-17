@@ -1,0 +1,83 @@
+{% extends "general/components/layout.html" %}
+{% load static %}
+{% block title %}Transaction - {% endblock %}
+{% block nav %}
+{% include "organizers/components/navbar.html" %}
+{% endblock %}
+{% block content %}
+
+<section class="z-0">
+    {% include "organizers/components/sidebar.html" %}
+</section>
+<section>
+    {% include "organizers/components/maintransaction.html" %}
+</section>
+{% endblock %}
+{% block script %}
+<script>
+    function cancelTransaction(transactionId, companyId) {
+        Swal.fire({
+            title: 'ยกเลิกรายการ',
+            html: `
+                <input type="text" id="cancelReason" class="kanit-regular bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="เหตุผลที่ยกเลิก" required />
+            `,
+            inputLabel: 'กรุณากรอกเหตุผลที่ยกเลิก',
+            showCancelButton: true,
+            confirmButtonText: 'ยืนยันการยกเลิก',
+            cancelButtonText: 'ยกเลิก',
+            customClass: {
+                confirmButton: 'kanit-regular bg-green-600 text-white hover:bg-green-700', 
+                cancelButton: 'kanit-regular bg-red-600 text-white hover:bg-red-700' 
+            },
+            preConfirm: () => {
+                // ดึงค่าจาก input
+                const cancelReason = document.getElementById('cancelReason').value;
+                if (!cancelReason) {
+                    Swal.showValidationMessage('กรุณากรอกเหตุผลที่ยกเลิก');
+                }
+                return cancelReason;  // คืนค่าเหตุผลการยกเลิก
+            }
+        }).then((result) => {
+            if (result.isConfirmed) {
+                fetch(`/creators/transaction/cancel/${companyId}/`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': '{{ csrf_token }}',  
+                    },
+                    // ส่ง request body เป็น JSON 
+                    body: JSON.stringify({
+                        'transaction_id': transactionId,
+                        'cancel_text': result.value 
+                    }) 
+                })
+                .then(response => response.json())
+                .then(data => {
+                    Swal.fire({
+                        title: 'สำเร็จ!',
+                        text: 'ยกเลิกรายการสำเร็จ',
+                        icon: 'success',
+                        customClass: {
+                            text: 'kanit-regular',
+                            confirmButton: 'kanit-regular bg-green-600 text-white hover:bg-green-700', 
+                        }
+                    }).then(() => {
+                        location.reload();  // รีเฟรชหน้า
+                    });
+                })
+                .catch(error => {
+                    Swal.fire({
+                        title: 'ผิดพลาด!',
+                        text: 'โปรดตรวจสอบข้อมูลของคุณก่อนส่งอีกครั้ง',
+                        icon: 'error',
+                        customClass: {
+                            text: 'kanit-regular',
+                            confirmButton: 'kanit-regular bg-green-600 text-white hover:bg-green-700', 
+                        }
+                    });
+                });
+            }
+        });
+    }
+    </script>
+{% endblock %}

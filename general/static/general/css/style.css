@@ -1,0 +1,70 @@
+.slider {
+    max-width: 50%;    
+    max-height: 50%;    
+    margin: 0 auto;     
+    overflow: hidden;   
+    display: block; 
+    border-radius: 30px;
+    margin-top: 32px;      
+}
+
+.slick-slide img {
+    width: 50%;         
+    height: auto;         
+    object-fit: cover;    
+    border-radius: 30px; 
+}
+
+/* ตกแต่งตัวจุด (dots) */
+.slick-dots {
+    position: absolute;
+    bottom: 10px;                /* ตำแหน่งของจุดจากด้านล่าง */
+    display: flex !important;    /* ทำให้จุดอยู่ในแนวนอน */
+    justify-content: center;     /* จัดจุดให้อยู่ตรงกลาง */
+    width: 100%;                 /* กำหนดความกว้างเต็ม */
+    padding: 0;
+    margin: 0;
+    list-style: none;            /* เอารูปแบบ list ออก */
+}
+
+.slick-dots li {
+    margin: 0 5px;               /* ระยะห่างระหว่างจุด */
+}
+
+.slick-dots li button {
+    background: transparent; /* ลบพื้นหลังปุ่ม */
+    border: none;            /* ลบเส้นขอบปุ่ม */
+    width: 20px;             /* กำหนดขนาดปุ่ม */
+    height: 20px;            /* กำหนดขนาดปุ่ม */
+    padding: 0;              /* ลบ padding */
+}
+
+.slick-dots li button:before {
+    content: "";              /* ปรับให้ไม่มีเนื้อหา */
+    width: 20px;              /* ความกว้างของจุด */
+    height: 20px;             /* ความสูงของจุด */
+    background-color: #888;   /* สีพื้นหลังสำหรับจุดที่ไม่ได้ active */
+    border-radius: 50%;       /* ทำให้เป็นวงกลม */
+    display: inline-block;     /* แสดงในแนวนอน */
+}
+
+.slick-dots li.slick-active button:before {
+    background-color: #ffffff;   /* สีพื้นหลังเมื่อ active */
+}
+
+/* ปรับระยะห่างของจุดและลูกศร */
+.slick-prev, .slick-next {
+    z-index: 1;               
+}
+
+
+.slick-prev,
+.slick-next {
+    visibility: hidden; /* ซ่อนปุ่ม Next และ Prev แต่ยังคงพื้นที่ */
+}
+
+
+
+
+
+

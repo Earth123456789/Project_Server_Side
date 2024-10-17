@@ -1,0 +1,101 @@
+{% extends "general/components/layout.html" %}
+{% load static %}
+{% block title %}{% endblock %}
+{% block nav %}
+{% include "general/components/navbar.html" %}
+{% endblock %}
+{% block content %}
+<link rel="stylesheet" href="{% static 'general/css/style.css' %}">
+
+<section>
+    <!-- Image + Search -->
+    <div class="relative">
+        <img src="{% static 'general/pic/background_homepage.jpg' %}" alt="Background Image"
+            class="w-full h-56 blur-2xl object-cover z-0">
+        <form class="absolute bottom-0 left-0 right-0 max-w-md mx-auto transform translate-y-1/2">
+            <label for="default-search"
+                class="mb-2 text-sm font-medium text-gray-900 sr-only dark:text-white">Search</label>
+            <div class="relative">
+                <div class="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
+                    <svg class="w-4 h-4 text-gray-500 dark:text-gray-400" aria-hidden="true"
+                        xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 20">
+                        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z" />
+                    </svg>
+                </div>
+                <form action="" method="get">
+                    <input type="search" name="search" id="default-search"
+                        class="block w-full p-4 ps-10 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 kanit-regular"
+                        placeholder="ค้นหา อีเว้นต์" required />
+                    <button type="submit"
+                        class="text-white absolute end-2.5 bottom-2.5 bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-4 py-2 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800 kanit-regular">ค้นหา</button>
+                </form>
+            </div>
+        </form>
+    </div>
+</section>
+
+<!-- Slider  -->
+{% if slider_events %}
+<section class="mt-12 sm:mt-16 lg:mt-24">
+    {% include "general/components/slider.html" %}
+</section>
+{% endif %}
+
+<!-- Card Most Follower -->
+{% if most_followed_event %}
+<section>
+    <article>
+        <div class="text-center mt-12 sm:mt-16 lg:mt-24">
+            <h1 class="text-2xl sm:text-3xl lg:text-4xl font-extrabold kanit-black-italic">อีเว้นต์ยอดนิยม</h1>
+            <div class="flex justify-center mt-8 sm:mt-12 lg:mt-14">
+                {% include "general/components/cardfollowers.html" %}
+            </div>
+        </div>
+    </article>
+</section>
+{% endif %}
+
+<!-- Card -->
+<section>
+    <article>
+        <div class="mt-12 sm:mt-16 lg:mt-24">
+            <div class="ml-6 sm:ml-12 md:ml-24 lg:ml-36">
+                <h1 class="ml-12 text-2xl sm:text-3xl lg:text-4xl font-extrabold mb-4 lg:mb-8 kanit-black-italic">อีเว้นต์ทั้งหมด</h1>
+                <form method="get" class="ml-12">
+                    <button type="submit" name="category" value=""
+                        class="relative inline-flex items-center justify-center p-0.5 mb-2 me-2 overflow-hidden text-sm font-medium text-gray-900 rounded-lg group bg-gradient-to-br from-green-400 to-blue-600 group-hover:from-green-400 group-hover:to-blue-600 hover:text-white dark:text-white focus:ring-4 focus:outline-none focus:ring-green-200 dark:focus:ring-green-800 kanit-regular">
+                        <span
+                            class="relative px-5 py-2.5 transition-all ease-in duration-75 bg-white dark:bg-gray-900 rounded-md group-hover:bg-opacity-0">
+                            ทั้งหมด
+                        </span>
+                    </button>
+                    {% for category in categories %}
+                    <button type="submit" name="category" value="{{ category.name }}"
+                        class="relative inline-flex items-center justify-center p-0.5 mb-2 me-2 overflow-hidden text-sm font-medium text-gray-900 rounded-lg group bg-gradient-to-br from-green-400 to-blue-600 group-hover:from-green-400 group-hover:to-blue-600 hover:text-white dark:text-white focus:ring-4 focus:outline-none focus:ring-green-200 dark:focus:ring-green-800 kanit-regular">
+                        <span
+                            class="relative px-5 py-2.5 transition-all ease-in duration-75 bg-white dark:bg-gray-900 rounded-md group-hover:bg-opacity-0">
+                            {{ category.name }}
+                        </span>
+                    </button>
+                    {% endfor %}
+                </form>
+            </div>
+            <div class="flex flex-wrap justify-center mt-8 sm:mt-12 lg:mt-14" id="events-container">
+                {% include "general/components/card.html" %}
+            </div>
+        </div>
+    </article>
+</section>
+
+
+
+{% block script %}
+<script src="{% static 'general/js/navbar.js' %}"></script>
+<script src="https://cdn.jsdelivr.net/npm/flowbite@2.5.2/dist/flowbite.min.js"></script>
+{% endblock %}
+
+{% endblock %}
+{% block footer %}
+{% include "general/components/footer.html" %}
+{% endblock %}

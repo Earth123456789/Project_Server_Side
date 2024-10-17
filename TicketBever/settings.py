@@ -10,7 +10,11 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.1/ref/settings/
 """
 
+import os
 from pathlib import Path
+from dotenv import load_dotenv
+
+load_dotenv()
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -20,10 +24,10 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-y*=x8_xr1n6)w@o6=)79$(f)qokpp!nr*!ny5hdnuh=wcopv)_'
+SECRET_KEY = os.getenv("SECRET_KEY")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = os.getenv("DEBUG") == "True"
 
 ALLOWED_HOSTS = []
 
@@ -40,10 +44,15 @@ INSTALLED_APPS = [
     'users',
     'general',
     'organizers',
-    'material',
-    'material.admin',
-    'django.contrib.auth',
+    'allauth',
+    'allauth.account',
+    'allauth.socialaccount',
+    'allauth.socialaccount.providers.google',
+    'rest_framework',
+    "rest_framework.authtoken",
 ]
+
+
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -53,6 +62,8 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    # Add the account middleware:
+    "allauth.account.middleware.AccountMiddleware",
 ]
 
 ROOT_URLCONF = 'TicketBever.urls'
@@ -60,7 +71,7 @@ ROOT_URLCONF = 'TicketBever.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [BASE_DIR / 'templates'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -90,7 +101,6 @@ DATABASES = {
     }
 }
 
-
 # Password validation
 # https://docs.djangoproject.com/en/5.1/ref/settings/#auth-password-validators
 
@@ -109,11 +119,12 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-
-
-
-# Internationalization
-# https://docs.djangoproject.com/en/5.1/topics/i18n/
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework.authentication.BasicAuthentication',
+        'rest_framework.authentication.TokenAuthentication',
+    ]
+}
 
 LANGUAGE_CODE = "th"
 
@@ -129,6 +140,11 @@ USE_TZ = True
 
 STATIC_URL = 'static/'
 
+MEDIA_URL = '/media/'
+
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
+
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
 
@@ -138,5 +154,69 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 AUTH_USER_MODEL = "users.User"
 
+AUTHENTICATION_BACKENDS = [
+    'allauth.account.auth_backends.AuthenticationBackend',
+    'django.contrib.auth.backends.ModelBackend',  # Backend พื้นฐานที่ใช้ username และ password
+    'users.backends.UsernameOrEmailBackend',        # Custom backend ที่ใช้ username หรือ email
+]
 
- 
+
+SOCIALACCOUNT_PROVIDERS = {
+    'google': {
+        # For each OAuth based provider, either add a ``SocialApp``
+        # (``socialaccount`` app) containing the required client
+        # credentials, or list them here:
+        'APP': {
+            'client_id': os.getenv("GOOGLE_CLIENT_ID", ""),
+            'secret': os.getenv("GOOGLE_SECRET_ID", ""),
+            'key': ''
+        },
+        'SCOPE': [
+            'profile',
+            'email',
+            'openid'
+        ],
+        'AUTH_PARAMS': {
+            'access_type': 'online',
+        }
+        
+    }
+}
+
+SOCIALACCOUNT_LOGIN_ON_GET = True
+
+SOCIALACCOUNT_AUTO_SIGNUP = True
+
+
+
+# Login + Logout
+
+LOGIN_URL = 'login'
+LOGOUT_URL = 'logout'
+LOGIN_REDIRECT_URL = 'homepage'  # ที่จะถูก redirect ไปเมื่อเข้าสู่ระบบสำเร็จ
+ACCOUNT_LOGOUT_REDIRECT_URL = 'homepage'  # ที่จะถูก redirect ไปเมื่อออกจากระบบ
+ACCOUNT_SIGNUP_REDIRECT_URL = 'homepage'  # ที่จะถูก redirect ไปหลังจากลงทะเบียน
+
+# Additional settings for AllAuth
+ACCOUNT_EMAIL_REQUIRED = True  # ให้ระบุอีเมลในการลงทะเบียน
+ACCOUNT_AUTHENTICATED_LOGIN_REDIRECTS = True  # สำหรับการ redirect หลังจากเข้าสู่ระบบ
+
+# Email
+
+# if DEBUG:
+#     EMAIL_BACKEND = "django.core.mail.backends.filebased.EmailBackend"
+#     EMAIL_FILE_PATH = BASE_DIR / "test_inbox"
+#     PASSWORD_RESET_TIMEOUT = 60
+# else:
+EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
+EMAIL_HOST = "smtp.gmail.com"
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = "earth247god@gmail.com"
+EMAIL_HOST_PASSWORD = "jirg kbas kfen nkrn"
+PASSWORD_RESET_TIMEOUT = 600
+DEFAULT_FROM_EMAIL = "Ticket Bever"
+
+
+GOOGLE_API_KEY = "AIzaSyAfMaPwJC5IjVoGau0ZIVWDIeeGSNTp80k"
+

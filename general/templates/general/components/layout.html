@@ -1,0 +1,74 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="{% static 'general/pic/favicon.ico' %}">
+    <!-- Tailwind -->
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <!-- Flowbite -->
+    <link href="https://cdn.jsdelivr.net/npm/flowbite@2.5.1/dist/flowbite.min.css" rel="stylesheet">
+    <!-- Slick CSS -->
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick/slick.css" />
+    <!-- Slick JS + jquery -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick/slick.min.js"></script>
+    <script src="
+    https://cdn.jsdelivr.net/npm/sweetalert2@11.14.1/dist/sweetalert2.all.min.js
+    "></script>
+    <link href="
+    https://cdn.jsdelivr.net/npm/sweetalert2@11.14.1/dist/sweetalert2.min.css
+    " rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Kanit:ital,wght@0,400;0,900;1,800;1,900&display=swap');
+
+        .kanit-regular {
+            font-family: "Kanit", sans-serif;
+            font-weight: 400;
+            font-style: normal;
+        }
+
+        .kanit-small {
+            font-family: "Kanit", sans-serif;
+            font-weight: 100;
+            font-style: normal;
+        }
+
+        .kanit-black {
+            font-family: "Kanit", sans-serif;
+            font-weight: 500;
+            font-style: normal;
+        }
+
+        .kanit-extrabold-italic {
+            font-family: "Kanit", sans-serif;
+            font-weight: 800;
+            font-style: italic;
+        }
+
+        .kanit-black-italic {
+            font-family: "Kanit", sans-serif;
+            font-weight: 700;
+            font-style: italic;
+        }
+    </style>
+    <title>{% block title %}{% endblock %}Ticket Bever</title>
+
+</head>
+
+<body>
+    <header>
+        {% block nav %}{% endblock %}
+    </header>
+    <main>
+        {% block content %}{% endblock %}
+    </main>
+    <footer>
+        {% block footer %}{% endblock %}
+    </footer>
+    {% block script %}{% endblock %}
+</body>
+
+</html>
