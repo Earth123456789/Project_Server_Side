@@ -135,6 +135,7 @@ class AddEventView(LoginRequiredMixin, View):
     def get(self, request, company_id):
 
         user = request.user
+        company = Company.objects.get(pk=company_id)
         # ตรวจสอบว่าเป็น "Organizers"
         if not user.groups.filter(name='Organizers').exists():
             raise PermissionDenied("เข้าได้เฉพาะผู้ใช้งานที่กำหนดไว้")
@@ -178,6 +179,21 @@ class CompanyDetailView(LoginRequiredMixin, View):
     login_url = 'login'
     
     def get(self, request, company_id):
+
+        user = request.user
+        company = Company.objects.get(pk=company_id)
+        
+        # ตรวจสอบว่าเป็น "Organizers"
+        if not user.groups.filter(name='Organizers').exists():
+            raise PermissionDenied("เข้าได้เฉพาะผู้ใช้งานที่กำหนดไว้")
+            
+        # ไม่ได้ลงทะเบียนเป็นบริษัท
+        if not Company.objects.filter(user=user).exists():
+            return redirect('organizer-register')  
+            
+        # เจ้าของบริษัทจริงๆ
+        if company.user != user:
+            raise PermissionDenied("เข้าได้เฉพาะเจ้าของบริษัทเท่านั้น")
         try:
             comp = Company.objects.get(pk = company_id)
         except Company.DoesNotExist:
