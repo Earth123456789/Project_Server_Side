@@ -21,6 +21,7 @@ from organizers.models import *
 from users.models import *
 
 from collections import defaultdict
+from datetime import date
 import json
 
 class OrganizerRegisterView(LoginRequiredMixin, View):
@@ -112,6 +113,13 @@ class DashBoardView(LoginRequiredMixin, View):
         # ไม่ได้เข้าสู่ระบบ 
         if user.is_anonymous:
             return redirect('login')
+        
+        event_participant_count =  Event.objects.filter(company=company_id).annotate(parcount=Count('eventparticipant')).order_by('-parcount')
+        print(event_participant_count)
+
+        onging_events = Event.objects.filter(company=company_id, end_date__gte=date.today()).annotate(parcount=Count('eventparticipant')).order_by("start_date")
+
+        print(onging_events)
 
         context = {
             "company": company,
@@ -124,7 +132,10 @@ class DashBoardView(LoginRequiredMixin, View):
                     "events": [event.name for event, count in event_counts.items()],
                     "profit": [float(count * event.ticket_price) for event, count in event_counts.items()]
                 }
-            }
+            },
+            "ongoing_events": onging_events,
+            "end_events": Event.objects.filter(company=company_id, end_date__lt=date.today()),
+            "popular_events": event_participant_count
         }
         return render(request, 'organizers/dashboard.html', context)  
 

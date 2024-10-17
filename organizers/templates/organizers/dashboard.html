@@ -6,10 +6,8 @@
 {% include "organizers/components/navbar.html" %}
 {% endblock %}
 {% block content %}
-
 <section class="z-0">
     {% include "organizers/components/sidebar.html" %}
-    
 </section>
 <section>
     <div class="p-4 m-4 sm:ml-64">
@@ -34,40 +32,30 @@
                     </div>
                 </div>
             </div>
-            <div class="flex items-center justify-center h-48 mb-4 rounded bg-gray-50 dark:bg-gray-800">
-                <p class="kanit-small text-2xl text-gray-400 dark:text-gray-500">
-                    อีเวนท์ที่กำลังดำเนินการอยู่
-                </p>
-            </div>
             <div class="grid grid-cols-2 gap-4 mb-4">
                 <div class="flex items-center justify-center rounded bg-gray-50 dark:bg-gray-800">
-                    <p class="kanit-small text-2xl text-gray-400 dark:text-gray-500">
-                        อีเวนต์ยอดนิยม
-                    </p>
+                    <div class="text-center py-5">
+                        <p class="kanit-small text-xl text-gray-400 dark:text-gray-500">
+                            อีเวนต์ยอดนิยม
+                        </p>
+                        <div>
+                            <p class="kanit-small text-xl text-gray-400 dark:text-gray-500">
+                                กำไรที่ได้รับ
+                            </p>
+                            <div>
+                                <canvas id="income"></canvas>
+                            </div>
+                        </div>
+                    </div>
                 </div>
                 <div class="flex items-center justify-center rounded bg-gray-50 dark:bg-gray-800">
                     <div class="text-center py-5">
                         <p class="kanit-small text-xl text-gray-400 dark:text-gray-500">
                             ผู้เข้าร่วมแต่ละอีเวนต์
-                            <div>
-                                <canvas id="attendee"></canvas>
-                            </div>
                         </p>
-                    </div>
-                </div>
-                <div class="flex items-center justify-center rounded bg-gray-50 dark:bg-gray-800">
-                    <p class="kanit-small text-2xl text-gray-400 dark:text-gray-500">
-                        อีเวนต์ที่ผ่านไปแล้ว
-                    </p>
-                </div>
-                <div class="flex items-center justify-center rounded bg-gray-50 dark:bg-gray-800">
-                    <div class="text-center py-5">
-                        <p class="kanit-small text-xl text-gray-400 dark:text-gray-500">
-                            กำไรที่ได้รับ
-                            <div>
-                                <canvas id="income"></canvas>
-                            </div>
-                        </p>
+                        <div>
+                            <canvas id="attendee"></canvas>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -77,71 +65,75 @@
 {% endblock %}
 {% block script %}
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper/swiper-bundle.min.css" />
+<script src="https://cdn.jsdelivr.net/npm/swiper/swiper-bundle.min.js"></script>
 <script>
-    new Chart(ctx = document.getElementById("attendee"), {
+    new Chart(document.getElementById("attendee"), {
         type: "doughnut",
         data: {
-            labels: {{ name | safe }},  
-            datasets: [{
-                label: "จำนวนผู้เข้าร่วมกิจกรรม",
-                data: {{ participant | safe }},   
-                borderWidth: 1
+            labels: {{ name | safe }},
+        datasets: [{
+            label: "จำนวนผู้เข้าร่วมกิจกรรม",
+            data: {{ participant | safe }},
+        borderWidth: 1
             }]
         },
         options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            scales: {
-                y: {
-                    beginAtZero: true
-                }
+        responsive: true,
+        maintainAspectRatio: false,
+        scales: {
+            y: {
+                beginAtZero: true
             }
         }
+    }
     });
-    new Chart(ctx = document.getElementById("income"), {
+
+    new Chart(document.getElementById("income"), {
         type: "bar",
         data: {
             labels: [
-            {% for event in price.each.events %}
+                {% for event in price.each.events %}
                 "{{ event | truncatewords:2 }}"{% if not forloop.last %}, {% endif %}
-            {% endfor %}
-            ],  
-            datasets: [{
-                label: "รายได้รวมของอีเวนต์ (บาท)",
-                data: {{ price.each.profit }},
-                borderWidth: 1,
-                barThickness: 40,
-                backgroundColor: 'rgba(75, 192, 192, 0.2)',
-                borderColor: 'rgba(75, 192, 192, 1)',
+        {% endfor %}
+            ],
+        datasets: [{
+            label: "รายได้รวมของอีเวนต์ (บาท)",
+            data: {{ price.each.profit }},
+        borderWidth: 1,
+        barThickness: 40,
+        backgroundColor: 'rgba(75, 192, 192, 0.2)',
+        borderColor: 'rgba(75, 192, 192, 1)',
             }]
         },
         options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            scales: {
-                y: {
-                    beginAtZero: true,
-                    ticks: {
-                        stepSize: 1000
-                    },
-                    max: Math.ceil(Math.max(...{{ price.each.profit | safe }}) / 1000) * 1000,
-                    grid: {
-                        drawBorder: false,
-                        lineWidth: 1,
-                        color: 'rgba(0, 0, 0, 0.1)'
-                    }
+        responsive: true,
+        maintainAspectRatio: false,
+        scales: {
+            y: {
+                beginAtZero: true,
+                ticks: {
+                    stepSize: 1000
                 },
-                x: {
+                max: Math.ceil(Math.max(...{{ price.each.profit | safe }}) / 1000) * 1000,
                     grid: {
-                        display: false
-                    },
-                    ticks: {
-                        maxRotation: 0,
-                        minRoatation: 0,
+        drawBorder: false,
+            lineWidth: 1,
+                color: 'rgba(0, 0, 0, 0.1)'
+    }
+                },
+    x: {
+        grid: {
+            display: false
+        },
+        ticks: {
+            maxRotation: 0,
+                minRoatation: 0,
                     }
-                }
+    }
             }
         }
     });
+
 </script>
 {% endblock %}
