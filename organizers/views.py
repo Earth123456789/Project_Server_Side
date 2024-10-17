@@ -21,6 +21,7 @@ from organizers.models import *
 from users.models import *
 
 from collections import defaultdict
+from datetime import date
 import json
 
 class OrganizerRegisterView(LoginRequiredMixin, View):
@@ -124,7 +125,10 @@ class DashBoardView(LoginRequiredMixin, View):
                     "events": [event.name for event, count in event_counts.items()],
                     "profit": [float(count * event.ticket_price) for event, count in event_counts.items()]
                 }
-            }
+            },
+            "ongoing_events": Event.objects.filter(company=company_id, end_date__gte=date.today()).annotate(parcount=Count('eventparticipant')).order_by("start_date"),
+            "end_events": Event.objects.filter(company=company_id, end_date__lt=date.today()),
+            "popular_events": Event.objects.filter(company=company_id).annotate(parcount=Count('eventparticipant')).order_by('-parcount')
         }
         return render(request, 'organizers/dashboard.html', context)  
 

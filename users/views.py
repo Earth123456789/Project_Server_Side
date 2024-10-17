@@ -22,7 +22,7 @@ from users.models import UserProfile, User, EventParticipant, Ticket
 
 from organizers.models import Event, Payment, Company
 
-from promptpay import qrcode
+# from promptpay import qrcode
 import json
 
 from reportlab.pdfgen import canvas

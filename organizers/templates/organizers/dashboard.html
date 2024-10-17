@@ -6,7 +6,25 @@
 {% include "organizers/components/navbar.html" %}
 {% endblock %}
 {% block content %}
-
+<style>
+    .parallax-bg {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-size: cover;
+        background-position: center;
+        z-index: 1;
+    }
+    .swiper-slide {
+        position: relative;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+    }
+</style>
 <section class="z-0">
     {% include "organizers/components/sidebar.html" %}
     
@@ -35,15 +53,71 @@
                 </div>
             </div>
             <div class="flex items-center justify-center h-48 mb-4 rounded bg-gray-50 dark:bg-gray-800">
-                <p class="kanit-small text-2xl text-gray-400 dark:text-gray-500">
-                    อีเวนท์ที่กำลังดำเนินการอยู่
-                </p>
+                <div class="flex items-center justify-center h-48 mb-4 rounded bg-gray-50 dark:bg-gray-800 relative overflow-hidden">
+                    <p class="kanit-small text-2xl text-gray-400 dark:text-gray-500">
+                        อีเวนต์ที่กำลังดำเนินการอยู่
+                    </p>
+                    <div>
+                        <div class="swiper mySwiper w-full h-full">
+                            <div class="swiper-wrapper">
+                                {% for event in ongoing_events %}
+                                <div class="swiper-slide">
+                                    <!-- Parallax background for each event -->
+                                    <div class="parallax-bg" style="background-image: url('{{ event.image.url }}');" data-swiper-parallax="-23%"></div>
+                        
+                                    <!-- Event content -->
+                                    <div class="bg-white p-6 rounded-lg shadow-md text-center h-full flex flex-col justify-center relative z-10">
+                                        <h3 class="kanit-small text-2xl text-gray-700" data-swiper-parallax="-100">{{ event.name }}</h3>
+                                        <p class="kanit-small text-gray-500" data-swiper-parallax="-150">{{ event.description }}</p>
+                                        <p class="kanit-small text-gray-500" data-swiper-parallax="-200">Participants: {{ event.parcount }}</p>
+                                        <p class="kanit-small text-gray-500" data-swiper-parallax="-250">Income: {{ event.income }} ฿</p>
+                                        <p class="kanit-small text-gray-400" data-swiper-parallax="-300">Start: {{ event.start_date }} | End: {{ event.end_date }}</p>
+                                    </div>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        
+                            <!-- Pagination and Navigation -->
+                            <div class="swiper-pagination"></div>
+                            <div class="swiper-button-next"></div>
+                            <div class="swiper-button-prev"></div>
+                            
+                        </div>
+                    </div>
+                </div>
             </div>
             <div class="grid grid-cols-2 gap-4 mb-4">
                 <div class="flex items-center justify-center rounded bg-gray-50 dark:bg-gray-800">
                     <p class="kanit-small text-2xl text-gray-400 dark:text-gray-500">
                         อีเวนต์ยอดนิยม
                     </p>
+                    <div>
+                        <div class="swiper mySwiper w-full h-full">
+                            <div class="swiper-wrapper">
+                                {% for event in popular_events %}
+                                <div class="swiper-slide">
+                                    <!-- Parallax background for each event -->
+                                    <div class="parallax-bg" style="background-image: url('{{ event.image.url }}');" data-swiper-parallax="-23%"></div>
+                        
+                                    <!-- Event content -->
+                                    <div class="bg-white p-6 rounded-lg shadow-md text-center h-full flex flex-col justify-center relative z-10">
+                                        <h3 class="kanit-small text-2xl text-gray-700" data-swiper-parallax="-100">{{ event.name }}</h3>
+                                        <p class="kanit-small text-gray-500" data-swiper-parallax="-150">{{ event.description }}</p>
+                                        <p class="kanit-small text-gray-500" data-swiper-parallax="-200">Participants: {{ event.parcount }}</p>
+                                        <p class="kanit-small text-gray-500" data-swiper-parallax="-250">Income: {{ event.income }} ฿</p>
+                                        <p class="kanit-small text-gray-400" data-swiper-parallax="-300">Start: {{ event.start_date }} | End: {{ event.end_date }}</p>
+                                    </div>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        
+                            <!-- Pagination and Navigation -->
+                            <div class="swiper-pagination"></div>
+                            <div class="swiper-button-next"></div>
+                            <div class="swiper-button-prev"></div>
+                            
+                        </div>
+                    </div>
                 </div>
                 <div class="flex items-center justify-center rounded bg-gray-50 dark:bg-gray-800">
                     <div class="text-center py-5">
@@ -59,6 +133,33 @@
                     <p class="kanit-small text-2xl text-gray-400 dark:text-gray-500">
                         อีเวนต์ที่ผ่านไปแล้ว
                     </p>
+                    <div>
+                        <div class="swiper mySwiper w-full h-full">
+                            <div class="swiper-wrapper">
+                                {% for event in end_events %}
+                                <div class="swiper-slide">
+                                    <!-- Parallax background for each event -->
+                                    <div class="parallax-bg" style="background-image: url('{{ event.image.url }}');" data-swiper-parallax="-23%"></div>
+                        
+                                    <!-- Event content -->
+                                    <div class="bg-white p-6 rounded-lg shadow-md text-center h-full flex flex-col justify-center relative z-10">
+                                        <h3 class="kanit-small text-2xl text-gray-700" data-swiper-parallax="-100">{{ event.name }}</h3>
+                                        <p class="kanit-small text-gray-500" data-swiper-parallax="-150">{{ event.description }}</p>
+                                        <p class="kanit-small text-gray-500" data-swiper-parallax="-200">Participants: {{ event.parcount }}</p>
+                                        <p class="kanit-small text-gray-500" data-swiper-parallax="-250">Income: {{ event.income }} ฿</p>
+                                        <p class="kanit-small text-gray-400" data-swiper-parallax="-300">Start: {{ event.start_date }} | End: {{ event.end_date }}</p>
+                                    </div>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        
+                            <!-- Pagination and Navigation -->
+                            <div class="swiper-pagination"></div>
+                            <div class="swiper-button-next"></div>
+                            <div class="swiper-button-prev"></div>
+                            
+                        </div>
+                    </div>
                 </div>
                 <div class="flex items-center justify-center rounded bg-gray-50 dark:bg-gray-800">
                     <div class="text-center py-5">
@@ -77,6 +178,8 @@
 {% endblock %}
 {% block script %}
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper/swiper-bundle.min.css" />
+<script src="https://cdn.jsdelivr.net/npm/swiper/swiper-bundle.min.js"></script>
 <script>
     new Chart(ctx = document.getElementById("attendee"), {
         type: "doughnut",
@@ -142,6 +245,25 @@
                 }
             }
         }
+    });
+    var swiper = new Swiper(".mySwiper", {
+        slidesPerView: 1,
+        spaceBetween: 5,
+        autoplay: {
+            delay: 6000,
+            disableOnInteraction: false,
+        },
+        loop: true,
+        pagination: {
+            el: ".swiper-pagination",
+            clickable: true,
+        },
+        navigation: {
+            nextEl: ".swiper-button-next",
+            prevEl: ".swiper-button-prev",
+        },
+        parallax: true,
+        speed: 800,
     });
 </script>
 {% endblock %}

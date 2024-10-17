@@ -19,8 +19,7 @@ from users.models import UserProfile, User
 
 from organizers.models import Event, Category, Company
 
-import google.generativeai as genai
-
+# import google.generativeai as genai
 
 # Create your views here.
 
