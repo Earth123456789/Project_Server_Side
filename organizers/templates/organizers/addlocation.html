@@ -1,0 +1,68 @@
+{% extends "general/components/layout.html" %}
+{% load static %}
+{% load custom_tags %}
+{% block title %}Create Event - {% endblock %}
+{% block nav %}
+{% include "organizers/components/navbar.html" %}
+{% endblock %}
+{% block content %}
+<style>
+    .form-input:focus {
+        border-color: #6BCB77;
+        box-shadow: 0 0 5px rgba(107, 203, 119, 0.5);
+        transition: border-color 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .form-button {
+        transition: background-color 0.3s ease;
+    }
+
+    .form-button:hover {
+        background-color: #4D96FF;
+        transform: scale(1.02);
+    }
+</style>
+<section class="z-0">
+    {% include "organizers/components/sidebar.html" %}
+</section>
+<section>
+    <div class="flex items-center justify-center m-14 ml-56">
+        <div class="bg-gradient-to-tr from-purple-100 to-indigo-500 rounded-lg shadow-lg p-6 border-2 border-gray-200 dark:border-gray-700 mt-14">
+            <article>
+                <form method="POST" class="bg-white rounded-lg p-6 shadow-md">
+                    {% csrf_token %}
+                    <h2 class="text-4xl font-bold mb-6 text-center kanit-black text-gray-800">เพิ่มสถานที่</h2>
+
+                    {% if form.non_field_errors %}
+                    <div class="mb-4 text-red-700 kanit-small">
+                        <ul>
+                            {% for error in form.non_field_errors %}
+                            <li>*** {{ error }} ****</li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                    {% endif %}
+
+                    <div class="mb-4">
+                        <label for="{{ form.name.id_for_label }}" class="kanit-small text-gray-700 font-semibold">ชื่อสถานที่:</label>
+                        {{ form.name }}
+                        {% if form.name.errors %}
+                        <div class="text-red-700 kanit-small">{{ form.name.errors }}</div>
+                        {% endif %}
+                    </div>
+
+                    <div class="mb-4">
+                        <label for="{{ form.description.id_for_label }}" class="kanit-small text-gray-700 font-semibold">รายละเอียดสถานที่:</label>
+                        {{ form.description }}
+                        {% if form.description.errors %}
+                        <div class="text-red-700 kanit-small">{{ form.description.errors }}</div>
+                        {% endif %}
+                    </div>
+
+                    <button type="submit" class="kanit-small w-full bg-green-500 hover:bg-green-700 text-white font-bold py-2 rounded-md transition duration-300 ease-in-out">ยืนยันการเพิ่มสถานที่</button>
+                </form>
+            </article>
+        </div>
+    </div>
+</section>
+{% endblock %}

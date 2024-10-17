@@ -15,6 +15,7 @@ urlpatterns = [
     path("company/<int:company_id>/", CompanyDetailView.as_view(), name="company"),
     path("event/<int:company_id>/new_event", AddEventView.as_view(), name="add_event"),
     path("transaction/<int:company_id>/", TransactionView.as_view(), name="transaction"),
+    path("event/<int:company_id>/new_location", AddLocationView.as_view(), name="add_location"),
     path("transaction/cancel/<int:company_id>/", CancelTransactionView.as_view(), name='cancel_transaction'),
 ] 
 

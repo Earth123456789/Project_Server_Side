@@ -149,6 +149,9 @@ class ChatView(LoginRequiredMixin, View):
 
    def get(self, request, user_id):
         
+
+        has_company = False
+        company = None
         if request.user.is_authenticated:
             # ตรวจสอบว่าผู้ใช้ มี Company ไหม
             try:

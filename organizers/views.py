@@ -174,6 +174,52 @@ class AddEventView(LoginRequiredMixin, View):
         }
         print(form.errors)
         return render(request, "organizers/addevent.html", context)
+    
+class AddLocationView(LoginRequiredMixin, View):
+    login_url = 'login'
+
+    def get(self, request, company_id):
+
+        user = request.user
+        company = Company.objects.get(pk=company_id)
+        # ตรวจสอบว่าเป็น "Organizers"
+        if not user.groups.filter(name='Organizers').exists():
+            raise PermissionDenied("เข้าได้เฉพาะผู้ใช้งานที่กำหนดไว้")
+            
+        # ไม่ได้ลงทะเบียนเป็นบริษัท
+        if not Company.objects.filter(user=user).exists():
+            return redirect('organizer-register')  
+            
+        # เจ้าของบริษัทจริงๆ
+        if company.user != user:
+            raise PermissionDenied("เข้าได้เฉพาะเจ้าของบริษัทเท่านั้น")
+
+        form = LocationForm()
+        context = {
+            "form": form,
+            "company": Company.objects.get(pk=company_id)
+        }
+        return render(request, 'organizers/addlocation.html', context)
+    
+    def post(self, request, company_id):
+        form = LocationForm(request.POST)
+        
+        if form.is_valid():
+            try:
+                with transaction.atomic():
+                    ev = form.save(commit=False)
+                    ev.company = Company.objects.get(pk=company_id)
+                    ev.save()
+            except Exception as e:
+                print(f"Error: {e}")
+            return redirect('dashboard', company_id=company_id)
+        
+        context = {
+                "form": form,
+                "company": Company.objects.get(pk=company_id)
+        }
+        print(form.errors)
+        return render(request, "organizers/addlocation.html", context)
 
 class CompanyDetailView(LoginRequiredMixin, View):
     login_url = 'login'
@@ -182,7 +228,7 @@ class CompanyDetailView(LoginRequiredMixin, View):
 
         user = request.user
         company = Company.objects.get(pk=company_id)
-        
+
         # ตรวจสอบว่าเป็น "Organizers"
         if not user.groups.filter(name='Organizers').exists():
             raise PermissionDenied("เข้าได้เฉพาะผู้ใช้งานที่กำหนดไว้")

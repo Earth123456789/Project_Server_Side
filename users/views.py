@@ -84,6 +84,7 @@ class LoginView(View):
 
         return render(request, 'registration/login.html', context)
     
+    @transaction.atomic
     def post(self, request):
         form = UserLoginForm(data=request.POST)
         if form.is_valid():
@@ -124,6 +125,7 @@ class ChangePasswordView(View):
 
         return render(request, 'registration/change_password_form.html', context)
     
+
     def post(self, request):
         form = ChangePasswordForm(data=request.POST)
         
@@ -196,6 +198,7 @@ class PasswordResetConfirmView(View):
 
         return render(request, 'users/password_reset_form.html', context)
     
+    @transaction.atomic
     def post(self, request, uidb64, token):
         uid = force_str(urlsafe_base64_decode(uidb64))
         user = User.objects.get(pk=uid)
@@ -669,6 +672,7 @@ class UserChangePassword(LoginRequiredMixin, View):
 
         return render(request, 'users/userprofilepassword.html', context)
     
+    @transaction.atomic
     def post(self, request, user_id):
 
         if request.user.id != user_id:
@@ -757,6 +761,7 @@ class PasswordChangeConfirmView(LoginRequiredMixin, View):
 
         return render(request, 'users/password_change_form.html', context)
     
+    @transaction.atomic
     def post(self, request, uidb64, token):
         uid = force_str(urlsafe_base64_decode(uidb64))
         user = User.objects.get(pk=uid)
@@ -949,6 +954,7 @@ class TransactionSuccessView(LoginRequiredMixin, View):
 
         return render(request, 'users/transactionsuccess.html', context)
     
+
     def post(self, request, user_id):
         if request.user.id != user_id:
             raise PermissionDenied("เข้าได้เฉพาะผู้ใช้งานที่กำหนดไว้")
