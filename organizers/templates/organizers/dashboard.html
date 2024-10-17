@@ -17,37 +17,37 @@
             <div class="grid grid-cols-3 gap-4 mb-4">
                 <div class="flex items-center justify-center h-24 rounded bg-red-300 dark:bg-red-800">
                     <div class="text-center">
-                        <p class="text-xl"> {{ event.count }} </p>
-                        <p class="text-sm text-gray-500">จำนวนอีเวนต์ที่จัดทั้งหมด</p>
+                        <p class="kanit-small text-xl"> {{ event.count }} </p>
+                        <p class="kanit-small text-sm text-gray-500">จำนวนอีเวนต์ที่จัดทั้งหมด</p>
                     </div>
                 </div>
                 <div class="flex items-center justify-center h-24 rounded bg-blue-300 dark:bg-blue-800">
                     <div class="text-center">
-                        <p class="text-xl"> {{ price.total }} </p>
-                        <p class="text-sm text-gray-500">รายได้สุทธิ</p>
+                        <p class="kanit-small text-xl"> {{ price.total }} </p>
+                        <p class="kanit-small text-sm text-gray-500">รายได้สุทธิ</p>
                     </div>
                 </div>
                 <div class="flex items-center justify-center h-24 rounded bg-yellow-100 dark:bg-yellow-800">
                     <div class="text-center">
                         <p class="text-xl"> {% sumfunc participant %} </p>
-                        <p class="text-sm text-gray-500">ยอดรวมผู้เข้าร่วมอีเวนต์</p>
+                        <p class="kanit-small text-sm text-gray-500">ยอดรวมผู้เข้าร่วมอีเวนต์</p>
                     </div>
                 </div>
             </div>
             <div class="flex items-center justify-center h-48 mb-4 rounded bg-gray-50 dark:bg-gray-800">
-                <p class="text-2xl text-gray-400 dark:text-gray-500">
+                <p class="kanit-small text-2xl text-gray-400 dark:text-gray-500">
                     อีเวนท์ที่กำลังดำเนินการอยู่
                 </p>
             </div>
             <div class="grid grid-cols-2 gap-4 mb-4">
                 <div class="flex items-center justify-center rounded bg-gray-50 dark:bg-gray-800">
-                    <p class="text-2xl text-gray-400 dark:text-gray-500">
+                    <p class="kanit-small text-2xl text-gray-400 dark:text-gray-500">
                         อีเวนต์ยอดนิยม
                     </p>
                 </div>
                 <div class="flex items-center justify-center rounded bg-gray-50 dark:bg-gray-800">
                     <div class="text-center py-5">
-                        <p class="text-xl text-gray-400 dark:text-gray-500">
+                        <p class="kanit-small text-xl text-gray-400 dark:text-gray-500">
                             ผู้เข้าร่วมแต่ละอีเวนต์
                             <div>
                                 <canvas id="attendee"></canvas>
@@ -56,13 +56,13 @@
                     </div>
                 </div>
                 <div class="flex items-center justify-center rounded bg-gray-50 dark:bg-gray-800">
-                    <p class="text-2xl text-gray-400 dark:text-gray-500">
+                    <p class="kanit-small text-2xl text-gray-400 dark:text-gray-500">
                         อีเวนต์ที่ผ่านไปแล้ว
                     </p>
                 </div>
                 <div class="flex items-center justify-center rounded bg-gray-50 dark:bg-gray-800">
                     <div class="text-center py-5">
-                        <p class="text-xl text-gray-400 dark:text-gray-500">
+                        <p class="kanit-small text-xl text-gray-400 dark:text-gray-500">
                             กำไรที่ได้รับ
                             <div>
                                 <canvas id="income"></canvas>

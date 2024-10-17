@@ -130,8 +130,23 @@ class DashBoardView(LoginRequiredMixin, View):
 
 class AddEventView(LoginRequiredMixin, View):
     login_url = 'login'
+
     
     def get(self, request, company_id):
+
+        user = request.user
+        # ตรวจสอบว่าเป็น "Organizers"
+        if not user.groups.filter(name='Organizers').exists():
+            raise PermissionDenied("เข้าได้เฉพาะผู้ใช้งานที่กำหนดไว้")
+            
+        # ไม่ได้ลงทะเบียนเป็นบริษัท
+        if not Company.objects.filter(user=user).exists():
+            return redirect('organizer-register')  
+            
+        # เจ้าของบริษัทจริงๆ
+        if company.user != user:
+            raise PermissionDenied("เข้าได้เฉพาะเจ้าของบริษัทเท่านั้น")
+
         form = EventForm()
         context = {
             "form": form,
@@ -151,12 +166,13 @@ class AddEventView(LoginRequiredMixin, View):
             except Exception as e:
                 print(f"Error: {e}")
             return redirect('dashboard', company_id=company_id)
-        else:
-            context = {
+        
+        context = {
                 "form": form,
                 "company": Company.objects.get(pk=company_id)
-            }
-            return render(request, "organizers/addevent.html", context)
+        }
+        print(form.errors)
+        return render(request, "organizers/addevent.html", context)
 
 class CompanyDetailView(LoginRequiredMixin, View):
     login_url = 'login'
