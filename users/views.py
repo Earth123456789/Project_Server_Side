@@ -64,13 +64,13 @@ class RegisterView(View):
             user.groups.add(user_group)
 
             return redirect('login')
-        
+
         context = {
             'form': form
         }
 
         return render(request, 'registration/register.html', context)
-    
+
 # register.html, login.html, forms.py, backends.py, signals.py, models.py
 class LoginView(View):
     
@@ -98,8 +98,6 @@ class LoginView(View):
             login(request,user)
             
             return redirect('homepage')  
-        
-        print(form.errors)
 
         context = {
             'form': form
@@ -828,7 +826,7 @@ class TicketSent(LoginRequiredMixin, View):
         print(email)
 
         if not email:
-           return JsonResponse({'status':'email-error'}, status=404)
+            return JsonResponse({'status':'email-error'}, status=404)
 
         try:
             ticket = Ticket.objects.get(id=ticket_id, event_participant__user_id=user_id)
@@ -850,7 +848,7 @@ class TicketSent(LoginRequiredMixin, View):
             return JsonResponse({'success': False, 'message': 'ตั๋วไม่พบหรือคุณไม่มีสิทธิ์ส่ง'}, status=404)
         
 
-class TicketDeatilView(LoginRequiredMixin, View):
+class TicketDetailView(LoginRequiredMixin, View):
     login_url = 'login'
 
     def get(self, request, user_id, ticket_id):

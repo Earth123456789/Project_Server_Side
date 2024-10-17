@@ -1,51 +1,147 @@
 {% extends "general/components/layout.html" %}
 {% load static %}
+{% load custom_tags %}
 {% block title %}Dashboard - {% endblock %}
 {% block nav %}
 {% include "organizers/components/navbar.html" %}
 {% endblock %}
 {% block content %}
 
-
 <section class="z-0">
     {% include "organizers/components/sidebar.html" %}
     
 </section>
 <section>
-    {% include "organizers/components/maindashboard.html" %}
+    <div class="p-4 m-4 sm:ml-64">
+        <div class="p-4 border-2 border-gray-200 border-dashed rounded-lg dark:border-gray-700 mt-14">
+            <div class="grid grid-cols-3 gap-4 mb-4">
+                <div class="flex items-center justify-center h-24 rounded bg-red-300 dark:bg-red-800">
+                    <div class="text-center">
+                        <p class="text-xl"> {{ event.count }} </p>
+                        <p class="text-sm text-gray-500">จำนวนอีเวนต์ที่จัดทั้งหมด</p>
+                    </div>
+                </div>
+                <div class="flex items-center justify-center h-24 rounded bg-blue-300 dark:bg-blue-800">
+                    <div class="text-center">
+                        <p class="text-xl"> {{ price.total }} </p>
+                        <p class="text-sm text-gray-500">รายได้สุทธิ</p>
+                    </div>
+                </div>
+                <div class="flex items-center justify-center h-24 rounded bg-yellow-100 dark:bg-yellow-800">
+                    <div class="text-center">
+                        <p class="text-xl"> {% sumfunc participant %} </p>
+                        <p class="text-sm text-gray-500">ยอดรวมผู้เข้าร่วมอีเวนต์</p>
+                    </div>
+                </div>
+            </div>
+            <div class="flex items-center justify-center h-48 mb-4 rounded bg-gray-50 dark:bg-gray-800">
+                <p class="text-2xl text-gray-400 dark:text-gray-500">
+                    อีเวนท์ที่กำลังดำเนินการอยู่
+                </p>
+            </div>
+            <div class="grid grid-cols-2 gap-4 mb-4">
+                <div class="flex items-center justify-center rounded bg-gray-50 dark:bg-gray-800">
+                    <p class="text-2xl text-gray-400 dark:text-gray-500">
+                        อีเวนต์ยอดนิยม
+                    </p>
+                </div>
+                <div class="flex items-center justify-center rounded bg-gray-50 dark:bg-gray-800">
+                    <div class="text-center py-5">
+                        <p class="text-xl text-gray-400 dark:text-gray-500">
+                            ผู้เข้าร่วมแต่ละอีเวนต์
+                            <div>
+                                <canvas id="attendee"></canvas>
+                            </div>
+                        </p>
+                    </div>
+                </div>
+                <div class="flex items-center justify-center rounded bg-gray-50 dark:bg-gray-800">
+                    <p class="text-2xl text-gray-400 dark:text-gray-500">
+                        อีเวนต์ที่ผ่านไปแล้ว
+                    </p>
+                </div>
+                <div class="flex items-center justify-center rounded bg-gray-50 dark:bg-gray-800">
+                    <div class="text-center py-5">
+                        <p class="text-xl text-gray-400 dark:text-gray-500">
+                            กำไรที่ได้รับ
+                            <div>
+                                <canvas id="income"></canvas>
+                            </div>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </section>
-
 {% endblock %}
 {% block script %}
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
-    const ctx = document.getElementById('myChart');
-    const eventname = {{ event_names|safe }};
-    const participantcount = {{ participant_counts|safe }};
-
-    console.log({{ eventname }})
-    console.log({{ participantcount }})
-
-    new Chart(ctx, {
-      type: 'doughnut',
-      data: {
-        // ทั่วไป Django จะ escape ข้อมูลทั้งหมดเพื่อป้องกันการแสดงข้อมูลผิดรูปแบบ
-        // JSON หรือ JavaScript สามารถถูกส่งไปใช้งานได้ในกรณีที่ปลอดภัย (ไม่มีการเปลี่ยนแปลงจาก User )
-        labels: eventname,  
-        datasets: [{
-          label: 'จำนวนผู้เข้าร่วมกิจกรรม',
-          data: participantcount,  
-          borderWidth: 1
-        }]
-      },
-      options: {
-        scales: {
-          y: {
-            beginAtZero: true
-          }
+    new Chart(ctx = document.getElementById("attendee"), {
+        type: "doughnut",
+        data: {
+            labels: {{ name | safe }},  
+            datasets: [{
+                label: "จำนวนผู้เข้าร่วมกิจกรรม",
+                data: {{ participant | safe }},   
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            }
         }
-      }
+    });
+    new Chart(ctx = document.getElementById("income"), {
+        type: "bar",
+        data: {
+            labels: [
+            {% for event in price.each.events %}
+                "{{ event | truncatewords:2 }}"{% if not forloop.last %}, {% endif %}
+            {% endfor %}
+            ],  
+            datasets: [{
+                label: "รายได้รวมของอีเวนต์ (บาท)",
+                data: {{ price.each.profit }},
+                borderWidth: 1,
+                barThickness: 40,
+                backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                borderColor: 'rgba(75, 192, 192, 1)',
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        stepSize: 1000
+                    },
+                    max: Math.ceil(Math.max(...{{ price.each.profit | safe }}) / 1000) * 1000,
+                    grid: {
+                        drawBorder: false,
+                        lineWidth: 1,
+                        color: 'rgba(0, 0, 0, 0.1)'
+                    }
+                },
+                x: {
+                    grid: {
+                        display: false
+                    },
+                    ticks: {
+                        maxRotation: 0,
+                        minRoatation: 0,
+                    }
+                }
+            }
+        }
     });
 </script>
 {% endblock %}
-

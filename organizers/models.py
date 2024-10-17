@@ -21,7 +21,7 @@ class Company(models.Model):
     contact = models.URLField(max_length=200, blank=True, null=True)
     type = models.CharField(max_length=10, choices=Companytype.choices, default='บุคคล')
 
-     # ทำให้เห็นใน หน้า admin
+    # ทำให้เห็นใน หน้า admin
     def __str__(self):
         return self.name
     
@@ -30,7 +30,7 @@ class Location(models.Model):
     name = models.CharField(max_length=255)
     description = models.TextField(blank=True, null=True)
 
-     # ทำให้เห็นใน หน้า admin
+    # ทำให้เห็นใน หน้า admin
     def __str__(self):
         return self.name
 
@@ -40,10 +40,9 @@ class Event(models.Model):
         Close = 'Close'
         Past = 'Past'
 
-
     location = models.ForeignKey('organizers.Location', on_delete=models.CASCADE)
     name = models.CharField(max_length=100)
-    description = models.TextField(blank=True ,null=True)
+    description = models.TextField(blank=True, null=True)
     start_date = models.DateField()
     start_time = models.TimeField(blank=True, null=True)
     end_date = models.DateField(blank=True, null=True)
@@ -56,7 +55,7 @@ class Event(models.Model):
     status = models.CharField(max_length=10, choices=EventStatus.choices, default='Show')
     ticket_price = models.DecimalField(max_digits=8, decimal_places=2, default=0.00)   # ราคาต่อใบ
 
-     # ทำให้เห็นใน หน้า admin
+    # ทำให้เห็นใน หน้า admin
     def __str__(self):
         return self.name
     
@@ -83,9 +82,3 @@ class Payment(models.Model):
 
     def __str__(self):
         return f"Payment by {self.user} for {self.company} - {self.amount}"
-    
-    
-
-
-    
-

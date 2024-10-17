@@ -1,0 +1,57 @@
+{% extends "general/components/layout.html" %}
+{% load static %}
+{% load custom_tags %}
+{% block title %}Company Detail - {% endblock %}
+{% block nav %}
+{% include "organizers/components/navbar.html" %}
+{% endblock %}
+{% block content %}
+
+<section class="z-0">
+    {% include "organizers/components/sidebar.html" %}
+</section>
+<section class="min-h-screen flex items-start justify-center space-x-8 mt-24 ml-56">
+    <main class="w-3/5 mt-14 bg-white border border-gray-200 rounded-lg shadow p-12 flex flex-col">
+        <h1 class="text-3xl text-left kanit-black-italic">แก้ไขข้อมูลบริษัท</h1>
+        <form method="POST" enctype="multipart/form-data">
+            {% csrf_token %}
+            <label for="{{ form.name.id_for_label }}" class="kanit-small">ชื่อองค์กร:</label>
+            {{ form.name }}
+            <div class="text-red-700 kanit-small">{{ form.name.errors.as_text }}</div>
+            <article class="grid grid-cols-2 gap-16 mb-4 mt-4">
+                <div>
+                    <label for="{{ form.email.id_for_label }}" class="kanit-small">อีเมล:</label>
+                    {{ form.email }}
+                    <div class="text-red-700 kanit-small">{{ form.email.errors.as_text }}</div>
+                </div>
+                <div>
+                    <label for="{{ form.telephone.id_for_label }}" class="kanit-small">นามสกุล:</label>
+                    {{ form.telephone }}
+                    <div class="text-red-700 kanit-small">{{ form.telephone.errors.as_text }}</div>
+                </div>
+            </article>
+            <article class="grid grid-cols-2 gap-16 mb-4 mt-4">
+                <div>
+                    <label for="{{ form.email.id_for_label }}" class="kanit-small">อีเมล:</label>
+                    {{ form.email }}
+                    <div class="text-red-700 kanit-small">{{ form.email.errors.as_text }}</div>
+                </div>
+                <div>
+                    <label for="{{ form.telephone.id_for_label }}" class="kanit-small">หมายเลขโทรศัพท์:</label>
+                    {{ form.telephone }}
+                    <div class="text-red-700 kanit-small">{{ form.telephone.errors.as_text }}</div>
+                </div>
+            </article>
+            <article class="grid grid-cols-2 gap-16 mb-4 mt-4">
+                <div>
+                    <label for="{{ form.contact.id_for_label }}" class="kanit-small">ช่องทางการติดต่อ:</label>
+                    {{ form.contact }}
+                    <div class="text-red-700 kanit-small">{{ form.contact.errors.as_text }}</div>
+                </div>
+            </article>
+            <button type="submit"
+                class="w-full bg-green-500 hover:bg-green-700 text-white font-bold py-2 rounded kanit-small">บันทึก</button>
+        </form>
+    </main>
+</section>
+{% endblock %}

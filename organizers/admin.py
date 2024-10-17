@@ -14,7 +14,6 @@ class CompanyAdmin(admin.ModelAdmin):
 class LocationAdmin(admin.ModelAdmin):
     list_display = ('name', 'description')  
 
-
 @admin.register(Event)
 class EventAdmin(admin.ModelAdmin):
     list_display = ('name', 'location', 'start_date', 'start_time', 'end_date', 'end_time', 'company', 'get_categories', 'image')  
@@ -28,6 +27,3 @@ class EventAdmin(admin.ModelAdmin):
 @admin.register(Payment)
 class EventAdmin(admin.ModelAdmin):
     list_display = ('company', 'event' , 'user', 'ticket_quantity', 'amount', 'status', 'payment_date')  
-
-   
-
