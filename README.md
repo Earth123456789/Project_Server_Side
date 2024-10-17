@@ -30,6 +30,8 @@ then
 
 Retore backup.sql in Pgadmin
 
+And Copy .env.sample
+
 then 
 
 ```sh
